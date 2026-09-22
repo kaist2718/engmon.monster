@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko" data-title-key="mag.pageTitle" data-desc-key="mag.pageDesc">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EngMon — 월간 영어 매거진</title>
+<meta name="description" content="EngMon(엥몬) — 호(issue) 단위로 읽는 월간 영어 매거진. 테마 어휘, 문법, 이디엄, 대화, 확인 문제를 오디오와 함께 담았습니다." />
+<meta property="og:title" content="EngMon — 1호 여행 영어" />
+<meta property="og:description" content="테마 어휘 · 문법 · 이디엄 · 대화 · 확인 문제를 한 호에 담았습니다." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://engmon.monster/" />
+<meta property="og:site_name" content="EngMon" />
+<meta property="og:locale" content="ko_KR" />
+<meta name="twitter:card" content="summary" />
+<meta name="theme-color" content="#0a0e13" />
+<link rel="canonical" href="https://engmon.monster/" />
+<!-- 테마/강조색을 첫 페인트 전에 적용해 깜박임을 막습니다.
+     모드: dark | light | system · 강조색: mint | violet | ocean | amber -->
+<script>
+  (function () {
+    var root = document.documentElement;
+    var mode, accent;
+
+    try {
+      mode = localStorage.getItem('monsterlab.theme');
+      accent = localStorage.getItem('monsterlab.accent');
+    } catch (e) { mode = null; accent = null; }
+
+    if (mode !== 'dark' && mode !== 'light' && mode !== 'system') mode = 'system';
+    if (['mint', 'violet', 'ocean', 'amber'].indexOf(accent) === -1) accent = 'mint';
+
+    var prefersLight = window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: light)').matches;
+
+    root.setAttribute('data-theme-mode', mode);
+    root.setAttribute('data-theme', mode === 'system' ? (prefersLight ? 'light' : 'dark') : mode);
+    root.setAttribute('data-accent', accent);
+  })();
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230a0e13'/%3E%3Ctext x='16' y='23' font-size='19' text-anchor='middle' fill='%236ee7a8' font-family='sans-serif' font-weight='bold'%3EE%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" href="styles.css?v=3" />
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap header-inner">
+    <a class="logo" href="https://monsterlab.monster" aria-label="EngMon — MonsterLab">
+      <span class="logo-mark" aria-hidden="true">E</span>
+      <span class="logo-text">Eng<span class="accent">Mon</span></span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="주요 메뉴">
+      <a href="#issue" data-i18n="mag.navIssue">1호</a>
+      <a href="#sections" data-i18n="mag.navSections">섹션</a>
+      <a href="#wordbook" data-i18n="mag.navWords">단어장</a>
+      <a href="https://monsterlab.monster" data-i18n="mag.navHome">홈</a>
+
+      <div class="nav-theme">
+        <span class="nav-theme-label" data-i18n="footer.themeLabel">테마</span>
+        <div class="theme-set" role="group" data-i18n-aria-label="theme.group">
+          <button class="theme-opt" type="button" data-theme-option="light" aria-pressed="false" aria-label="라이트 모드로 보기" title="라이트 모드로 보기"><span aria-hidden="true">☀️</span></button>
+          <button class="theme-opt" type="button" data-theme-option="dark" aria-pressed="false" aria-label="다크 모드로 보기" title="다크 모드로 보기"><span aria-hidden="true">🌙</span></button>
+          <button class="theme-opt" type="button" data-theme-option="system" aria-pressed="true" aria-label="시스템 설정 따르기" title="시스템 설정 따르기"><span aria-hidden="true">🖥️</span></button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="header-actions">
+      <div class="theme-set theme-set--bar" role="group" data-i18n-aria-label="theme.group">
+        <button class="theme-opt" type="button" data-theme-option="light" aria-pressed="false" aria-label="라이트 모드로 보기" title="라이트 모드로 보기"><span aria-hidden="true">☀️</span></button>
+        <button class="theme-opt" type="button" data-theme-option="dark" aria-pressed="false" aria-label="다크 모드로 보기" title="다크 모드로 보기"><span aria-hidden="true">🌙</span></button>
+        <button class="theme-opt" type="button" data-theme-option="system" aria-pressed="true" aria-label="시스템 설정 따르기" title="시스템 설정 따르기"><span aria-hidden="true">🖥️</span></button>
+      </div>
+      <button class="lang-btn" id="langBtn" type="button" aria-label="Switch language">
+        <span class="lang-icon" aria-hidden="true">🌐</span>
+        <span id="langLabel">EN</span>
+      </button>
+      <button class="menu-btn" id="menuBtn" type="button" aria-label="메뉴" aria-expanded="false" aria-controls="nav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <div class="read-bar" aria-hidden="true"><span class="read-bar-fill" id="readBarFill"></span></div>
+
+  <!-- ── 표지 ───────────────────────────────────────── -->
+  <section class="cover" id="issue">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="wrap cover-inner">
+
+      <div class="cover-card">
+        <span class="cover-brand">MONSTERLAB</span>
+        <span class="cover-numeral" id="issueNumeral">01</span>
+        <span class="cover-theme" id="issueThemeCover">여행 영어</span>
+        <span class="cover-rule" aria-hidden="true"></span>
+        <span class="cover-date" id="issueDateCover">2026 · 10</span>
+      </div>
+
+      <div class="cover-text">
+        <p class="badge" id="issueKicker">ISSUE 01</p>
+        <h1 id="issueTitle">여행 영어</h1>
+        <p class="lead" id="issueSummary"></p>
+        <ul class="issue-meta" id="issueMeta"></ul>
+
+        <div class="cover-progress">
+          <div class="cover-progress-head">
+            <span data-i18n="mag.progressLabel">읽기 진행</span>
+            <span class="cover-progress-count" id="issueProgressText">0 / 0</span>
+          </div>
+          <div class="cover-progress-track">
+            <span class="cover-progress-fill" id="issueProgressFill"></span>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <a class="btn btn-primary" id="resumeBtn" href="#sections" data-i18n="mag.startReading">1호 읽기</a>
+          <a class="btn btn-ghost" href="#wordbook">
+            <span data-i18n="mag.openWordbook">단어장</span>
+            <span class="count-pill" data-wb-count>0</span>
+          </a>
+        </div>
+
+        <div class="rate-set" role="group" data-i18n-aria-label="mag.rateGroup">
+          <span class="rate-label" data-i18n="mag.rateLabel">듣기 속도</span>
+          <button class="rate-opt" type="button" data-rate="0.75" aria-pressed="false">0.75×</button>
+          <button class="rate-opt" type="button" data-rate="0.92" aria-pressed="true">1×</button>
+          <button class="rate-opt" type="button" data-rate="1.15" aria-pressed="false">1.25×</button>
+        </div>
+
+        <p class="draft-note" data-i18n="mag.draftNotice">
+          이 페이지는 1호 템플릿(초안)입니다. 문장과 섹션 구성은 예시이고, 새 호를 추가하려면 issues.js만 고치면 됩니다.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── 목차 + 본문 ────────────────────────────────── -->
+  <div class="wrap issue-layout">
+
+    <aside class="issue-aside" id="sections">
+      <p class="aside-kicker" data-i18n="mag.tocKicker">CONTENTS</p>
+      <p class="aside-title" data-i18n="mag.tocTitle">이번 호의 섹션</p>
+      <ol class="toc-list" id="tocList"></ol>
+      <p class="aside-hint" data-i18n="mag.tocLead">
+        섹션별로 듣고, 읽고, 모르는 단어는 단어장에 담아두세요. 진행 상황은 이 브라우저에 저장됩니다.
+      </p>
+    </aside>
+
+    <div class="issue-body" id="issueContent"></div>
+
+  </div>
+
+  <!-- ── 단어장 ─────────────────────────────────────── -->
+  <section class="section section-alt" id="wordbook">
+    <div class="wrap">
+      <p class="section-kicker" data-i18n="mag.wbKicker">WORDBOOK</p>
+      <div class="wb-head">
+        <h2 class="section-title" data-i18n="mag.wbTitle">저장한 단어</h2>
+        <span class="count-pill count-pill--lg" data-wb-count>0</span>
+      </div>
+      <p class="section-lead" data-i18n="mag.wbLead">
+        저장한 표현은 이 브라우저에 남습니다. 나중에 복사해 노트 앱이나 학습 앱으로 옮기세요.
+      </p>
+
+      <p class="wb-empty" id="wbEmpty" data-i18n="mag.wbEmpty">아직 저장한 단어가 없습니다.</p>
+      <ul class="wb-list" id="wbList"></ul>
+
+      <div class="wb-actions" id="wbActions" hidden>
+        <button class="btn btn-ghost btn-sm" id="wbCopyBtn" type="button" data-i18n="mag.wbCopy">전체 복사</button>
+        <button class="btn btn-ghost btn-sm" id="wbClearBtn" type="button" data-i18n="mag.wbClear">비우기</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 다음 호 ────────────────────────────────────── -->
+  <section class="section section-cta" id="next">
+    <div class="wrap cta-inner">
+      <h2 class="section-title" data-i18n="mag.nextTitle">다음 호가 나오면 알려드릴까요?</h2>
+      <p class="section-lead" data-i18n="mag.nextLead">
+        새 호 소식과 피드백은 모두 같은 메일로 받습니다. 원하는 주제가 있으면 함께 적어 보내주세요.
+      </p>
+      <a class="btn btn-primary" href="mailto:kaist2718@gmail.com?subject=EngMon%20%EB%8B%A4%EC%9D%8C%20%ED%98%B8" data-i18n="mag.subscribe">메일 보내기</a>
+      <p class="contact-note" data-i18n="mag.nextNote">보통 영업일 기준 2~3일 안에 답장드립니다.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <span class="logo-mark" aria-hidden="true">E</span>
+      <span>Eng<span class="accent">Mon</span></span>
+    </div>
+    <nav class="footer-links" aria-label="바닥글 메뉴">
+      <a href="https://monsterlab.monster" data-i18n="mag.navHome">홈</a>
+      <a href="https://monsterlab.monster/#services" data-i18n="nav.services">서비스</a>
+      <a href="https://monsterlab.monster/#faq" data-i18n="nav.faq">FAQ</a>
+      <a href="https://toeic.monster" target="_blank" rel="noopener">toeic.monster</a>
+      <a href="mailto:kaist2718@gmail.com">kaist2718@gmail.com</a>
+    </nav>
+    <div class="footer-settings">
+      <span class="footer-setting">
+        <span class="footer-setting-label" data-i18n="footer.themeLabel">테마</span>
+        <span id="footerTheme">시스템</span>
+      </span>
+      <span class="footer-setting">
+        <span class="footer-setting-label" data-i18n="footer.accentLabel">강조색</span>
+        <span class="accent-swatches" role="group" data-i18n-aria-label="accent.group">
+          <button class="swatch" type="button" data-accent="mint"   aria-pressed="true"  aria-label="민트"></button>
+          <button class="swatch" type="button" data-accent="violet" aria-pressed="false" aria-label="바이올렛"></button>
+          <button class="swatch" type="button" data-accent="ocean"  aria-pressed="false" aria-label="오션"></button>
+          <button class="swatch" type="button" data-accent="amber"  aria-pressed="false" aria-label="앰버"></button>
+        </span>
+      </span>
+    </div>
+    <p class="copyright">&copy; <span id="year">2026</span> EngMon · <a href="https://monsterlab.monster" target="_blank" rel="noopener">MonsterLab</a>. <span data-i18n="footer.rights">모든 권리 보유.</span></p>
+  </div>
+</footer>
+
+<button class="to-top" id="toTop" type="button" aria-label="맨 위로" data-i18n-aria-label="top.back" hidden>
+  <span aria-hidden="true">↑</span>
+</button>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="issues.js?v=3"></script>
+<script src="script.js?v=3"></script>
+<script src="magazine.js?v=3"></script>
+</body>
+</html>
