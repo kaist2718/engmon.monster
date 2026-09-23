@@ -1693,7 +1693,8 @@ check('좁은 화면에서 섹션 머리가 줄바꿈된다 (CSS 회귀)', () =>
   assert(/\.m-tools\s*\{[^}]*flex\s*:\s*1 1 100%/.test(block),
     '좁은 화면에서 .m-tools가 아랫줄 전체 폭을 차지하지 않습니다');
   return '.m-head 줄바꿈 + .m-tools 전체 폭 확인';
-});/* ── 8. 방문 분석 (Microsoft Clarity) ───────────────────────────────── */
+});
+/* ── 8. 방문 분석 (Counter.dev) ─────────────────────────────────────── */
 
 /* analytics.js 를 최소 환경에서 실행해, 무엇을 했는지 돌려줍니다.
    실제로 스크립트를 내려받지 않고 주입 시도만 관찰합니다. */
@@ -1714,7 +1715,7 @@ function runAnalytics(env) {
   const location = { protocol: (env && env.protocol) || 'https:' };
   const navigator = { doNotTrack: env && env.dnt };
   const window = {
-    ENGMON_CLARITY_ID: env ? env.id : undefined,
+    ENGMON_COUNTER_ID: env ? env.id : undefined,
     document: document,
     location: location,
     navigator: navigator,
@@ -1735,24 +1736,24 @@ function runAnalytics(env) {
   return { appended: appended, window: window };
 }
 
-const CLARITY_ID = 'kwq1z2abcd';
+const COUNTER_ID = '93671ad4-a966-4a52-b48f-56c92d10a671';
 
-check('방문 분석 — 프로젝트 ID가 없으면 아무 요청도 보내지 않는다', () => {
+check('방문 분석 — 사이트 ID가 없으면 아무 요청도 보내지 않는다', () => {
   const cases = [
     { label: '설정 없음', env: undefined },
     { label: '빈 문자열', env: { id: '' } },
     { label: '공백', env: { id: '   ' } },
-    { label: '자리표시자', env: { id: 'xxxxxxxxxx' } },
+    { label: '자리표시자', env: { id: '00000000-0000-0000-0000-000000000000' } },
     { label: '형식 오류(도메인)', env: { id: 'engmon.monster' } },
     { label: '형식 오류(너무 짧음)', env: { id: 'abc' } },
-    { label: '형식 오류(하이픈)', env: { id: 'kwq1-z2abcd' } },
+    { label: '형식 오류(하이픈 없음)', env: { id: '93671ad4a9664a52b48f56c92d10a671' } },
+    { label: '형식 오류(하이픈 위치)', env: { id: '93671ad4-a966-4a52-b48f-56c92d10a67' } },
   ];
 
   cases.forEach((c) => {
     const out = runAnalytics(c.env);
     assert(out.appended.length === 0,
       c.label + ': 스크립트를 붙였습니다 — ID를 채우기 전에는 아무 것도 하지 않아야 합니다');
-    assert(!out.window.clarity, c.label + ': clarity 대기열을 만들었습니다');
   });
 
   return cases.length + '가지 경우 모두 무동작';
@@ -1760,44 +1761,46 @@ check('방문 분석 — 프로젝트 ID가 없으면 아무 요청도 보내지
 
 check('방문 분석 — 로컬(file://)·추적 금지에서는 보내지 않는다', () => {
   const blocked = [
-    { label: 'file://', env: { id: CLARITY_ID, protocol: 'file:' } },
-    { label: 'navigator.doNotTrack', env: { id: CLARITY_ID, dnt: '1' } },
-    { label: 'window.doNotTrack', env: { id: CLARITY_ID, windowDnt: '1' } },
+    { label: 'file://', env: { id: COUNTER_ID, protocol: 'file:' } },
+    { label: 'navigator.doNotTrack', env: { id: COUNTER_ID, dnt: '1' } },
+    { label: 'window.doNotTrack', env: { id: COUNTER_ID, windowDnt: '1' } },
   ];
 
   blocked.forEach((c) => {
     const out = runAnalytics(c.env);
     assert(out.appended.length === 0, c.label + ': 그래도 보냈습니다');
-    /* Clarity 자체는 DNT 를 따르지 않으므로, 우리가 아예 불러오지 않아야 합니다 */
-    assert(!out.window.clarity, c.label + ': clarity 대기열을 만들었습니다');
   });
 
   /* 로컬 확인이 통계에 섞이지 않아야 하고, 브라우저 검증도 조용해야 합니다 */
   return blocked.map((c) => c.label).join(' · ') + ' 차단 확인';
 });
 
-check('방문 분석 — Clarity 스크립트를 한 번만 부르고 ID를 넘긴다', () => {
-  const out = runAnalytics({ id: CLARITY_ID });
+check('방문 분석 — Counter.dev 스크립트를 한 번만 부르고 ID를 넘긴다', () => {
+  const out = runAnalytics({ id: COUNTER_ID });
   assert(out.appended.length === 1, '스크립트를 붙이지 않았습니다');
 
   const tag = out.appended[0];
-  assert(tag.src === 'https://www.clarity.ms/tag/' + CLARITY_ID,
-    'Clarity 주소가 다릅니다: ' + tag.src);
+  assert(tag.src === 'https://cdn.counter.dev/script.js',
+    'Counter.dev 주소가 다릅니다: ' + tag.src);
   assert(tag.async === true, '스크립트가 async가 아닙니다 — 페이지 표시를 막습니다');
 
-  /* 공식 스니펫과 같이 clarity 대기열을 먼저 만듭니다(로드 전 호출도 유실되지 않게) */
-  assert(typeof out.window.clarity === 'function', 'clarity 대기열이 없습니다');
+  /* 사이트 ID 와 UTC 시차는 태그의 data-* 속성으로 넘깁니다 */
+  assert(tag.attrs['data-id'] === COUNTER_ID,
+    '사이트 ID(data-id)가 넘어가지 않았습니다: ' + tag.attrs['data-id']);
+  assert(/^-?\d+(\.\d+)?$/.test(tag.attrs['data-utcoffset'] || ''),
+    'data-utcoffset 이 숫자가 아닙니다: ' + tag.attrs['data-utcoffset']);
 
-  /* 예전 도구(GA4·Umami·Cloudflare) 흔적이 남아 있으면 안 됩니다 */
-  assert(!out.window.gtag && !out.window.dataLayer && !out.window.umami,
-    'GA4/Umami 흔적이 남아 있습니다');
+  /* 예전 도구(GA4·Umami·Clarity) 흔적이 남아 있으면 안 됩니다 */
+  assert(!out.window.gtag && !out.window.dataLayer && !out.window.umami && !out.window.clarity,
+    'GA4/Umami/Clarity 흔적이 남아 있습니다');
 
-  /* 학습 행동을 보내는 호출이 섞여 들어오지 않았는지 — 방문·히트맵만 수집 */
+  /* 학습 행동을 보내는 호출이 섞여 들어오지 않았는지 — 방문수·유입·국가만 수집 */
   const src = fs.readFileSync(path.join(ROOT, 'analytics.js'), 'utf8');
-  assert(!/clarity\(\s*['"]event/.test(src), '학습 이벤트를 보내는 코드가 있습니다');
-  assert((src.match(/clarity\.ms\/tag/g) || []).length === 1, 'Clarity 주소가 여러 곳에 있습니다');
+  assert(!/counter\(\s*['"]event/.test(src), '학습 이벤트를 보내는 코드가 있습니다');
+  assert((src.match(/cdn\.counter\.dev\/script\.js/g) || []).length === 1,
+    'Counter.dev 주소가 여러 곳에 있습니다');
 
-  return 'script 1회 · async · clarity 대기열';
+  return 'script 1회 · async · data-id/data-utcoffset';
 });
 
 check('index.html — 방문 분석 스크립트를 한 번만, ID는 한 곳에서 정한다', () => {
@@ -1806,20 +1809,22 @@ check('index.html — 방문 분석 스크립트를 한 번만, ID는 한 곳에
   assert(refs.length === 1, 'analytics.js 참조가 ' + refs.length + '개입니다 (1개여야 합니다)');
   assert(refs[0][1], 'analytics.js 에 ?v= 캐시 무효화 버전이 없습니다');
 
-  const ids = [...html.matchAll(/ENGMON_CLARITY_ID\s*=/g)];
-  assert(ids.length === 1, '프로젝트 ID를 정하는 곳이 ' + ids.length + '곳입니다 (한 곳이어야 합니다)');
+  const ids = [...html.matchAll(/ENGMON_COUNTER_ID\s*=/g)];
+  assert(ids.length === 1, '사이트 ID를 정하는 곳이 ' + ids.length + '곳입니다 (한 곳이어야 합니다)');
 
   /* 스크립트보다 ID 설정이 먼저 와야 합니다 */
-  assert(html.indexOf('ENGMON_CLARITY_ID') < html.indexOf('analytics.js'),
-    '프로젝트 ID 설정이 analytics.js 보다 뒤에 있습니다');
+  assert(html.indexOf('ENGMON_COUNTER_ID') < html.indexOf('analytics.js'),
+    '사이트 ID 설정이 analytics.js 보다 뒤에 있습니다');
+  assert(html.indexOf('ENGMON_CLARITY_ID') === -1, '예전 Clarity 설정이 남아 있습니다');
   assert(html.indexOf('ENGMON_GA4_ID') === -1, '예전 GA4 설정이 남아 있습니다');
   assert(html.indexOf('ENGMON_UMAMI_ID') === -1, '예전 Umami 설정이 남아 있습니다');
   assert(html.indexOf('ENGMON_CF_TOKEN') === -1, '예전 Cloudflare 설정이 남아 있습니다');
 
   /* 인라인 태그를 직접 붙이면 중복 로드가 됩니다 — analytics.js 가 넣습니다 */
-  assert(html.indexOf('clarity.ms') === -1, 'index.html 에 Clarity 스크립트를 직접 넣었습니다');
+  assert(html.indexOf('counter.dev/script.js') === -1,
+    'index.html 에 Counter.dev 스크립트를 직접 넣었습니다');
 
-  return 'analytics.js 1회 · 프로젝트 ID 1곳';
+  return 'analytics.js 1회 · 사이트 ID 1곳';
 });
 
 /* ── 결과 ─────────────────────────────────────────────────────────────── */
