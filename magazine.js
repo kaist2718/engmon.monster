@@ -661,9 +661,9 @@
     var summary = byId('issueSummary');
 
     if (numeral) numeral.textContent = pad(WEEK.week);
-    if (dateCover) dateCover.textContent = isPublished(WEEK)
-      ? String(WEEK.published).replace('-', ' · ')
-      : t('mag.planned');
+    /* 표지 오른쪽은 발행 월 대신 주(week) 표시를 씁니다 — 발행 여부와 상관없이 52주 모두 같은 형식입니다.
+       (`published` 는 기록용 데이터로만 남고 화면에는 나오지 않습니다.) */
+    if (dateCover) dateCover.textContent = 'WEEK ' + pad(WEEK.week);
     if (themeCover) themeCover.textContent = pick(WEEK.theme);
     if (kicker) kicker.textContent = 'WEEK ' + pad(WEEK.week);
     if (title) title.textContent = pick(WEEK.title);

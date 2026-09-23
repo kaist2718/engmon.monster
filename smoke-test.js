@@ -1397,8 +1397,8 @@ if (magazine) {
     assert(dom.byId.get('issueProgressText').textContent === t('mag.planned', 'ko'),
       '진행률 = ' + dom.byId.get('issueProgressText').textContent);
     assert(dom.byId.get('tocList').children.length === 1, '목차가 안내 한 줄도 없습니다');
-    assert(dom.byId.get('issueDateCover').textContent === t('mag.planned', 'ko'),
-      '표지 날짜 = ' + dom.byId.get('issueDateCover').textContent);
+    assert(dom.byId.get('issueDateCover').textContent === 'WEEK 05',
+      '표지 주 표시 = ' + dom.byId.get('issueDateCover').textContent);
 
     return 'W05 · 준비 중 안내 · 진행률 "' + dom.byId.get('issueProgressText').textContent + '"';
   });
