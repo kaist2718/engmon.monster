@@ -75,7 +75,8 @@ node smoke-test.js
   (이 두 줄이 빠지면 목차가 화면보다 길 때 아래쪽 항목을 볼 수 없게 됩니다.)
 - **CSS 회귀**: 좁은 화면(≤760px)에서 섹션 머리(`.m-head`)가 줄바꿈되는지 검사합니다.
   (줄바꿈이 없으면 학습 도구가 가로 폭을 다 차지해 제목이 **한 글자 폭으로 찌그러집니다**.)
-- **문의 폼**: `FormData` 전송 값(`email`·`message`·`_subject`·`source`), 허니팟 칸이 비어 있는지,
+- **문의 폼**: UTF-8 본문(`x-www-form-urlencoded`) 전송 값(`email`·`message`·`_subject`·`source`),
+  허니팟 칸이 비어 있는지,
   reCAPTCHA 키가 없을 때 **외부 요청이 0** 인지(있을 때만 스크립트 1회 + 토큰 전달),
   성공/실패/한도 초과(429) 문구,
   전송 후 입력값 초기화, 언어를 바꿨을 때 안내 문구가 함께 바뀌는지, `action`에 실제 폼 ID가 들어 있는지 확인합니다.
@@ -169,8 +170,15 @@ ID가 비어 있으면 외부 요청이 **0개**인지, ID를 넣으면 `gtag.js
 - 보내는 값: `email`(답장 주소 — Formspree 가 회신 주소로 씁니다) · `message`(선택) ·
   `_subject`(숨은 필드, 스크립트가 없으면 이 값이 그대로) · `source`(접속 도메인).
   reCAPTCHA를 켜면 `g-recaptcha-response` 가 더해집니다.
-- 전송 형식은 **`FormData`(multipart/form-data)** 입니다. `Content-Type` 을 직접 지정하지 않아
-  CORS 사전 요청(preflight)이 없고, 브라우저가 폼을 직접 POST 할 때와 같은 형식입니다.
+- **한글이 깨져 도착할 때**: 이 폼은 항상 UTF-8 로 보냅니다. 그런데 PowerShell·cmd 터미널에서
+  `curl`·스크립트로 시험 전송하면 Windows 콘솔 문자셋(CP949)으로 인코딩되어 메일이 깨져
+  도착합니다(이모지는 `?` 로 바뀝니다). 확인은 브라우저에서 폼에 직접 입력해 보내세요.
+- 전송 형식은 **`x-www-form-urlencoded` + `charset=UTF-8`** 입니다. 폼 값을 `URLSearchParams` 로
+  UTF-8 퍼센트 인코딩해 보내고 `Content-Type` 에 문자셋을 적습니다.
+  (예전에는 `FormData`(multipart)를 썼는데, multipart 본문에는 "이 본문은 UTF-8" 이라는 표시가
+  없어 수신 쪽이 EUC-KR/CP949 로 해석하면 한글 문의가 깨져 도착했습니다.
+  `x-www-form-urlencoded` 는 CORS 안전 헤더라 사전 요청(preflight)도 생기지 않습니다.
+  스크립트 없이 전송되는 경우를 위해 `<form>` 에 `accept-charset="UTF-8"` 도 함께 적어 두었습니다.)
 - **스팸 방지 기본값**: 숨은 함정 칸(`name="_gotcha"`)을 화면 밖으로 밀어 두었습니다.
   봇이 이 칸을 채우면 Formspree가 제출을 조용히 버립니다(사람에게는 보이지 않고 탭 순서에서도 빠집니다).
 - **reCAPTCHA v3 (선택)**: `<form data-recaptcha-key="">` 에 사이트 키를 넣으면 켜집니다
@@ -185,7 +193,9 @@ ID가 비어 있으면 외부 요청이 **0개**인지, ID를 넣으면 `gtag.js
   (이 설정은 프로젝트당 도메인 한 개입니다. 무료 플랜도 쓸 수 있습니다 — 폼·프로젝트 무제한, 월 50건 합산.)
 
 > 전송 내용은 `smoke-test.js` 가 최소 `FormData` 구현으로 검사합니다 — 폼에 적힌 `name` 과
-> 입력값을 읽어 `body.get('email')` 처럼 확인하므로, 필드 이름이 바뀌면 테스트가 먼저 걸립니다.
+> 입력값을 읽어 UTF-8 본문 문자열을 만들고, 테스트는 그 문자열을 `URLSearchParams` 로 다시
+> 파싱해 `get('email')` 처럼 확인합니다(본문에 한글이 UTF-8 퍼센트 인코딩으로 들어갔는지도 함께
+> 검사합니다). 필드 이름이 바뀌면 테스트가 먼저 걸립니다.
 
 ## 캐시 무효화 (배포 후 "안 바뀐 것처럼 보이는" 문제)
 

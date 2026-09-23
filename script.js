@@ -603,7 +603,9 @@
      없는 브라우저에서는 그대로 POST 되어 Formspree 안내 페이지가 뜹니다. */
   guard('문의 폼', function () {
     var form = $('contactForm');
-    if (!form || typeof window.fetch !== 'function') return;
+    /* 본문을 UTF-8 로 직접 만들려면 URLSearchParams 가 필요합니다(없으면 그대로 POST). */
+    if (!form || typeof window.fetch !== 'function' ||
+        typeof window.URLSearchParams !== 'function') return;
 
     /* action 에서 전송 주소를 읽습니다(없으면 가로채지 않고 그대로 POST). */
     var endpoint = (form.getAttribute('action') || '').trim();
@@ -694,6 +696,29 @@
       submitBtn.textContent = currentDict()[busy ? 'form.sending' : 'form.send'];
     }
 
+    /* 폼 값을 UTF-8 퍼센트 인코딩 문자열로 만듭니다.
+       values 는 폼 입력값에 덧붙일 값(_subject·source·토큰)입니다.
+
+       왜 FormData(multipart) 대신 직접 만드는가:
+         multipart 는 값 자체는 UTF-8 로 나가지만 "이 본문은 UTF-8" 이라는 표시가
+         본문에 없습니다. 그래서 수신 쪽이 다른 문자셋으로 해석하면 한글 문의가
+         깨져 도착합니다(실제로 EUC-KR/CP949 로 해석된 깨진 메일을 받은 적이 있습니다).
+         x-www-form-urlencoded 는 문자셋을 Content-Type 에 적을 수 있고,
+         URLSearchParams 는 값을 항상 UTF-8 퍼센트 인코딩으로 만듭니다.
+         CORS 안전 헤더라서 사전 요청(preflight)도 생기지 않습니다. */
+    function utf8Body(values) {
+      var data = new FormData(form);
+
+      Object.keys(values).forEach(function (name) { data.set(name, values[name]); });
+
+      var params = new URLSearchParams();
+      data.forEach(function (value, name) {
+        if (typeof value === 'string') params.append(name, value); /* 파일 필드는 없습니다 */
+      });
+
+      return params.toString();
+    }
+
     document.addEventListener('langchange', renderStatus);
 
     on(form, 'submit', function (e) {
@@ -701,25 +726,28 @@
       e.preventDefault();
       if (sending || !emailEl || !msgEl) return;
 
-      /* FormData(multipart/form-data) 로 보냅니다 — Content-Type 을 직접 지정하지 않아
-         CORS 사전 요청(preflight)이 없고, 폼을 그대로 POST 할 때와 같은 형식입니다.
+      /* x-www-form-urlencoded + charset=UTF-8 로 보냅니다 — 문자셋을 본문에 적어
+         두어야 수신 쪽이 한글을 UTF-8 로 해석합니다(영어 확장 문자의 깨짐 방지).
          Accept: application/json 이라 페이지 이동 없이 결과를 받습니다.
          source 에 접속 도메인이 담겨, 같은 폼을 다른 사이트에서 써도 구분됩니다. */
-      var data = new FormData(form);
-
-      data.set('_subject', (subjectEl && subjectEl.value) || 'EngMon 다음 호 알림 요청');
-      data.set('source', (window.location && window.location.hostname) || 'engmon.monster');
+      var extra = {
+        '_subject': (subjectEl && subjectEl.value) || 'EngMon 다음 호 알림 요청',
+        'source': (window.location && window.location.hostname) || 'engmon.monster'
+      };
 
       setStatus('');
       setSending(true);
 
       withRecaptchaToken(function (token) {
-        if (token) data.set('g-recaptcha-response', token);
+        if (token) extra['g-recaptcha-response'] = token;
 
         window.fetch(endpoint, {
           method: 'POST',
-          headers: { Accept: 'application/json' },
-          body: data
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+          },
+          body: utf8Body(extra)
         }).then(sent, failed);
       });
 

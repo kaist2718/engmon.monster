@@ -246,9 +246,11 @@
            action 의 폼 ID를 바꾸면 수신처가 바뀝니다.
            data-recaptcha-key 에 Google reCAPTCHA v3 **사이트 키**를 넣으면 스팸 방지가 켜집니다
            (Formspree 쪽에는 같은 키의 비밀 키를 넣어야 합니다. 비워 두면 외부 요청이 0입니다).
-           스크립트가 있으면 페이지 이동 없이 전송하고, 없으면 이 주소로 그대로 POST 합니다. -->
+           스크립트가 있으면 페이지 이동 없이 전송하고, 없으면 이 주소로 그대로 POST 합니다.
+           accept-charset="UTF-8" — 스크립트 없이 전송될 때 브라우저가 본문을 UTF-8 로
+           인코딩하도록 못 박습니다(한글이 CP949 로 나가면 수신 메일이 깨집니다). -->
       <form class="next-form" id="contactForm" action="https://formspree.io/f/mnpnvqaq"
-            method="POST" data-recaptcha-key="">
+            method="POST" data-recaptcha-key="" accept-charset="UTF-8">
         <div class="nf-row">
           <label for="cfEmail" data-i18n="form.email">답장 받을 이메일</label>
           <input id="cfEmail" name="email" type="email" required autocomplete="email"
@@ -329,7 +331,7 @@
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script src="issues.js?v=6"></script>
-<script src="script.js?v=8"></script>
+<script src="script.js?v=9"></script>
 <script src="magazine.js?v=6"></script>
 </body>
 </html>
