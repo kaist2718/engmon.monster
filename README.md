@@ -6,10 +6,10 @@ MonsterLab(`monsterlab.monster`)의 두 번째 서비스입니다.
 ## 구조
 
 ```
-index.html     # 매거진 본문 (표지·호 선택기·목차·섹션·복습·단어장·다음 호)
+index.html     # 매거진 본문 (표지·호 선택기·목차·섹션·복습·단어장·다음 호 신청 폼)
 issues.js      # 매거진 데이터(호·섹션) — 이 파일이 콘텐츠의 "DB"
 magazine.js    # 매거진 렌더링·오디오·받아쓰기·퀴즈·복습 카드·단어장·진행률
-script.js      # 페이지 공통 (한/영 전환, 테마, 강조색, 모바일 메뉴) — EngMon 범위로 정리된 사전
+script.js      # 페이지 공통 (한/영 전환, 테마, 강조색, 모바일 메뉴, 문의 폼 전송) — EngMon 범위로 정리된 사전
 styles.css     # 스타일 (다크/라이트 테마, 강조색 프리셋, 인쇄용, 반응형)
 analytics.js   # 방문 분석 (Google Analytics 4) — 측정 ID를 넣기 전에는 아무 것도 안 함
 smoke-test.js  # 검증 스크립트 (배포 전 `node smoke-test.js`)
@@ -75,6 +75,10 @@ node smoke-test.js
   (이 두 줄이 빠지면 목차가 화면보다 길 때 아래쪽 항목을 볼 수 없게 됩니다.)
 - **CSS 회귀**: 좁은 화면(≤760px)에서 섹션 머리(`.m-head`)가 줄바꿈되는지 검사합니다.
   (줄바꿈이 없으면 학습 도구가 가로 폭을 다 차지해 제목이 **한 글자 폭으로 찌그러집니다**.)
+- **문의 폼**: `FormData` 전송 값(`email`·`message`·`_subject`·`source`), 허니팟 칸이 비어 있는지,
+  reCAPTCHA 키가 없을 때 **외부 요청이 0** 인지(있을 때만 스크립트 1회 + 토큰 전달),
+  성공/실패/한도 초과(429) 문구,
+  전송 후 입력값 초기화, 언어를 바꿨을 때 안내 문구가 함께 바뀌는지, `action`에 실제 폼 ID가 들어 있는지 확인합니다.
 - **방문 분석**: 측정 ID가 없을 때 **아무 요청도 보내지 않는지**, `file://`·추적 금지에서 멈추는지,
   켜졌을 때 "페이지 방문만" 설정으로 보내는지 확인합니다.
 
@@ -155,13 +159,41 @@ ID가 비어 있으면 외부 요청이 **0개**인지, ID를 넣으면 `gtag.js
 그리고 `send_page_view` 외의 이벤트를 보내지 않는지 검사합니다.
 **구글로는 아무 것도 보내지 않습니다** (요청을 실패시킵니다).
 
+## 문의 폼 (Formspree)
+
+「다음 호」 섹션(`#next`)의 신청 폼은 별도 서버 없이 [Formspree](https://formspree.io)로 전송됩니다.
+
+**현재 연결 상태:** engmon.monster → `https://formspree.io/f/mnpnvqaq`
+
+- 수신처를 바꾸려면 **`index.html` 의 `<form ... action>` 한 줄**의 폼 ID만 바꾸면 됩니다.
+- 보내는 값: `email`(답장 주소 — Formspree 가 회신 주소로 씁니다) · `message`(선택) ·
+  `_subject`(숨은 필드, 스크립트가 없으면 이 값이 그대로) · `source`(접속 도메인).
+  reCAPTCHA를 켜면 `g-recaptcha-response` 가 더해집니다.
+- 전송 형식은 **`FormData`(multipart/form-data)** 입니다. `Content-Type` 을 직접 지정하지 않아
+  CORS 사전 요청(preflight)이 없고, 브라우저가 폼을 직접 POST 할 때와 같은 형식입니다.
+- **스팸 방지 기본값**: 숨은 함정 칸(`name="_gotcha"`)을 화면 밖으로 밀어 두었습니다.
+  봇이 이 칸을 채우면 Formspree가 제출을 조용히 버립니다(사람에게는 보이지 않고 탭 순서에서도 빠집니다).
+- **reCAPTCHA v3 (선택)**: `<form data-recaptcha-key="">` 에 사이트 키를 넣으면 켜집니다
+  (같은 키의 비밀 키를 Formspree 폼 설정에 넣어야 합니다). 켠 경우에만 첫 전송 때 Google 스크립트를
+  한 번 불러오고 토큰을 붙입니다 — **비워 두면 외부 요청이 0** 입니다(방문 분석과 같은 방식).
+- `script.js` 의 `guard('문의 폼')` 블록이 `fetch` 로 전송(`Accept: application/json`)을 맡습니다.
+  **스크립트가 없어도 동작합니다** — 그때는 브라우저가 `action` 으로 그대로 POST 하고
+  Formspree 안내 페이지가 뜹니다. 전송 중에는 버튼을 잠그고(Formspree 는 분당 20건 제한),
+  결과를 `#formStatus` 에 표시합니다. `429` 는 "잠시 후 다시 시도" 문구로 구분합니다.
+- 전송이 안 되면 옆의 **「메일 보내기」(mailto)** 버튼으로 같은 내용을 보낼 수 있습니다.
+- 대시보드에서 **Restrict to domain → `engmon.monster`** 를 넣어 두면 다른 도메인에서 오는 제출이 스팸함으로 갑니다.
+  (이 설정은 프로젝트당 도메인 한 개입니다. 무료 플랜도 쓸 수 있습니다 — 폼·프로젝트 무제한, 월 50건 합산.)
+
+> 전송 내용은 `smoke-test.js` 가 최소 `FormData` 구현으로 검사합니다 — 폼에 적힌 `name` 과
+> 입력값을 읽어 `body.get('email')` 처럼 확인하므로, 필드 이름이 바뀌면 테스트가 먼저 걸립니다.
+
 ## 캐시 무효화 (배포 후 "안 바뀐 것처럼 보이는" 문제)
 
-CSS·JS를 참조할 때 `?v=5` 같은 버전을 붙여 둡니다.
+CSS·JS를 참조할 때 `?v=8` 같은 버전을 붙여 둡니다.
 
 ```html
-<link rel="stylesheet" href="styles.css?v=5" />
-<script src="script.js?v=5"></script>
+<link rel="stylesheet" href="styles.css?v=8" />
+<script src="script.js?v=8"></script>
 ```
 
 **CSS나 JS를 고쳐서 배포할 때는 `index.html`의 `?v=` 숫자를 올리세요.**

@@ -121,6 +121,17 @@
       'mag.nextTitle': '다음 호가 나오면 알려드릴까요?',
       'mag.nextLead': '새 호 소식과 피드백은 모두 같은 메일로 받습니다. 원하는 주제가 있으면 함께 적어 보내주세요.',
       'mag.subscribe': '메일 보내기',
+
+      'form.email': '답장 받을 이메일',
+      'form.emailPh': 'you@example.com',
+      'form.message': '하고 싶은 말 (선택)',
+      'form.messagePh': '원하는 주제나 다뤄 주었으면 하는 표현을 적어 주세요.',
+      'form.send': '보내기',
+      'form.sending': '보내는 중…',
+      'form.sent': '보냈습니다. 다음 호가 나오면 알려드리겠습니다.',
+      'form.sendFail': '전송하지 못했습니다. 잠시 후 다시 시도하거나 메일로 보내 주세요.',
+      'form.rateLimited': '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
+      'form.privacy': '남겨 주신 주소는 다음 호 안내와 답장에만 씁니다.',
       'mag.theme': '테마',
       'mag.level': '레벨',
       'mag.sections': '섹션',
@@ -263,6 +274,17 @@
       'mag.nextTitle': 'Want to hear about the next issue?',
       'mag.nextLead': 'New issues and feedback both land in the same inbox. Tell us which topics you want.',
       'mag.subscribe': 'Send an email',
+
+      'form.email': 'Email to reply to',
+      'form.emailPh': 'you@example.com',
+      'form.message': 'Anything to add (optional)',
+      'form.messagePh': 'A topic you want covered, or an expression you would like to see.',
+      'form.send': 'Send',
+      'form.sending': 'Sending…',
+      'form.sent': 'Sent — we will email you when the next issue is out.',
+      'form.sendFail': 'Could not send. Please try again shortly, or email us instead.',
+      'form.rateLimited': 'Too many requests. Please wait a moment and try again.',
+      'form.privacy': 'Your address is used only for replies and next-issue news.',
       'mag.theme': 'Theme',
       'mag.level': 'Level',
       'mag.sections': 'sections',
@@ -572,6 +594,154 @@
 
     on(document, 'keydown', function (e) {
       if (e.key === 'Escape') closeNav();
+    });
+  });
+
+  /* ── 8. 문의 폼 (Formspree) ────────────────────────────────────────
+     폼 ID는 index.html의 <form action="https://formspree.io/f/폼ID"> 에 있습니다.
+     이 블록이 하는 일은 “있으면 더 편한” 계층입니다 — 스크립트가 없거나 fetch를 쓸 수
+     없는 브라우저에서는 그대로 POST 되어 Formspree 안내 페이지가 뜹니다. */
+  guard('문의 폼', function () {
+    var form = $('contactForm');
+    if (!form || typeof window.fetch !== 'function') return;
+
+    /* action 에서 전송 주소를 읽습니다(없으면 가로채지 않고 그대로 POST). */
+    var endpoint = (form.getAttribute('action') || '').trim();
+    if (!endpoint) return;
+
+    var emailEl = $('cfEmail');
+    var msgEl = $('cfMsg');
+    var subjectEl = $('cfSubject');
+    var statusEl = $('formStatus');
+    var submitBtn = $('cfSubmit');
+    var sending = false;
+    var statusKey = '';
+    var statusIsError = false;
+
+    /* Google reCAPTCHA v3 — index.html의 <form data-recaptcha-key="..."> 에 사이트 키를
+       넣으면 켜집니다(Formspree 쪽에는 비밀 키를 넣고 reCAPTCHA를 켜두어야 합니다).
+       비워 두면 Google 스크립트를 아예 불러오지 않아 외부 요청이 0입니다. */
+    var recaptchaKey = (form.getAttribute('data-recaptcha-key') || '').trim();
+    var recaptchaReady = false;
+    var recaptchaLoading = false;
+    var recaptchaQueue = [];
+
+    /* reCAPTCHA 스크립트를 한 번만 불러오고, 그 동안 들어온 요청은 모아 처리합니다. */
+    function ensureRecaptcha(callback) {
+      if (recaptchaReady) return callback(true);
+
+      recaptchaQueue.push(callback);
+      if (recaptchaLoading) return;
+      recaptchaLoading = true;
+
+      var head = document.head || document.body;
+      var script = document.createElement('script');
+      script.src = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(recaptchaKey);
+      script.async = true;
+      script.onload = function () { flush(true); };
+      script.onerror = function () { flush(false); };
+      head.appendChild(script);
+
+      function flush(ok) {
+        recaptchaReady = ok;
+
+        var queue = recaptchaQueue;
+        recaptchaQueue = [];
+        queue.forEach(function (fn) { fn(ok); });
+      }
+    }
+
+    /* 토큰을 못 받아도 전송은 그대로 시도합니다(Formspree가 최종 판단 —
+       실패하면 기존 실패 안내가 뜨고 메일 보내기 버튼이 대안으로 남습니다). */
+    function withRecaptchaToken(callback) {
+      if (!recaptchaKey) return callback('');
+
+      ensureRecaptcha(function (ok) {
+        if (!ok || !window.grecaptcha) return callback('');
+
+        window.grecaptcha.ready(function () {
+          window.grecaptcha.execute(recaptchaKey, { action: 'submit' }).then(
+            function (token) { callback(token || ''); },
+            function () { callback(''); }
+          );
+        });
+      });
+    }
+
+    /* 문구 키를 기억해 두었다가 언어를 바꿔도 다시 그립니다. */
+    function renderStatus() {
+      if (!statusEl) return;
+
+      var message = statusKey ? currentDict()[statusKey] : '';
+      statusEl.textContent = message;
+      statusEl.hidden = !message;
+      statusEl.classList.toggle('is-error', !!(message && statusIsError));
+    }
+
+    function setStatus(key, isError) {
+      statusKey = key || '';
+      statusIsError = !!isError;
+      renderStatus();
+    }
+
+    /* 전송 중에는 버튼을 잠가 중복 전송을 막습니다(Formspree는 분당 20건 제한). */
+    function setSending(busy) {
+      sending = busy;
+      if (!submitBtn) return;
+
+      submitBtn.disabled = busy;
+      submitBtn.setAttribute('aria-busy', String(busy));
+      submitBtn.textContent = currentDict()[busy ? 'form.sending' : 'form.send'];
+    }
+
+    document.addEventListener('langchange', renderStatus);
+
+    on(form, 'submit', function (e) {
+      /* 브라우저 기본 검사(required · type=email)를 통과한 뒤에만 submit 이벤트가 옵니다. */
+      e.preventDefault();
+      if (sending || !emailEl || !msgEl) return;
+
+      /* FormData(multipart/form-data) 로 보냅니다 — Content-Type 을 직접 지정하지 않아
+         CORS 사전 요청(preflight)이 없고, 폼을 그대로 POST 할 때와 같은 형식입니다.
+         Accept: application/json 이라 페이지 이동 없이 결과를 받습니다.
+         source 에 접속 도메인이 담겨, 같은 폼을 다른 사이트에서 써도 구분됩니다. */
+      var data = new FormData(form);
+
+      data.set('_subject', (subjectEl && subjectEl.value) || 'EngMon 다음 호 알림 요청');
+      data.set('source', (window.location && window.location.hostname) || 'engmon.monster');
+
+      setStatus('');
+      setSending(true);
+
+      withRecaptchaToken(function (token) {
+        if (token) data.set('g-recaptcha-response', token);
+
+        window.fetch(endpoint, {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: data
+        }).then(sent, failed);
+      });
+
+      function sent(res) {
+        if (res.ok) return finishSent();
+
+        /* 429 = 분당·월간 전송 한도 초과 (Formspree 문서 기준) */
+        setSending(false);
+        setStatus(res.status === 429 ? 'form.rateLimited' : 'form.sendFail', true);
+      }
+
+      function failed() {
+        setSending(false);
+        setStatus('form.sendFail', true);
+      }
+
+      function finishSent() {
+        setSending(false);
+        form.reset();
+        setStatus('form.sent');
+        showToast(currentDict()['form.sent']);
+      }
     });
   });
 
