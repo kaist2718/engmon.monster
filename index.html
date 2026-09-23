@@ -4,9 +4,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>EngMon — 월간 영어 매거진</title>
-<meta name="description" content="EngMon(엥몬) — 호(issue) 단위로 읽는 월간 영어 매거진. 테마 어휘, 문법, 이디엄, 대화, 확인 문제를 오디오와 함께 담았습니다." />
-<meta property="og:title" content="EngMon — 1호 여행 영어" />
-<meta property="og:description" content="테마 어휘 · 문법 · 이디엄 · 대화 · 확인 문제를 한 호에 담았습니다." />
+<meta name="description" content="EngMon(엥몬) — 호(issue) 단위로 읽는 월간 영어 매거진. 테마 어휘, 구동사, 연어, 문법, 발음, 회화, 받아쓰기, 확인 문제를 오디오와 함께 담았습니다." />
+<meta property="og:title" content="EngMon — 월간 영어 매거진" />
+<meta property="og:description" content="어휘 · 구동사 · 연어 · 문법 · 발음 · 회화 · 받아쓰기 · 확인 문제를 한 호에 담았습니다." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://engmon.monster/" />
 <meta property="og:site_name" content="EngMon" />
@@ -19,15 +19,17 @@
 <script>
   (function () {
     var root = document.documentElement;
-    var mode, accent;
+    var mode, accent, tr;
 
     try {
       mode = localStorage.getItem('monsterlab.theme');
       accent = localStorage.getItem('monsterlab.accent');
-    } catch (e) { mode = null; accent = null; }
+      tr = localStorage.getItem('monsterlab.translation');
+    } catch (e) { mode = null; accent = null; tr = null; }
 
     if (mode !== 'dark' && mode !== 'light' && mode !== 'system') mode = 'system';
     if (['mint', 'violet', 'ocean', 'amber'].indexOf(accent) === -1) accent = 'mint';
+    if (tr !== 'on' && tr !== 'off') tr = 'on';
 
     var prefersLight = window.matchMedia &&
       window.matchMedia('(prefers-color-scheme: light)').matches;
@@ -35,10 +37,16 @@
     root.setAttribute('data-theme-mode', mode);
     root.setAttribute('data-theme', mode === 'system' ? (prefersLight ? 'light' : 'dark') : mode);
     root.setAttribute('data-accent', accent);
+    root.setAttribute('data-tr', tr);
   })();
 </script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230a0e13'/%3E%3Ctext x='16' y='23' font-size='19' text-anchor='middle' fill='%236ee7a8' font-family='sans-serif' font-weight='bold'%3EE%3C/text%3E%3C/svg%3E" />
-<link rel="stylesheet" href="styles.css?v=3" />
+<link rel="stylesheet" href="styles.css?v=6" />
+<!-- 방문 분석 (Google Analytics 4) — 페이지 방문만 수집합니다.
+     아래 측정 ID 를 채우면 켜지고, 비워 두면 어떤 요청도 보내지 않습니다.
+     자세한 내용은 README 의 "방문 분석" 항목을 보세요. -->
+<script>window.ENGMON_GA4_ID = '';</script>
+<script defer src="analytics.js?v=6"></script>
 </head>
 <body>
 
@@ -50,8 +58,9 @@
     </a>
 
     <nav class="nav" id="nav" aria-label="주요 메뉴">
-      <a href="#issue" data-i18n="mag.navIssue">1호</a>
+      <a href="#issue" data-i18n="mag.navIssue">이번 호</a>
       <a href="#sections" data-i18n="mag.navSections">섹션</a>
+      <a href="#review" data-i18n="mag.navReview">복습</a>
       <a href="#wordbook" data-i18n="mag.navWords">단어장</a>
       <a href="https://monsterlab.monster" data-i18n="mag.navHome">홈</a>
 
@@ -115,12 +124,16 @@
           </div>
         </div>
 
+        <div class="issue-nav" id="issueNav" role="group" data-i18n-aria-label="mag.issuePicker"></div>
+
         <div class="hero-actions">
-          <a class="btn btn-primary" id="resumeBtn" href="#sections" data-i18n="mag.startReading">1호 읽기</a>
+          <a class="btn btn-primary" id="resumeBtn" href="#sections" data-i18n="mag.startReading">읽기 시작</a>
           <a class="btn btn-ghost" href="#wordbook">
             <span data-i18n="mag.openWordbook">단어장</span>
             <span class="count-pill" data-wb-count>0</span>
           </a>
+          <button class="btn btn-ghost" type="button" data-tr-toggle aria-pressed="true" data-i18n="mag.hideKo">번역 가리기</button>
+          <button class="btn btn-ghost" type="button" id="printBtn" data-i18n="mag.print">인쇄 · PDF</button>
         </div>
 
         <div class="rate-set" role="group" data-i18n-aria-label="mag.rateGroup">
@@ -130,9 +143,15 @@
           <button class="rate-opt" type="button" data-rate="1.15" aria-pressed="false">1.25×</button>
         </div>
 
-        <p class="draft-note" data-i18n="mag.draftNotice">
-          이 페이지는 1호 템플릿(초안)입니다. 문장과 섹션 구성은 예시이고, 새 호를 추가하려면 issues.js만 고치면 됩니다.
-        </p>
+        <div class="guide">
+          <p class="guide-title" data-i18n="mag.guideTitle">이 호를 이렇게 쓰세요</p>
+          <ol class="guide-steps">
+            <li data-i18n="mag.guide1">표지에서 섹션을 훑고, 오늘 할 분량을 정합니다. (한 섹션 3~8분)</li>
+            <li data-i18n="mag.guide2">듣기를 한 번 재생하고, 이어서 영어만 눈으로 읽습니다.</li>
+            <li data-i18n="mag.guide3">모르는 표현은 단어장에 담고, 확인 문제·받아쓰기로 점검합니다.</li>
+            <li data-i18n="mag.guide4">복습 화면에서 단어를 다시 보고, 완료 표시로 진행률을 채웁니다.</li>
+          </ol>
+        </div>
       </div>
 
     </div>
@@ -142,20 +161,52 @@
   <div class="wrap issue-layout">
 
     <aside class="issue-aside" id="sections">
-      <p class="aside-kicker" data-i18n="mag.tocKicker">CONTENTS</p>
-      <p class="aside-title" data-i18n="mag.tocTitle">이번 호의 섹션</p>
-      <ol class="toc-list" id="tocList"></ol>
-      <p class="aside-hint" data-i18n="mag.tocLead">
-        섹션별로 듣고, 읽고, 모르는 단어는 단어장에 담아두세요. 진행 상황은 이 브라우저에 저장됩니다.
-      </p>
+      <div class="aside-inner">
+        <p class="aside-kicker" data-i18n="mag.tocKicker">CONTENTS</p>
+        <p class="aside-title" data-i18n="mag.tocTitle">이번 호의 섹션</p>
+        <button class="btn btn-ghost btn-sm aside-tr" type="button" data-tr-toggle aria-pressed="true" data-i18n="mag.hideKo">번역 가리기</button>
+        <ol class="toc-list" id="tocList"></ol>
+        <p class="aside-hint" data-i18n="mag.tocLead">
+          섹션별로 듣고, 읽고, 모르는 단어는 단어장에 담아두세요. 진행 상황은 이 브라우저에 저장됩니다.
+        </p>
+      </div>
     </aside>
 
     <div class="issue-body" id="issueContent"></div>
 
   </div>
 
+  <!-- ── 복습 (플래시카드) ──────────────────────────── -->
+  <section class="section section-alt" id="review">
+    <div class="wrap">
+      <p class="section-kicker" data-i18n="mag.reviewKicker">REVIEW</p>
+      <div class="wb-head">
+        <h2 class="section-title" data-i18n="mag.reviewTitle">단어 복습</h2>
+        <span class="count-pill count-pill--lg" id="reviewDueCount">0</span>
+      </div>
+      <p class="section-lead" data-i18n="mag.reviewLead">
+        단어장에 담은 표현을 카드로 다시 봅니다. 맞힌 카드는 다음에 더 늦게, 틀린 카드는 더 자주 나옵니다.
+      </p>
+
+      <div class="daily" id="dailyPanel">
+        <div class="daily-main">
+          <p class="daily-title" data-i18n="mag.dailyTitle">오늘의 학습</p>
+          <p class="daily-count"><span id="dailyCount">0</span> / <span id="dailyGoal">3</span> <span data-i18n="mag.dailyUnit">개 활동</span></p>
+          <div class="daily-track"><span class="daily-fill" id="dailyFill"></span></div>
+        </div>
+        <div class="daily-side">
+          <p class="daily-streak"><span aria-hidden="true">🔥</span> <strong id="streakCount">0</strong> <span data-i18n="mag.streakLabel">일 연속</span></p>
+          <p class="daily-best"><span data-i18n="mag.bestLabel">최고</span> <strong id="bestStreak">0</strong></p>
+        </div>
+        <div class="daily-dots" id="dailyDots"></div>
+      </div>
+
+      <div class="review-stage" id="reviewStage"></div>
+    </div>
+  </section>
+
   <!-- ── 단어장 ─────────────────────────────────────── -->
-  <section class="section section-alt" id="wordbook">
+  <section class="section" id="wordbook">
     <div class="wrap">
       <p class="section-kicker" data-i18n="mag.wbKicker">WORDBOOK</p>
       <div class="wb-head">
@@ -163,16 +214,23 @@
         <span class="count-pill count-pill--lg" data-wb-count>0</span>
       </div>
       <p class="section-lead" data-i18n="mag.wbLead">
-        저장한 표현은 이 브라우저에 남습니다. 나중에 복사해 노트 앱이나 학습 앱으로 옮기세요.
+        저장한 표현은 이 브라우저에 남습니다. 검색하거나 CSV로 내보내 노트 앱으로 옮기세요.
       </p>
 
-      <p class="wb-empty" id="wbEmpty" data-i18n="mag.wbEmpty">아직 저장한 단어가 없습니다.</p>
-      <ul class="wb-list" id="wbList"></ul>
-
-      <div class="wb-actions" id="wbActions" hidden>
+      <div class="wb-tools" id="wbTools">
+        <input class="wb-search" id="wbSearch" type="search" autocomplete="off" data-i18n-placeholder="mag.searchPlaceholder" placeholder="단어 검색" data-i18n-aria-label="mag.searchPlaceholder" />
+        <button class="btn btn-primary btn-sm" id="wbReviewBtn" type="button" data-i18n="mag.reviewStart">복습 시작</button>
+        <button class="btn btn-ghost btn-sm" id="wbExportBtn" type="button" data-i18n="mag.export">CSV로 내보내기</button>
         <button class="btn btn-ghost btn-sm" id="wbCopyBtn" type="button" data-i18n="mag.wbCopy">전체 복사</button>
+        <button class="btn btn-ghost btn-sm" id="wbBackupBtn" type="button" data-i18n="mag.backup">전체 백업(JSON)</button>
+        <button class="btn btn-ghost btn-sm" id="wbRestoreBtn" type="button" data-i18n="mag.restore">백업 가져오기</button>
         <button class="btn btn-ghost btn-sm" id="wbClearBtn" type="button" data-i18n="mag.wbClear">비우기</button>
+        <input class="visually-hidden" id="wbRestoreFile" type="file" accept=".json,application/json" aria-hidden="true" tabindex="-1" />
       </div>
+
+      <p class="wb-empty" id="wbEmpty" data-i18n="mag.wbEmpty">아직 저장한 단어가 없습니다.</p>
+      <p class="wb-empty wb-no-match" id="wbNoMatch" hidden data-i18n="mag.noMatch">검색 결과가 없습니다.</p>
+      <ul class="wb-list" id="wbList"></ul>
     </div>
   </section>
 
@@ -219,6 +277,9 @@
       </span>
     </div>
     <p class="copyright">&copy; <span id="year">2026</span> EngMon · <a href="https://monsterlab.monster" target="_blank" rel="noopener">MonsterLab</a>. <span data-i18n="footer.rights">모든 권리 보유.</span></p>
+    <p class="footer-note" data-i18n="footer.analytics">
+      방문 통계는 Google Analytics 로 익명 수집합니다. 학습 기록(단어장·진행률)은 이 브라우저에만 남습니다.
+    </p>
   </div>
 </footer>
 
@@ -228,8 +289,8 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="issues.js?v=3"></script>
-<script src="script.js?v=3"></script>
-<script src="magazine.js?v=3"></script>
+<script src="issues.js?v=6"></script>
+<script src="script.js?v=6"></script>
+<script src="magazine.js?v=6"></script>
 </body>
 </html>

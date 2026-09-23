@@ -38,13 +38,67 @@
       'accent.ocean': '오션',
       'accent.amber': '앰버',
 
-      'mag.navIssue': '1호',
+      'mag.navIssue': '이번 호',
       'mag.navSections': '섹션',
+      'mag.navReview': '복습',
       'mag.navWords': '단어장',
       'mag.navHome': '홈',
-      'mag.startReading': '1호 읽기',
+      'mag.startReading': '읽기 시작',
       'mag.openWordbook': '단어장',
-      'mag.draftNotice': '이 페이지는 1호 템플릿(초안)입니다. 문장과 섹션 구성은 예시이고, 새 호를 추가하려면 issues.js만 고치면 됩니다.',
+      'mag.hideKo': '번역 가리기',
+      'mag.hideKoOn': '번역을 가렸습니다',
+      'mag.hideKoOff': '번역을 다시 보여줍니다',
+      'mag.issuePicker': '호 선택',
+      'mag.issueSwitched': '호를 바꿨습니다',
+      'mag.guideTitle': '이 호를 이렇게 쓰세요',
+      'mag.guide1': '표지에서 섹션을 훑고 오늘 할 분량을 정합니다. 한 섹션에 3~8분이면 충분합니다.',
+      'mag.guide2': '듣기를 한 번 재생한 뒤, 영어만 눈으로 다시 읽습니다.',
+      'mag.guide3': '모르는 표현은 단어장에 담고, 확인 문제와 받아쓰기로 점검합니다.',
+      'mag.guide4': '복습 화면에서 카드를 넘기고, 완료 표시로 진행률을 채웁니다.',
+      'mag.words': '단어',
+      'mag.sentences': '문장',
+      'mag.meaning': '영영 뜻',
+      'mag.example': '예문',
+      'mag.playLine': '이 줄 듣기',
+      'mag.playWord': '발음 듣기',
+      'mag.playAll': '대화 전체 듣기',
+      'mag.quizScore': '정답',
+      'mag.quizRetry': '다시 풀기',
+      'mag.check': '확인',
+      'mag.reveal': '정답 보기',
+      'mag.correct': '정확합니다',
+      'mag.incorrect': '다시 들어보세요',
+      'mag.answerIs': '정답',
+      'mag.youTyped': '내가 쓴 문장',
+      'mag.typeFirst': '문장을 입력해 주세요',
+      'mag.emptySection': '이 섹션은 준비 중입니다.',
+      'mag.reviewKicker': 'REVIEW',
+      'mag.reviewTitle': '단어 복습',
+      'mag.reviewLead': '단어장에 담은 표현을 카드로 다시 봅니다. 맞힌 카드는 더 늦게, 틀린 카드는 더 자주 나옵니다.',
+      'mag.reviewStart': '복습 시작',
+      'mag.reviewEmpty': '복습할 카드가 없습니다. 먼저 단어를 담아 보세요.',
+      'mag.reviewDone': '오늘 복습을 마쳤습니다.',
+      'mag.reviewFlip': '뜻 보기',
+      'mag.reviewKnow': '알아요',
+      'mag.reviewAgain': '몰라요',
+      'mag.reviewCard': '카드',
+      'mag.reviewDue': '오늘 볼 카드',
+      'mag.searchPlaceholder': '단어 검색',
+      'mag.export': 'CSV로 내보내기',
+      'mag.exported': 'CSV 파일을 저장했습니다',
+      'mag.exportEmpty': '내보낼 단어가 없습니다',
+      'mag.noMatch': '검색 결과가 없습니다.',
+      'mag.print': '인쇄 · PDF',
+      'mag.dailyTitle': '오늘의 학습',
+      'mag.dailyUnit': '개 활동',
+      'mag.streakLabel': '일 연속',
+      'mag.bestLabel': '최고',
+      'mag.dailyGoalReached': '오늘 목표를 채웠습니다',
+      'mag.backup': '전체 백업(JSON)',
+      'mag.restore': '백업 가져오기',
+      'mag.backupDone': '백업 파일을 저장했습니다',
+      'mag.restoreDone': '백업을 불러왔습니다',
+      'mag.restoreFailed': '이 파일은 읽을 수 없습니다',
       'mag.tocKicker': 'CONTENTS',
       'mag.tocTitle': '이번 호의 섹션',
       'mag.tocLead': '섹션별로 듣고, 읽고, 모르는 단어는 단어장에 담아두세요. 진행 상황은 이 브라우저에 저장됩니다.',
@@ -82,10 +136,17 @@
       'mag.quizCorrect': '정답입니다',
       'mag.quizWrong': '다시 보세요',
       'mag.kind.vocabulary': '어휘',
+      'mag.kind.phrasal': '구동사',
+      'mag.kind.collocation': '연어',
       'mag.kind.grammar': '문법',
+      'mag.kind.pronunciation': '발음',
       'mag.kind.idioms': '이디엄',
+      'mag.kind.slang': '슬랭',
       'mag.kind.natural': '자연스러운 표현',
       'mag.kind.conversation': '회화',
+      'mag.kind.listening': '듣기·받아쓰기',
+      'mag.kind.reading': '독해',
+      'mag.kind.writing': '쓰기',
       'mag.kind.discussion': '토론',
       'mag.kind.culture': '문화',
       'mag.kind.quiz': '확인 문제',
@@ -93,9 +154,10 @@
       'mag.kind.note': '해설 노트',
 
       'mag.pageTitle': 'EngMon — 월간 영어 매거진',
-      'mag.pageDesc': '여행 영어를 테마로 한 1호. 어휘·문법·이디엄·대화·확인 문제를 오디오와 함께 읽는 월간 영어 매거진.',
+      'mag.pageDesc': '매월 한 가지 주제를 어휘·구동사·문법·발음·회화·받아쓰기·독해·확인 문제로 끝까지 파고드는 영어 학습 매거진. 브라우저 음성으로 바로 듣습니다.',
 
-      'footer.rights': '모든 권리 보유.'
+      'footer.rights': '모든 권리 보유.',
+      'footer.analytics': '방문 통계는 Google Analytics 로 익명 수집합니다. 학습 기록(단어장·진행률)은 이 브라우저에만 남습니다.'
     },
 
     en: {
@@ -118,13 +180,67 @@
       'accent.ocean': 'Ocean',
       'accent.amber': 'Amber',
 
-      'mag.navIssue': 'Issue 1',
+      'mag.navIssue': 'This issue',
       'mag.navSections': 'Sections',
+      'mag.navReview': 'Review',
       'mag.navWords': 'Wordbook',
       'mag.navHome': 'Home',
       'mag.startReading': 'Start reading',
       'mag.openWordbook': 'Wordbook',
-      'mag.draftNotice': 'This page is the issue 1 template (draft). The wording and sections are samples — to add a new issue, edit issues.js only.',
+      'mag.hideKo': 'Hide translation',
+      'mag.hideKoOn': 'Translation hidden',
+      'mag.hideKoOff': 'Translation shown again',
+      'mag.issuePicker': 'Choose an issue',
+      'mag.issueSwitched': 'Issue changed',
+      'mag.guideTitle': 'How to use this issue',
+      'mag.guide1': 'Skim the sections on the cover and pick the part for today. One section takes three to eight minutes.',
+      'mag.guide2': 'Play the audio once, then read the English again with your eyes only.',
+      'mag.guide3': 'Save unknown expressions, then check yourself with the quiz and the dictation.',
+      'mag.guide4': 'Turn the cards on the review screen, and mark sections done to fill the progress bar.',
+      'mag.words': 'words',
+      'mag.sentences': 'sentences',
+      'mag.meaning': 'Meaning',
+      'mag.example': 'Example',
+      'mag.playLine': 'Play this line',
+      'mag.playWord': 'Play the pronunciation',
+      'mag.playAll': 'Play the whole dialogue',
+      'mag.quizScore': 'correct',
+      'mag.quizRetry': 'Try again',
+      'mag.check': 'Check',
+      'mag.reveal': 'Show answer',
+      'mag.correct': 'Correct',
+      'mag.incorrect': 'Listen again',
+      'mag.answerIs': 'Answer',
+      'mag.youTyped': 'Your answer',
+      'mag.typeFirst': 'Type the sentence first',
+      'mag.emptySection': 'This section is being prepared.',
+      'mag.reviewKicker': 'REVIEW',
+      'mag.reviewTitle': 'Word review',
+      'mag.reviewLead': 'Review the expressions you saved as cards. Cards you know come back later, cards you miss come back sooner.',
+      'mag.reviewStart': 'Start review',
+      'mag.reviewEmpty': 'No cards to review yet. Save a few words first.',
+      'mag.reviewDone': 'You have finished the review for today.',
+      'mag.reviewFlip': 'Show meaning',
+      'mag.reviewKnow': 'I know it',
+      'mag.reviewAgain': 'Not yet',
+      'mag.reviewCard': 'Card',
+      'mag.reviewDue': 'Cards due today',
+      'mag.searchPlaceholder': 'Search words',
+      'mag.export': 'Export CSV',
+      'mag.exported': 'The CSV file was saved',
+      'mag.exportEmpty': 'There is nothing to export',
+      'mag.noMatch': 'No words match your search.',
+      'mag.print': 'Print or PDF',
+      'mag.dailyTitle': 'Today',
+      'mag.dailyUnit': 'actions',
+      'mag.streakLabel': 'day streak',
+      'mag.bestLabel': 'best',
+      'mag.dailyGoalReached': 'Daily goal reached',
+      'mag.backup': 'Back up all data',
+      'mag.restore': 'Restore backup',
+      'mag.backupDone': 'Backup file saved',
+      'mag.restoreDone': 'Backup restored',
+      'mag.restoreFailed': 'That file could not be read',
       'mag.tocKicker': 'CONTENTS',
       'mag.tocTitle': 'Sections in this issue',
       'mag.tocLead': 'Listen, read, and save the words you do not know. Your progress is stored in this browser.',
@@ -162,10 +278,17 @@
       'mag.quizCorrect': 'Correct',
       'mag.quizWrong': 'Try again',
       'mag.kind.vocabulary': 'Vocabulary',
+      'mag.kind.phrasal': 'Phrasal verbs',
+      'mag.kind.collocation': 'Collocations',
       'mag.kind.grammar': 'Grammar',
+      'mag.kind.pronunciation': 'Pronunciation',
       'mag.kind.idioms': 'Idioms',
+      'mag.kind.slang': 'Slang',
       'mag.kind.natural': 'Natural English',
       'mag.kind.conversation': 'Conversation',
+      'mag.kind.listening': 'Listening and dictation',
+      'mag.kind.reading': 'Reading',
+      'mag.kind.writing': 'Writing',
       'mag.kind.discussion': 'Discussion',
       'mag.kind.culture': 'Culture',
       'mag.kind.quiz': 'Quiz',
@@ -173,15 +296,15 @@
       'mag.kind.note': 'Notes',
 
       'mag.pageTitle': 'EngMon — Monthly English magazine',
-      'mag.pageDesc': 'Issue 1 on travel English: vocabulary, grammar, idioms, dialogue and a quiz, read alongside audio.',
+      'mag.pageDesc': 'A monthly English magazine that digs into one topic through vocabulary, phrasal verbs, grammar, pronunciation, conversation, dictation, reading and quizzes, read alongside browser audio.',
 
-      'footer.rights': 'All rights reserved.'
+      'footer.rights': 'All rights reserved.',
+      'footer.analytics': 'Visit statistics are collected anonymously with Google Analytics. Learning records (wordbook, progress) stay in this browser only.'
     }
   };
 
   var STORAGE_KEY = 'monsterlab.lang';
   var DEFAULT_LANG = 'ko';
-  var EMAIL = 'kaist2718@gmail.com';
 
   var htmlEl = document.documentElement;
   var langBtn = document.getElementById('langBtn');
@@ -268,11 +391,6 @@
       if (value != null) el.textContent = value;
     });
 
-    $$('[data-i18n-html]').forEach(function (el) {
-      var value = dict[el.getAttribute('data-i18n-html')];
-      if (value != null) el.innerHTML = value;
-    });
-
     $$('[data-i18n-placeholder]').forEach(function (el) {
       var value = dict[el.getAttribute('data-i18n-placeholder')];
       if (value != null) el.setAttribute('placeholder', value);
@@ -291,9 +409,6 @@
       var descEl = document.querySelector('meta[name="description"]');
       if (descEl) descEl.setAttribute('content', dict[descKey]);
     }
-
-    var hintEl = $('formHint');
-    if (hintEl) hintEl.classList.remove('is-error');
 
     htmlEl.setAttribute('lang', lang);
     if (langLabel) langLabel.textContent = lang === 'ko' ? 'EN' : 'KO';
@@ -460,214 +575,7 @@
     });
   });
 
-  /* ── 8. 복사 (클립보드) ────────────────────────────────────────────── */
-  function copyToClipboard(text, message) {
-    function fallback() {
-      var area = document.createElement('textarea');
-      area.value = text;
-      area.setAttribute('readonly', 'readonly');
-      area.style.position = 'fixed';
-      area.style.opacity = '0';
-      document.body.appendChild(area);
-      area.select();
-
-      var copied = false;
-      try { copied = document.execCommand('copy'); } catch (err) { copied = false; }
-
-      document.body.removeChild(area);
-      showToast(copied ? message : currentDict()['contact.copyFailed']);
-    }
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(
-        function () { showToast(message); },
-        fallback
-      );
-    } else {
-      fallback();
-    }
-  }
-
-  guard('주소 복사', function () {
-    var copyMailBtn = $('copyMailBtn');
-    if (!copyMailBtn) return;
-
-    on(copyMailBtn, 'click', function () {
-      copyToClipboard(EMAIL, currentDict()['contact.copied']);
-    });
-  });
-
-  /* ── 9. 문의 폼 ────────────────────────────────────────────────────── */
-  guard('문의 폼', function () {
-    var form = $('contactForm');
-    if (!form) return;
-
-    var MAX_MESSAGE = 2000;
-    var nameEl = $('cfName');
-    var emailEl = $('cfEmail');
-    var msgEl = $('cfMsg');
-    var countEl = $('cfCount');
-    var preview = $('mailPreview');
-    var previewSubject = $('mailPreviewSubject');
-    var previewBody = $('mailPreviewBody');
-    var intentTabs = $$('.intent-tab');
-    var gmailBtn = $('sendGmailBtn');
-    var copyBodyBtn = $('copyBodyBtn');
-    var activeIntent = 'general';
-
-    if (!nameEl || !emailEl || !msgEl) return;
-
-    msgEl.setAttribute('maxlength', String(MAX_MESSAGE));
-
-    function showError(id, message) {
-      var box = $(id);
-      if (!box) return;
-      box.textContent = message || '';
-      box.hidden = !message;
-    }
-
-    function validEmail(value) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-    }
-
-    function composedMail() {
-      var dict = currentDict();
-      var name = nameEl.value.trim();
-      var email = emailEl.value.trim();
-      var subject = dict['contact.subject.' + activeIntent] + (name ? ' — ' + name : '');
-      var lines = [];
-
-      if (name) lines.push(dict['form.name'] + ': ' + name);
-      if (email) lines.push(dict['form.email'] + ': ' + email);
-      if (lines.length) lines.push('');
-      lines.push(msgEl.value.trim());
-
-      return { subject: subject, body: lines.join('\n') };
-    }
-
-    function validate() {
-      var dict = currentDict();
-      var ok = true;
-
-      showError('cfNameErr', '');
-      showError('cfEmailErr', '');
-      showError('cfMsgErr', '');
-
-      if (!nameEl.value.trim()) { showError('cfNameErr', dict['form.needName']); ok = false; }
-      if (!validEmail(emailEl.value.trim())) { showError('cfEmailErr', dict['form.needEmail']); ok = false; }
-      if (!msgEl.value.trim()) { showError('cfMsgErr', dict['form.needMessage']); ok = false; }
-
-      if (!ok) {
-        var firstError = form.querySelector('.field-error:not([hidden])');
-        if (firstError) {
-          var field = firstError.parentNode &&
-            firstError.parentNode.querySelector('input, textarea');
-          if (field && field.focus) field.focus();
-        }
-      }
-
-      return ok;
-    }
-
-    function syncPreview() {
-      if (!preview) return;
-
-      var mail = composedMail();
-      var hasInput = !!(nameEl.value.trim() || msgEl.value.trim());
-
-      preview.hidden = !hasInput;
-      if (!hasInput) return;
-      if (previewSubject) previewSubject.textContent = mail.subject;
-      if (previewBody) previewBody.textContent = mail.body;
-    }
-
-    function updateCount() {
-      if (countEl) countEl.textContent = msgEl.value.length + ' / ' + MAX_MESSAGE;
-    }
-
-    intentTabs.forEach(function (tab) {
-      on(tab, 'click', function () {
-        activeIntent = tab.getAttribute('data-intent');
-        intentTabs.forEach(function (other) {
-          var active = other === tab;
-          other.classList.toggle('is-active', active);
-          other.setAttribute('aria-pressed', active ? 'true' : 'false');
-        });
-        syncPreview();
-      });
-    });
-
-    [nameEl, emailEl, msgEl].forEach(function (field) {
-      on(field, 'input', function () {
-        updateCount();
-        syncPreview();
-      });
-    });
-
-    /* 1) 기본 메일 앱 */
-    on(form, 'submit', function (e) {
-      e.preventDefault();
-      if (!validate()) return;
-
-      var mail = composedMail();
-      window.location.href = 'mailto:' + EMAIL +
-        '?subject=' + encodeURIComponent(mail.subject) +
-        '&body=' + encodeURIComponent(mail.body);
-
-      showToast(currentDict()['form.opened']);
-    });
-
-    /* 2) Gmail 새 창 (메일 앱이 없는 환경) */
-    on(gmailBtn, 'click', function () {
-      if (!validate()) return;
-
-      var mail = composedMail();
-      window.open(
-        'https://mail.google.com/mail/?view=cm&fs=1' +
-        '&to=' + encodeURIComponent(EMAIL) +
-        '&su=' + encodeURIComponent(mail.subject) +
-        '&body=' + encodeURIComponent(mail.body),
-        '_blank',
-        'noopener'
-      );
-    });
-
-    /* 3) 본문 복사 (어디에든 붙여넣기) */
-    on(copyBodyBtn, 'click', function () {
-      if (!validate()) return;
-
-      var mail = composedMail();
-      copyToClipboard(mail.subject + '\n\n' + mail.body, currentDict()['form.bodyCopied']);
-    });
-
-    updateCount();
-  });
-
-  /* ── 10. 스크롤 등장 ───────────────────────────────────────────────── */
-  guard('스크롤 등장', function () {
-    if (reduceMotion || !('IntersectionObserver' in window)) return;
-
-    var targets = $$('.card, .service, .timeline > li, .faq, .preview-window');
-    if (!targets.length) return;
-
-    document.documentElement.classList.add('reveal-ready');
-
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
-
-    targets.forEach(function (el, i) {
-      el.classList.add('reveal');
-      el.style.transitionDelay = ((i % 4) * 70) + 'ms';
-      observer.observe(el);
-    });
-  });
-
-  /* ── 11. 헤더 그림자 · 맨 위로 · 현재 섹션 ─────────────────────────── */
+  /* ── 9. 헤더 그림자 · 맨 위로 · 현재 섹션 ────────────────────────── */
   guard('스크롤 반응', function () {
     var header = $('siteHeader');
     var toTop = $('toTop');
@@ -708,7 +616,7 @@
     on(window, 'scroll', onScroll, { passive: true });
   });
 
-  /* ── 12. 푸터 연도 ─────────────────────────────────────────────────── */
+  /* ── 10. 푸터 연도 ─────────────────────────────────────────────────── */
   guard('푸터 연도', function () {
     var yearEl = $('year');
     if (yearEl) yearEl.textContent = String(new Date().getFullYear());

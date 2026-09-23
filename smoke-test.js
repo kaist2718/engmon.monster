@@ -43,6 +43,28 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+/* 만들어진 DOM 트리에서 클래스 이름으로 요소를 찾습니다.
+   (매거진은 DOM을 직접 만들어 붙이므로 querySelector로는 잡히지 않습니다) */
+function collect(root, className, out) {
+  if (!root) return out || [];
+  const found = out || [];
+  const classes = root.className ? String(root.className).split(/\s+/) : [];
+  if (classes.indexOf(className) > -1) found.push(root);
+  (root.children || []).forEach((child) => collect(child, className, found));
+  return found;
+}
+
+/* 속성으로 요소를 찾습니다 (완료 표시 버튼처럼 클래스가 없는 경우) */
+function collectAttr(root, attr, out) {
+  if (!root) return out || [];
+  const found = out || [];
+  if (root.getAttribute && root.getAttribute(attr) != null) found.push(root);
+  (root.children || []).forEach((child) => collectAttr(child, attr, found));
+  return found;
+}
+
+const pad2 = (n) => (String(n).length < 2 ? '0' + n : String(n));
+
 /* ── 최소 DOM 구현 ──────────────────────────────────────────────────────── */
 function makeClassList() {
   const set = new Set();
@@ -111,6 +133,7 @@ function makeElement(tag) {
   };
   el.querySelector = () => null;
   el.querySelectorAll = () => [];
+  el.click = () => el.dispatch('click');
   el.focus = () => {};
   el.select = () => {};
   el.getBoundingClientRect = () => ({ top: 0, left: 0, right: 0, bottom: 0, width: 0, height: 0 });
@@ -180,6 +203,12 @@ function makeDom(html, options) {
     return el;
   });
 
+  bySelector['[data-tr-toggle]'] = [...html.matchAll(/data-tr-toggle/g)].map(() => {
+    const el = makeElement('button');
+    el.setAttribute('data-tr-toggle', '1');
+    return el;
+  });
+
   bySelector['meta[name="theme-color"]'] = [makeMeta('theme-color', '#0a0e13')];
   bySelector['meta[name="description"]'] = [makeMeta('description', '')];
 
@@ -214,6 +243,11 @@ function makeDom(html, options) {
       return bySelector[sel] || [];
     },
     createElement: (tag) => makeElement(tag),
+    createTextNode: (text) => {
+      const node = makeElement('span');
+      node.textContent = String(text);
+      return node;
+    },
     addEventListener: (type, fn) => {
       (documentListeners[type] = documentListeners[type] || []).push(fn);
     },
@@ -260,6 +294,13 @@ function makeSandbox(dom, opts) {
     },
     SpeechSynthesisUtterance: class {
       constructor(text) { this.text = text; }
+    },
+    /* 파일 선택 대신 고정된 문자열을 돌려주는 최소 구현 */
+    FileReader: class {
+      readAsText(file) {
+        this.result = (file && file.__text) || '';
+        if (this.onload) this.onload();
+      }
     },
     getComputedStyle: () => ({ getPropertyValue: () => '' }),
     _store: store,
@@ -486,12 +527,11 @@ check('요소 하나가 없어도 나머지 기능이 동작한다', () => {
   page.dom.byId.get('langBtn').dispatch('click');
   assert(page.dom.documentElement.getAttribute('lang') === 'en', '언어 전환이 죽었습니다');
   return '#siteHeader·#toTop·#footerTheme 제거 후에도 정상';
-});
-
-check('필수 요소(#langBtn·#langLabel·#toast)가 HTML에 있다', () => {
-  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-  ['langBtn', 'langLabel', 'toast', 'siteHeader', 'nav', 'menuBtn',
-    'issueContent', 'tocList', 'wbList'].forEach((id) => {
+});  check('필수 요소(#langBtn·#langLabel·#toast)가 HTML에 있다', () => {
+    const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+    ['langBtn', 'langLabel', 'toast', 'siteHeader', 'nav', 'menuBtn',
+      'issueContent', 'tocList', 'wbList', 'printBtn', 'dailyPanel', 'dailyDots',
+      'wbBackupBtn', 'wbRestoreBtn', 'wbRestoreFile'].forEach((id) => {
     assert(html.indexOf('id="' + id + '"') !== -1, '# ' + id + ' 가 index.html에 없습니다');
   });
   return 'index.html 필수 요소 확인';
@@ -596,15 +636,30 @@ if (magazine) {
     return expected + '개 섹션';
   });
 
-  check('표지·목차·진행률이 채워진다', () => {
+  check('표지·목차·진행률이 데이터와 맞는다', () => {
+    const issue = (sandbox.MAGAZINE_ISSUES || [])[0];
     const numeral = dom.byId.get('issueNumeral');
     const toc = dom.byId.get('tocList');
     const progress = dom.byId.get('issueProgressText');
 
-    assert(numeral && numeral.textContent === '01', '호 번호 = ' + (numeral && numeral.textContent));
-    assert(toc && toc.children.length, '목차가 비어 있습니다');
-    assert(progress && progress.textContent === '0 / 10', '진행률 = ' + (progress && progress.textContent));
-    return '호 01 · 목차 ' + toc.children.length + '개 · 진행률 "' + progress.textContent + '"';
+    assert(numeral && numeral.textContent === pad2(issue.number),
+      '호 번호 = ' + (numeral && numeral.textContent) + ' (기대: ' + pad2(issue.number) + ')');
+    assert(toc && toc.children.length === issue.sections.length,
+      '목차 항목 = ' + (toc && toc.children.length) + '개 (데이터: ' + issue.sections.length + '개)');
+    assert(progress && progress.textContent === '0 / ' + issue.sections.length,
+      '진행률 = ' + (progress && progress.textContent));
+    return '호 ' + pad2(issue.number) + ' · 목차 ' + toc.children.length + '개 · 진행률 "' + progress.textContent + '"';
+  });
+
+  check('표지 통계(단어 수·퀴즈 수)가 채워진다', () => {
+    const chips = dom.byId.get('issueMeta');
+    assert(chips && chips.children.length === 6, '표지 통계 칩 = ' + (chips && chips.children.length) + '개');
+
+    const values = chips.children.map((li) => li.children[1] && li.children[1].textContent);
+    values.forEach((v, i) => {
+      assert(v && v !== '' && v !== 'undefined', i + '번째 칩이 비었습니다');
+    });
+    return values.join(' · ');
   });
 
   check('화면에 번역되지 않은 키 이름이 남지 않는다', () => {
@@ -674,6 +729,259 @@ if (magazine) {
       '저장된 속도가 복원되지 않았습니다');
 
     return '1× → 0.75× 저장 및 복원 확인';
+  });
+
+  check('호 선택기로 다른 호를 열 수 있다', () => {
+    const data = sandbox.MAGAZINE_ISSUES || [];
+    const nav = dom.byId.get('issueNav');
+
+    assert(data.length > 1, '호가 ' + data.length + '개뿐입니다 (여러 호를 담아야 합니다)');
+    assert(nav && nav.children.length === data.length, '호 버튼 ' + (nav && nav.children.length) + '개');
+
+    const active = nav.children.filter((b) => b.getAttribute('aria-pressed') === 'true')[0];
+    assert(active, '현재 보고 있는 호 표시가 없습니다');
+
+    const other = nav.children.filter((b) => b !== active)[0];
+    const next = data[nav.children.indexOf(other)];
+    other.dispatch('click');
+
+    assert(dom.byId.get('issueNumeral').textContent === pad2(next.number),
+      '호를 바꿨는데 표지 번호 = ' + dom.byId.get('issueNumeral').textContent);
+    assert(JSON.parse(sandbox.localStorage.getItem('monsterlab.issue')) === next.slug,
+      '선택한 호가 저장되지 않았습니다');
+    assert(dom.byId.get('tocList').children.length === next.sections.length,
+      '목차가 새 호 기준으로 다시 그려지지 않았습니다');
+    return pad2(data[0].number) + ' → ' + pad2(next.number) + ' 전환 · 목차 ' + next.sections.length + '개';
+  });
+
+  check('번역 가리기 토글이 상태·저장값·버튼 표시를 바꾼다', () => {
+    const buttons = dom.bySelector['[data-tr-toggle]'];
+    assert(buttons.length >= 1, '토글 버튼이 HTML에 없습니다');
+
+    const before = dom.documentElement.getAttribute('data-tr');
+    assert(before === 'on', '초기 data-tr = ' + before);
+
+    buttons[0].dispatch('click');
+
+    assert(dom.documentElement.getAttribute('data-tr') === 'off',
+      'data-tr = ' + dom.documentElement.getAttribute('data-tr'));
+    assert(JSON.parse(sandbox.localStorage.getItem('monsterlab.translation')) === 'off',
+      '저장값 = ' + sandbox.localStorage.getItem('monsterlab.translation'));
+    assert(buttons[0].getAttribute('aria-pressed') === 'false', 'aria-pressed가 갱신되지 않았습니다');
+
+    buttons[0].dispatch('click');
+    assert(dom.documentElement.getAttribute('data-tr') === 'on', '다시 켜지지 않았습니다');
+    return 'on ↔ off · 버튼 ' + buttons.length + '개 동기화';
+  });
+
+  check('받아쓰기가 정답과 오답을 구분한다', () => {
+    const inputs = collect(dom.byId.get('issueContent'), 'dict-input');
+    assert(inputs.length, '받아쓰기 입력칸이 렌더링되지 않았습니다');
+
+    const input = inputs[0];
+    const row = input.parentNode;
+    const checkBtn = collect(row, 'dict-actions')[0].children[0];
+
+    input.value = 'totally wrong sentence';
+    checkBtn.dispatch('click');
+    assert(collect(row, 'dict-bad').length === 1, '오답 안내가 없습니다');
+    assert(collect(row, 'dict-answer').length === 1, '오답일 때 정답이 공개되지 않았습니다');
+    assert(collect(row, 'dict-word').length > 0, '정답 문장이 단어로 나뉘어 표시되지 않았습니다');
+
+    const dictation = (sandbox.MAGAZINE_ISSUES || []).find((i) => i.slug === JSON.parse(sandbox.localStorage.getItem('monsterlab.issue')))
+      .sections.filter((s) => s.dictation && s.dictation.length)[0];
+    assert(dictation, '받아쓰기 데이터를 찾지 못했습니다');
+
+    input.value = dictation.dictation[0].en;
+    checkBtn.dispatch('click');
+    assert(collect(row, 'dict-ok').length === 1, '정답 표시가 없습니다');
+    assert(collect(row, 'dict-bad').length === 0, '정답인데 오답 안내가 남아 있습니다');
+    return '오답 → 정답 처리 확인 (문항 ' + inputs.length + '개)';
+  });
+
+  check('확인 문제가 점수를 매기고 다시 풀 수 있다', () => {
+    const issue = (sandbox.MAGAZINE_ISSUES || [])
+      .find((i) => i.slug === JSON.parse(sandbox.localStorage.getItem('monsterlab.issue')));
+    const quizSection = issue.sections.filter((s) => s.quiz && s.quiz.length)[0];
+    assert(quizSection, '확인 문제 데이터가 없습니다');
+
+    const rows = collect(dom.byId.get('issueContent'), 'quiz-item');
+    const total = quizSection.quiz.length;
+    assert(rows.length >= total, '퀴즈 항목 = ' + rows.length + '개');
+
+    rows.slice(0, total).forEach((row, i) => {
+      const options = collect(row, 'quiz-opt');
+      options[quizSection.quiz[i].answer].dispatch('click');
+    });
+
+    const summary = collect(dom.byId.get('issueContent'), 'quiz-summary')[0];
+    assert(summary && summary.hidden === false, '모두 풀었는데 점수 요약이 나오지 않았습니다');
+
+    const score = collect(summary, 'quiz-summary-score')[0];
+    assert(score && score.textContent === total + ' / ' + total, '점수 = ' + (score && score.textContent));
+
+    const retry = collect(summary, 'quiz-summary-actions')[0].children[0];
+    retry.dispatch('click');
+
+    assert(summary.hidden === true, '다시 풀기 후 요약이 사라지지 않았습니다');
+    assert(collect(rows[0], 'quiz-feedback').length === 0, '다시 풀기 후 피드백이 남아 있습니다');
+    return total + '문항 채점 + 다시 풀기 확인';
+  });
+
+  check('단어장 검색이 목록을 걸러낸다', () => {
+    const page = runPage('index.html', {
+      storage: {
+        'monsterlab.wordbook': JSON.stringify([
+          { en: 'layover', ko: '경유 대기' },
+          { en: 'boarding pass', ko: '탑승권' },
+        ]),
+      },
+    });
+
+    const list = page.dom.byId.get('wbList');
+    assert(list.children.length === 2, '저장 단어 ' + list.children.length + '개');
+
+    const search = page.dom.byId.get('wbSearch');
+    assert(search, '#wbSearch가 없습니다');
+
+    search.value = 'boarding';
+    search.dispatch('input');
+    assert(list.children.length === 1, '검색 후 ' + list.children.length + '개');
+    assert(page.dom.byId.get('wbNoMatch').hidden === true, '결과가 있는데 안내가 보입니다');
+
+    search.value = 'zzz';
+    search.dispatch('input');
+    assert(list.children.length === 0, '없는 단어인데 ' + list.children.length + '개 남았습니다');
+    assert(page.dom.byId.get('wbNoMatch').hidden === false, '검색 결과 없음 안내가 보이지 않습니다');
+    return '2 → 1 → 0개 필터링';
+  });
+
+  check('단어를 담으면 복습 카드가 준비된다', () => {
+    const page = runPage('index.html', {
+      storage: { 'monsterlab.wordbook': JSON.stringify([{ en: 'layover', ko: '경유 대기', note: '경유' }]) },
+    });
+
+    const pill = page.dom.byId.get('reviewDueCount');
+    const stage = page.dom.byId.get('reviewStage');
+
+    assert(pill && pill.textContent === '1', '복습 대기 카드 = ' + (pill && pill.textContent));
+
+    const start = collect(stage, 'review-start')[0];
+    assert(start, '복습 시작 안내가 없습니다');
+    collect(start, 'btn')[0].dispatch('click');
+
+    assert(collect(stage, 'review-card').length === 1, '카드가 나타나지 않았습니다');
+    assert(collect(stage, 'review-face-ko').length === 0, '뜻이 처음부터 보입니다');
+
+    collect(stage, 'review-actions')[0].children[0].dispatch('click');   /* 뜻 보기 */
+    assert(collect(stage, 'review-face-ko').length === 1, '뜻이 나타나지 않았습니다');
+
+    collect(stage, 'review-actions')[0].children[0].dispatch('click');   /* 알아요 */
+    assert(collect(stage, 'review-done').length === 1, '복습 완료 화면이 없습니다');
+
+    const srs = JSON.parse(page.sandbox.localStorage.getItem('monsterlab.srs'));
+    assert(srs && srs.layover && srs.layover.box === 1, '복습 단계가 기록되지 않았습니다');
+    return '카드 1장 복습 · 다음 단계 box=' + srs.layover.box;
+  });
+
+  check('모든 섹션 종류에 ko·en 문구가 있다', () => {
+    const kinds = new Set();
+    (sandbox.MAGAZINE_ISSUES || []).forEach((issue) => {
+      issue.sections.forEach((s) => kinds.add(s.kind));
+    });
+
+    const missing = [];
+    kinds.forEach((kind) => {
+      ['ko', 'en'].forEach((lang) => {
+        if (sandbox.MonsterLab.t('mag.kind.' + kind, lang) === 'mag.kind.' + kind) {
+          missing.push(kind + ' (' + lang + ')');
+        }
+      });
+    });
+
+    assert(missing.length === 0, '누락: ' + missing.join(', '));
+    return kinds.size + '종 × ko·en 확인';
+  });
+
+  check('학습 리듬(오늘의 활동·연속 학습일)이 기록된다', () => {
+    const page = runPage('index.html');
+    const { sandbox: sb, dom: d } = page;
+
+    const done = collectAttr(d.byId.get('issueContent'), 'data-done-for')
+      .filter((node) => node.tagName === 'BUTTON');
+    assert(done.length >= 3, '완료 표시 버튼 = ' + done.length + '개');
+
+    assert(d.byId.get('dailyCount').textContent === '0', '처음부터 오늘 활동이 있습니다');
+    assert(d.byId.get('dailyDots').children.length === 7, '요일 점 = ' + d.byId.get('dailyDots').children.length + '개');
+
+    done[0].dispatch('click');
+    done[1].dispatch('click');
+    done[2].dispatch('click');
+
+    assert(d.byId.get('dailyCount').textContent === '3', '오늘 활동 = ' + d.byId.get('dailyCount').textContent);
+    assert(d.byId.get('streakCount').textContent === '1', '연속 학습일 = ' + d.byId.get('streakCount').textContent);
+    assert(d.byId.get('dailyFill').style.width === '100%', '진행 막대 = ' + d.byId.get('dailyFill').style.width);
+
+    const days = JSON.parse(sb.localStorage.getItem('monsterlab.days'));
+    assert(days && days.length === 1, '학습일 기록 = ' + (days && days.length) + '일');
+
+    /* 완료를 취소하는 것은 활동으로 세지 않아야 합니다 */
+    done[0].dispatch('click');
+    assert(d.byId.get('dailyCount').textContent === '3',
+      '완료 취소까지 활동으로 세고 있습니다 (' + d.byId.get('dailyCount').textContent + ')');
+
+    return '활동 3회 · 연속 1일 · 막대 100% · 되돌리기 제외';
+  });
+
+  check('백업 파일을 불러와 단어장·복습·진행률·학습일을 합친다', () => {
+    const page = runPage('index.html', {
+      storage: { 'monsterlab.wordbook': JSON.stringify([{ en: 'layover', ko: '경유 대기' }]) },
+    });
+    const { sandbox: sb, dom: d } = page;
+
+    const payload = {
+      app: 'EngMon',
+      wordbook: [{ en: 'headline', ko: '헤드라인' }, { en: 'layover', ko: '중복된 값' }],
+      srs: { headline: { box: 3, due: 1 } },
+      progress: { 'issue-03': ['daily-words'] },
+      days: ['2026-09-01', '2026-09-02'],
+    };
+
+    const file = d.byId.get('wbRestoreFile');
+    file.files = [{ __text: JSON.stringify(payload) }];
+    file.dispatch('change');
+
+    const words = JSON.parse(sb.localStorage.getItem('monsterlab.wordbook'));
+    assert(words.length === 2, '병합 후 단어 = ' + words.length + '개');
+    assert(words.some((w) => w.en === 'headline'), '새 단어가 들어오지 않았습니다');
+    assert(words.filter((w) => w.en === 'layover')[0].ko === '경유 대기', '기존 단어가 덮어써졌습니다');
+
+    const srs = JSON.parse(sb.localStorage.getItem('monsterlab.srs'));
+    assert(srs && srs.headline && srs.headline.box === 3, '복습 단계가 복원되지 않았습니다');
+
+    const days = JSON.parse(sb.localStorage.getItem('monsterlab.days'));
+    assert(days && days.length === 2, '학습일 = ' + (days && days.length) + '일');
+
+    const progress = JSON.parse(sb.localStorage.getItem('monsterlab.progress'));
+    assert(progress && progress['issue-03'] && progress['issue-03'].indexOf('daily-words') > -1,
+      '진행률이 복원되지 않았습니다');
+
+    /* 깨진 파일은 조용히 거절합니다 */
+    file.files = [{ __text: '{ not json' }];
+    file.dispatch('change');
+    assert(JSON.parse(sb.localStorage.getItem('monsterlab.wordbook')).length === 2,
+      '깨진 파일이 단어장을 바꿔 버렸습니다');
+
+    return '단어 1→2 · 복습단계 · 진행률 · 학습일 2일 · 깨진 파일 거절';
+  });
+
+  check('인쇄 버튼이 있고 눌러도 오류가 나지 않는다', () => {
+    const page = runPage('index.html');
+    const btn = page.dom.byId.get('printBtn');
+    assert(btn, '#printBtn이 없습니다');
+
+    btn.dispatch('click');   /* 테스트 환경에는 window.print가 없습니다 — 가드가 있어야 합니다 */
+    return 'window.print 호출 가드 확인';
   });
 }
 
@@ -760,6 +1068,8 @@ check('매거진 데이터 구조가 올바르다', () => {
   const seen = new Set();
   let items = 0;
   let quizzes = 0;
+  let dictation = 0;
+  let tables = 0;
 
   issues.forEach((issue) => {
     ['number', 'slug', 'theme', 'title', 'summary'].forEach((field) => {
@@ -793,10 +1103,188 @@ check('매거진 데이터 구조가 올바르다', () => {
         assert(item.explain && item.explain.ko && item.explain.en,
           section.id + ' 퀴즈 해설에 ko/en이 필요합니다');
       });
+
+      (section.dictation || []).forEach((line) => {
+        dictation++;
+        assert(line.en && line.ko, section.id + ' 받아쓰기에 ko/en이 필요합니다');
+      });
+
+      if (section.table) {
+        tables++;
+        assert(Array.isArray(section.table.head) && section.table.head.length,
+          section.id + ' 표에 head가 필요합니다');
+        assert(Array.isArray(section.table.rows) && section.table.rows.length,
+          section.id + ' 표에 rows가 필요합니다');
+        section.table.head.forEach((head) => {
+          assert(head && head.ko && head.en, section.id + ' 표 머리말에 ko/en이 필요합니다');
+        });
+      }
+
+      if (section.body) {
+        assert(Array.isArray(section.body.en) && section.body.en.length,
+          section.id + ' 본문에 영어 문단(en)이 필요합니다');
+      }
+
+      if (section.reading) {
+        assert(Array.isArray(section.reading) && section.reading.length,
+          section.id + ' 독해 지문이 배열이 아닙니다');
+      }
     });
   });
 
-  return issues.length + '호 / 섹션 ' + seen.size + '개 / 항목 ' + items + '개 / 퀴즈 ' + quizzes + '개';
+  return issues.length + '호 / 섹션 ' + seen.size + '개 / 항목 ' + items + '개 / 퀴즈 ' + quizzes +
+    '개 / 받아쓰기 ' + dictation + '개 / 표 ' + tables + '개';
+});
+
+check('인쇄용 스타일이 있고 번역을 종이에서는 되살린다', () => {
+  const css = fs.readFileSync(path.join(ROOT, 'styles.css'), 'utf8');
+  assert(/@media print/.test(css), '인쇄 스타일(@media print)이 없습니다');
+  assert(/:root\[data-tr="off"\] \.trl \{ display: block !important; \}/.test(css),
+    '인쇄할 때 한국어 해설이 감춰집니다');
+  assert(/break-inside: avoid/.test(css), '인쇄 시 섹션 중간에서 페이지가 끊깁니다');
+  return '인쇄 스타일 + 번역 강제 표시 + 페이지 나눔 확인';
+});
+
+check('스티키 목차가 화면보다 길어도 스크롤된다 (CSS 회귀)', () => {
+  const css = fs.readFileSync(path.join(ROOT, 'styles.css'), 'utf8');
+  const start = css.indexOf('.issue-aside {');
+  assert(start > -1, '.issue-aside 규칙을 찾지 못했습니다');
+
+  const rule = css.slice(start, css.indexOf('}', start));
+  assert(/max-height\s*:/.test(rule),
+    '.issue-aside에 max-height가 없습니다 — 목차 아래쪽이 영영 잘립니다');
+  assert(/overflow-y\s*:\s*auto/.test(rule),
+    '.issue-aside에 overflow-y: auto가 없습니다 — 목차를 끝까지 내려볼 수 없습니다');
+  return 'max-height + overflow-y: auto 확인';
+});
+
+check('좁은 화면에서 섹션 머리가 줄바꿈된다 (CSS 회귀)', () => {
+  const css = fs.readFileSync(path.join(ROOT, 'styles.css'), 'utf8');
+
+  /* 760px 이하 블록을 잘라서 검사합니다 */
+  const start = css.indexOf('@media (max-width: 760px) {');
+  assert(start > -1, '760px 이하 미디어 쿼리를 찾지 못했습니다');
+  const block = css.slice(start, css.indexOf('\n@media (max-width: 900px)', start));
+
+  assert(/\.m-head\s*\{[^}]*flex-wrap\s*:\s*wrap/.test(block),
+    '좁은 화면에서 .m-head에 flex-wrap: wrap이 없습니다 — 학습 도구가 폭을 다 먹고 제목이 한 글자 폭으로 찌그러집니다');
+  assert(/\.m-tools\s*\{[^}]*flex\s*:\s*1 1 100%/.test(block),
+    '좁은 화면에서 .m-tools가 아랫줄 전체 폭을 차지하지 않습니다');
+  return '.m-head 줄바꿈 + .m-tools 전체 폭 확인';
+});
+
+/* ── 8. 방문 분석 (Google Analytics 4) ──────────────────────────────── */
+
+/* analytics.js 를 최소 환경에서 실행해, 무엇을 했는지 돌려줍니다.
+   실제로 스크립트를 내려받지 않고 주입 시도만 관찰합니다. */
+function runAnalytics(env) {
+  const appended = [];
+  const document = {
+    head: { appendChild: (node) => appended.push(node) },
+    documentElement: { appendChild: (node) => appended.push(node) },
+    createElement: (tag) => ({ tagName: String(tag).toUpperCase(), src: '', async: false }),
+  };
+  const location = { protocol: (env && env.protocol) || 'https:' };
+  const navigator = { doNotTrack: env && env.dnt };
+  const window = {
+    ENGMON_GA4_ID: env ? env.id : undefined,
+    document: document,
+    location: location,
+    navigator: navigator,
+    doNotTrack: env && env.windowDnt,
+  };
+
+  const sandbox = {
+    window: window,
+    document: document,
+    location: location,
+    navigator: navigator,
+    encodeURIComponent: encodeURIComponent,
+    Date: Date,
+  };
+  vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(path.join(ROOT, 'analytics.js'), 'utf8'), sandbox, { filename: 'analytics.js' });
+
+  return { appended: appended, window: window };
+}
+
+check('방문 분석 — 측정 ID가 없으면 아무 요청도 보내지 않는다', () => {
+  const cases = [
+    { label: '설정 없음', env: undefined },
+    { label: '빈 문자열', env: { id: '' } },
+    { label: '공백', env: { id: '   ' } },
+    { label: '자리표시자', env: { id: 'G-XXXXXXXXXX' } },
+    { label: '형식 오류(짧음)', env: { id: 'G-123' } },
+    { label: '형식 오류(UA-)', env: { id: 'UA-12345678-1' } },
+  ];
+
+  cases.forEach((c) => {
+    const out = runAnalytics(c.env);
+    assert(out.appended.length === 0,
+      c.label + ': 스크립트를 붙였습니다 — ID를 채우기 전에는 아무 것도 하지 않아야 합니다');
+    assert(!out.window.gtag, c.label + ': gtag를 만들었습니다');
+  });
+
+  return cases.length + '가지 경우 모두 무동작';
+});
+
+check('방문 분석 — 로컬(file://)·추적 금지에서는 보내지 않는다', () => {
+  const blocked = [
+    { label: 'file://', env: { id: 'G-ABCDE12345', protocol: 'file:' } },
+    { label: 'navigator.doNotTrack', env: { id: 'G-ABCDE12345', dnt: '1' } },
+    { label: 'window.doNotTrack', env: { id: 'G-ABCDE12345', windowDnt: '1' } },
+  ];
+
+  blocked.forEach((c) => {
+    const out = runAnalytics(c.env);
+    assert(out.appended.length === 0, c.label + ': 그래도 보냈습니다');
+  });
+
+  /* 로컬 확인이 통계에 섞이지 않아야 하고, 브라우저 검증도 조용해야 합니다 */
+  return blocked.map((c) => c.label).join(' · ') + ' 차단 확인';
+});
+
+check('방문 분석 — 페이지 방문만 수집하도록 설정한다', () => {
+  const out = runAnalytics({ id: 'G-ABCDE12345' });
+  assert(out.appended.length === 1, '스크립트를 붙이지 않았습니다');
+
+  const tag = out.appended[0];
+  assert(tag.src === 'https://www.googletagmanager.com/gtag/js?id=G-ABCDE12345',
+    'gtag 스크립트 주소가 다릅니다: ' + tag.src);
+  assert(tag.async === true, '스크립트가 async가 아닙니다 — 페이지 표시를 막습니다');
+
+  const calls = out.window.dataLayer.map((args) => Array.prototype.slice.call(args));
+  const config = calls.filter((c) => c[0] === 'config')[0];
+  assert(config, "gtag('config', …) 호출이 없습니다");
+  assert(config[1] === 'G-ABCDE12345', '측정 ID가 전달되지 않았습니다');
+
+  const opts = config[2] || {};
+  assert(opts.send_page_view === true, '페이지 방문 수집이 꺼져 있습니다');
+  assert(opts.anonymize_ip === true, 'IP 익명화가 꺼져 있습니다');
+  assert(opts.allow_google_signals === false, '광고 신호를 끄지 않았습니다');
+  assert(opts.allow_ad_personalization_signals === false, '광고 맞춤설정 신호를 끄지 않았습니다');
+
+  /* 학습 행동을 보내는 코드가 섞여 들어오지 않았는지 — '페이지 방문만' 원칙 */
+  const events = calls.filter((c) => c[0] === 'event').map((c) => c[1]);
+  assert(events.length === 0, '학습 이벤트를 보내고 있습니다: ' + events.join(', '));
+
+  return '스크립트 1회 · config 1회 · 이벤트 0회 · IP 익명화';
+});
+
+check('index.html — 방문 분석 스크립트를 한 번만, ID는 한 곳에서 정한다', () => {
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const refs = [...html.matchAll(/<script[^>]+src="analytics\.js(\?v=[\w.-]+)?"/g)];
+  assert(refs.length === 1, 'analytics.js 참조가 ' + refs.length + '개입니다 (1개여야 합니다)');
+  assert(refs[0][1], 'analytics.js 에 ?v= 캐시 무효화 버전이 없습니다');
+
+  const ids = [...html.matchAll(/ENGMON_GA4_ID\s*=/g)];
+  assert(ids.length === 1, '측정 ID를 정하는 곳이 ' + ids.length + '곳입니다 (한 곳이어야 합니다)');
+
+  /* 스크립트보다 ID 설정이 먼저 와야 합니다 */
+  assert(html.indexOf('ENGMON_GA4_ID') < html.indexOf('analytics.js'),
+    '측정 ID 설정이 analytics.js 보다 뒤에 있습니다');
+
+  return 'analytics.js 1회 · 측정 ID 1곳';
 });
 
 /* ── 결과 ─────────────────────────────────────────────────────────────── */
