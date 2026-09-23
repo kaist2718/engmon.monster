@@ -10,10 +10,10 @@
      1) 목차(사이드바)가 화면보다 길 때 잘리지 않고 스크롤되는가
      2) 모바일/태블릿 폭에서 가로 오버플로·잘림이 없는가
      3) 터치 스와이프·목차 링크 이동이 동작하는가
-     4) 호 전환·오늘의 학습·복습·백업·인쇄가 동작하는가
+     4) 주(week) 전환·52주 플랜·오늘의 학습·복습·백업·인쇄가 동작하는가
      5) 콘솔 에러가 없는가
-     6) 방문 분석(GA4) — 측정 ID가 없으면 요청이 없는가, 넣으면 한 번만 보내는가
-        (구글에는 실제로 보내지 않습니다. 요청만 가로채서 확인합니다)
+     6) 방문 분석(Microsoft Clarity) — 프로젝트 ID가 없으면 요청이 없는가, 넣으면 한 번만 보내는가
+        (Clarity 서버에는 실제로 보내지 않습니다. 요청만 가로채서 확인합니다)
 
    Chrome 경로는 CHROME 환경변수로 덮어쓸 수 있습니다.
    ───────────────────────────────────────────────────────────────────────────── */
@@ -109,18 +109,33 @@ function connect(wsUrl) {
 }
 
 /* 프로젝트 폴더를 그대로 서빙하는 최소 정적 서버 (http 로 열어야 분석 스크립트가 삽니다).
-   `/ga-test.html` 은 index.html 의 측정 ID만 바꿔 내려 줍니다 — 켜진 상태를 확인하려고. */
+   `/analytics-off.html` 은 ID를 비운 사본, `/analytics-on.html` 은 테스트 ID를 넣은 사본입니다 —
+   꺼진/켜진 상태를 실제 index.html 의 설정과 무관하게 검사하려고. */
+const CLARITY_TEST_ID = 'kwq1z2abcd';
+
+/* index.html 의 프로젝트 ID 를 읽습니다 — 꺼진 상태와 켜진 상태를 둘 다 검사하려고. */
+function readClarityId(root) {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const m = html.match(/window\.ENGMON_CLARITY_ID\s*=\s*'([^']*)'/);
+  return m ? m[1].trim() : '';
+}
+
 function serveStatic(root) {
   const state = { patched: false };
+  const withId = (id) => fs.readFileSync(path.join(root, 'index.html'), 'utf8')
+    .replace(/window\.ENGMON_CLARITY_ID\s*=\s*'[^']*'/, "window.ENGMON_CLARITY_ID = '" + id + "'");
+
   const server = http.createServer((req, res) => {
     const file = decodeURIComponent(req.url.split('?')[0]);
     const send = (body, type) => { res.writeHead(200, { 'Content-Type': type }); res.end(body); };
 
-    if (file === '/ga-test.html') {
-      const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-      const patched = html.replace(/window\.ENGMON_GA4_ID\s*=\s*''/, "window.ENGMON_GA4_ID = 'G-TEST1234567'");
-      state.patched = patched !== html;
-      return send(patched, 'text/html; charset=utf-8');
+    /* ID 를 비운 사본 — 기본(꺼진) 상태 검사용 */
+    if (file === '/analytics-off.html') return send(withId(''), 'text/html; charset=utf-8');
+
+    /* 테스트 ID 를 넣은 사본 — 켠 상태 검사용 (실제 ID 와 무관하게 결정적) */
+    if (file === '/analytics-on.html') {
+      state.patched = true;
+      return send(withId(CLARITY_TEST_ID), 'text/html; charset=utf-8');
     }
 
     const target = path.join(root, file === '/' ? 'index.html' : file);
@@ -340,7 +355,9 @@ const overflowProbe = `(() => {
   await load(1400, 900, false);
   const f = await evalv(`(() => {
     const out = {};
-    out.issueButtons = document.querySelectorAll('.issue-btn').length;
+    out.weekChips = document.querySelectorAll('.week-chip').length;
+    out.planItems = document.querySelectorAll('.plan-item').length;
+    out.plannedItems = document.querySelectorAll('.plan-item.is-planned').length;
     out.dots = document.querySelectorAll('.daily-dot').length;
     out.dailyBefore = document.getElementById('dailyCount').textContent;
     out.issueBefore = document.getElementById('issueNumeral').textContent;
@@ -351,13 +368,19 @@ const overflowProbe = `(() => {
     out.streak = document.getElementById('streakCount').textContent;
     out.dailyFill = document.getElementById('dailyFill').style.width;
 
-    // 호 전환 4호 → 1호
-    const btns = document.querySelectorAll('.issue-btn');
-    btns[3].click();
+    // 주 전환 W01 → W04 (발행된 마지막 주)
+    const chips = document.querySelectorAll('.week-chip');
+    chips[3].click();
     out.issueAfter = document.getElementById('issueNumeral').textContent;
     out.sectionsAfter = document.querySelectorAll('.m-section').length;
-    out.issueSaved = localStorage.getItem('monsterlab.issue');
-    btns[0].click();
+    out.issueSaved = JSON.parse(localStorage.getItem('monsterlab.issue'));
+
+    // 아직 발행 전인 주(W05) → 본문 대신 준비 중 안내
+    chips[4].click();
+    out.plannedNotice = !!document.querySelector('.m-planned-note');
+    out.plannedSections = document.querySelectorAll('#issueContent .m-section').length;
+    out.plannedToc = document.querySelectorAll('#tocList .is-planned').length;
+    chips[0].click();
 
     // 번역 가리기
     const tr = document.querySelector('[data-tr-toggle]');
@@ -386,9 +409,16 @@ const overflowProbe = `(() => {
 
     return out;
   })()`);
-  report(f.issueButtons === 4, '호 선택기 4개 · 호 전환', '4호 → ' + f.issueAfter + '호 (섹션 ' + f.sectionsAfter + '개, 저장=' + f.issueSaved + ')');
+  report(f.weekChips === 52 && f.planItems === 52, '주 선택기·52주 플랜에 모든 주가 나온다',
+    '칩 ' + f.weekChips + '개 · 플랜 ' + f.planItems + '주');
+  report(f.plannedItems === 48, '아직 발행되지 않은 주는 예정으로 표시', f.plannedItems + '주 예정');
+  report(f.issueAfter === '04' && f.issueSaved === 'week-04', '주 전환 W01 → W04',
+    'W' + f.issueAfter + ' (섹션 ' + f.sectionsAfter + '개, 저장=' + f.issueSaved + ')');
+  report(f.plannedNotice === true && f.plannedSections === 1 && f.plannedToc === 1,
+    '발행 전인 주는 준비 중 안내를 보여 준다',
+    '안내=' + f.plannedNotice + ' · 본문 ' + f.plannedSections + '개 · 목차 ' + f.plannedToc + '줄');
   report(f.dots === 7, '오늘의 학습 — 7일 점 표시', 'dots=' + f.dots);
-  report(f.dailyBefore === '0' && f.issueBefore === '04', '새 프로필에서 시작 상태가 깨끗함', '활동 0 · ' + f.issueBefore + '호');
+  report(f.dailyBefore === '0' && f.issueBefore === '01', '새 프로필에서 시작 상태가 깨끗함', '활동 0 · W' + f.issueBefore);
   report(f.dailyCount === '1' && f.streak === '1', '학습 활동·연속 학습일 기록', '활동=' + f.dailyCount + ' · 연속=' + f.streak + '일 · 막대=' + f.dailyFill);
   report(f.trAttr === 'off' && f.trBack === 'on' && f.trLabels.length === 2, '번역 가리기 토글 + 버튼 2곳 동기화', f.trLabels.join(' / '));
   report(f.wbCount === '1', '단어 담기 → 단어장 카운트', '단어장 ' + f.wbCount + '개');
@@ -442,11 +472,11 @@ const overflowProbe = `(() => {
     console.log('  .shots/b-*.png 저장');
   }
 
-  /* ── 7. 방문 분석 (GA4) ──────────────────────────────────────────────── */
-  console.log('\n[7] 방문 분석 (GA4) — 네트워크 확인');
+  /* ── 7. 방문 분석 (Microsoft Clarity) ───────────────────────────────── */
+  console.log('\n[7] 방문 분석 (Microsoft Clarity) — 네트워크 확인');
 
-  /* 실제로 구글로 보내지 않도록 모든 요청을 가로챕니다.
-     gtag 스크립트 요청은 붙잡아 확인만 하고 실패시킵니다. */
+  /* 실제로 Clarity 로 보내지 않도록 모든 요청을 가로챕니다.
+     Clarity 요청은 붙잡아 확인만 하고 실패시킵니다. */
   const requested = [];
   const static_ = await serveStatic(__dirname);
   const local = 'http://127.0.0.1:' + static_.port;
@@ -454,53 +484,66 @@ const overflowProbe = `(() => {
     if (msg.method !== 'Fetch.requestPaused') return;
     const params = msg.params;
     requested.push(params.request.url);
-    const fail = params.request.url.indexOf('googletagmanager.com') > -1;
+    const fail = params.request.url.indexOf('clarity.ms') > -1;
     cdp.send(fail ? 'Fetch.failRequest' : 'Fetch.continueRequest', fail
       ? { requestId: params.requestId, errorReason: 'Failed' }
       : { requestId: params.requestId }).catch(() => {});
   };
   await cdp.send('Fetch.enable', { patterns: [{ urlPattern: '*' }] });
 
-  /* (a) 측정 ID가 비어 있을 때 — 외부 요청이 하나도 없어야 합니다 */
+  /* (a) 프로젝트 ID가 비어 있을 때 — 외부 요청이 하나도 없어야 합니다 */
   requested.length = 0;
   await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
-  await cdp.send('Page.navigate', { url: local + '/index.html' });
+  await cdp.send('Page.navigate', { url: local + '/analytics-off.html' });
   await sleep(1800);
   const offExternal = requested.filter((u) => u.indexOf('127.0.0.1') === -1);
-  const offGlobals = await evalv('typeof window.gtag + "/" + typeof window.dataLayer');
-  report(offExternal.length === 0, '측정 ID가 없으면 외부 요청이 없다',
-    '외부 요청 ' + offExternal.length + '개' + (offExternal.length ? ': ' + offExternal.join(', ') : '') + ' · gtag=' + offGlobals);
+  const offGlobals = await evalv('typeof window.gtag + "/" + typeof window.umami + "/" + typeof window.clarity');
+  report(offExternal.length === 0 && offGlobals.indexOf('function') === -1, 'ID가 없으면 외부 요청이 없다',
+    '외부 요청 ' + offExternal.length + '개' + (offExternal.length ? ': ' + offExternal.join(', ') : '') + ' · gtag/umami/clarity=' + offGlobals);
 
-  /* (b) 측정 ID를 넣었을 때 — gtag 스크립트 1회 + config 1회 */
+  /* (b) 프로젝트 ID를 넣었을 때 — Clarity 스크립트 1회 + ID 전달 */
   requested.length = 0;
-  await cdp.send('Page.navigate', { url: local + '/ga-test.html' });
+  await cdp.send('Page.navigate', { url: local + '/analytics-on.html' });
   await sleep(1800);
-  const gtagReqs = requested.filter((u) => u.indexOf('googletagmanager.com') > -1);
-  report(static_.state.patched, '측정 ID를 채운 사본을 만들 수 있다',
+  const clarityReqs = requested.filter((u) => u.indexOf('clarity.ms') > -1);
+  report(static_.state.patched && clarityReqs.length > 0, 'ID를 채운 사본을 만들 수 있다',
     static_.state.patched ? 'index.html 의 ID 한 줄만 교체해 켤 수 있음'
-      : 'index.html 에서 ENGMON_GA4_ID 를 찾지 못했습니다 — ID를 정하는 곳이 바뀌었는지 확인하세요');
-  const configCall = await evalv(`(() => {
-    const layer = window.dataLayer || [];
-    const calls = layer.map((a) => Array.prototype.slice.call(a));
-    const config = calls.filter((c) => c[0] === 'config')[0];
+      : 'index.html 에서 ENGMON_CLARITY_ID 를 찾지 못했습니다 — ID를 정하는 곳이 바뀌었는지 확인하세요');
+
+  const clarityTag = await evalv(`(() => {
+    const tags = Array.prototype.slice.call(document.querySelectorAll('script[src*="clarity.ms"]'));
     return {
-      hasGtag: typeof window.gtag === 'function',
-      config: config ? config[1] : null,
-      pageView: config && config[2] ? config[2].send_page_view : null,
-      anon: config && config[2] ? config[2].anonymize_ip : null,
-      signals: config && config[2] ? config[2].allow_google_signals : null,
-      events: calls.filter((c) => c[0] === 'event').length,
+      count: tags.length,
+      src: tags[0] ? tags[0].src : null,
+      async: tags[0] ? tags[0].async : null,
+      queue: typeof window.clarity,
+      traces: typeof window.gtag + '/' + typeof window.umami + '/' + typeof window.dataLayer,
     };
   })()`);
 
-  report(gtagReqs.length === 1 && gtagReqs[0].indexOf('id=G-TEST1234567') > -1,
-    '측정 ID를 넣으면 gtag 스크립트를 한 번만 부른다',
-    'gtag 요청 ' + gtagReqs.length + '회' + (gtagReqs[0] ? ' · ' + gtagReqs[0].replace('https://', '') : ''));
-  report(configCall.hasGtag === true && configCall.config === 'G-TEST1234567',
-    '설정이 측정 ID로 전달된다', 'config=' + configCall.config + ' · gtag 함수=' + configCall.hasGtag);
-  report(configCall.pageView === true && configCall.anon === true && configCall.signals === false && configCall.events === 0,
-    '페이지 방문만 수집한다',
-    'page_view=' + configCall.pageView + ' · IP 익명화=' + configCall.anon + ' · 광고신호=' + configCall.signals + ' · 이벤트 ' + configCall.events + '개');
+  report(clarityReqs.length === 1 && clarityTag.src === 'https://www.clarity.ms/tag/' + CLARITY_TEST_ID,
+    'ID를 넣으면 Clarity 스크립트를 한 번만 부른다',
+    'Clarity 요청 ' + clarityReqs.length + '회 · ' + (clarityTag.src || '').replace('https://', ''));
+  report(clarityTag.count === 1 && clarityTag.async === true && clarityTag.queue === 'function',
+    'ID가 스크립트 주소로 전달된다',
+    '스크립트 ' + clarityTag.count + '개 · async=' + clarityTag.async + ' · clarity=' + clarityTag.queue);
+  report(clarityTag.traces === 'undefined/undefined/undefined',
+    '학습 행동·GA4/Umami 흔적 없이 방문·히트맵만 수집한다',
+    'gtag/umami/dataLayer=' + clarityTag.traces);
+
+  /* (c) 실제 index.html 에 ID가 들어 있으면 그 ID로도 한 번 더 확인합니다 */
+  const realId = readClarityId(__dirname);
+  if (realId) {
+    requested.length = 0;
+    await cdp.send('Page.navigate', { url: local + '/index.html' });
+    await sleep(1800);
+    const liveReqs = requested.filter((u) => u.indexOf('clarity.ms') > -1);
+    report(liveReqs.length === 1 && liveReqs[0].indexOf('/tag/' + realId) > -1,
+      '실제 index.html 의 ID로 Clarity 를 한 번만 부른다',
+      '요청 ' + liveReqs.length + '회 · ' + (liveReqs[0] || '').replace('https://', ''));
+  } else {
+    report(true, '실제 index.html 은 아직 꺼진 상태', 'ID를 채우면 이 검사가 자동으로 켜집니다');
+  }
 
   await cdp.send('Fetch.disable');
   cdp.onEvent = null;

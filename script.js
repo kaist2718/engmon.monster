@@ -38,20 +38,34 @@
       'accent.ocean': '오션',
       'accent.amber': '앰버',
 
-      'mag.navIssue': '이번 호',
+      'mag.navIssue': '이번 주',
       'mag.navSections': '섹션',
       'mag.navReview': '복습',
       'mag.navWords': '단어장',
+      'mag.navPlan': '플랜',
       'mag.navHome': '홈',
       'mag.startReading': '읽기 시작',
       'mag.openWordbook': '단어장',
       'mag.hideKo': '번역 가리기',
       'mag.hideKoOn': '번역을 가렸습니다',
       'mag.hideKoOff': '번역을 다시 보여줍니다',
-      'mag.issuePicker': '호 선택',
-      'mag.issueSwitched': '호를 바꿨습니다',
-      'mag.guideTitle': '이 호를 이렇게 쓰세요',
-      'mag.guide1': '표지에서 섹션을 훑고 오늘 할 분량을 정합니다. 한 섹션에 3~8분이면 충분합니다.',
+      'mag.issuePicker': '주 선택',
+      'mag.issueSwitched': '주를 바꿨습니다',
+      'mag.week': '주차',
+      'mag.quarter': '분기',
+      'mag.status': '상태',
+      'mag.published': '발행됨',
+      'mag.planned': '발행 예정',
+      'mag.openPlan': '52주 플랜 보기',
+      'mag.plannedTitle': '이 주는 아직 준비 중입니다',
+      'mag.plannedToc': '구성을 마치는 대로 공개합니다.',
+      'mag.plannedLead': '5주부터는 구성이 끝나는 대로 차례로 공개합니다. 아래 플랜에서 이 주의 주제를 먼저 볼 수 있습니다.',
+      'mag.planKicker': '52 WEEKS',
+      'mag.planTitle': '1년 52주 플랜',
+      'mag.planLead': '4분기 52주입니다. 발행된 주는 바로 읽을 수 있고, 아직 준비 중인 주는 주제만 먼저 보여 줍니다. 구성을 마치는 대로 차례로 공개합니다.',
+      'mag.sectionSuffix': '개 섹션',
+      'mag.guideTitle': '이 주를 이렇게 쓰세요',
+      'mag.guide1': '표지에서 이번 주 섹션을 훑고 오늘 할 분량을 정합니다. 한 섹션에 1~8분이면 충분합니다.',
       'mag.guide2': '듣기를 한 번 재생한 뒤, 영어만 눈으로 다시 읽습니다.',
       'mag.guide3': '모르는 표현은 단어장에 담고, 확인 문제와 받아쓰기로 점검합니다.',
       'mag.guide4': '복습 화면에서 카드를 넘기고, 완료 표시로 진행률을 채웁니다.',
@@ -100,7 +114,7 @@
       'mag.restoreDone': '백업을 불러왔습니다',
       'mag.restoreFailed': '이 파일은 읽을 수 없습니다',
       'mag.tocKicker': 'CONTENTS',
-      'mag.tocTitle': '이번 호의 섹션',
+      'mag.tocTitle': '이번 주의 섹션',
       'mag.tocLead': '섹션별로 듣고, 읽고, 모르는 단어는 단어장에 담아두세요. 진행 상황은 이 브라우저에 저장됩니다.',
       'mag.wbKicker': 'WORDBOOK',
       'mag.wbTitle': '저장한 단어',
@@ -118,20 +132,44 @@
       'mag.resume': '이어서 읽기',
       'mag.nextSection': '다음 섹션',
       'mag.nextNote': '보통 영업일 기준 2~3일 안에 답장드립니다.',
-      'mag.nextTitle': '다음 호가 나오면 알려드릴까요?',
-      'mag.nextLead': '새 호 소식과 피드백은 모두 같은 메일로 받습니다. 원하는 주제가 있으면 함께 적어 보내주세요.',
+      'mag.nextTitle': '새 주가 나오면 알려드릴까요?',
+      'mag.nextLead': '새 주 소식과 피드백은 모두 같은 메일로 받습니다. 원하는 주제가 있으면 함께 적어 보내주세요.',
       'mag.subscribe': '메일 보내기',
 
+      'form.type': '문의 유형',
+      'form.type.subscribe': '새 주 알림 신청',
+      'form.type.content': '콘텐츠 오류·오타 제보',
+      'form.type.topic': '새 주제·주차 제안',
+      'form.type.study': '학습 방법 질문',
+      'form.type.partner': '제휴·광고 문의',
+      'form.type.etc': '그 외 문의',
+      'form.hint.subscribe': '새 주가 나오면 알려드립니다. 내용은 비워 두어도 됩니다.',
+      'form.hint.content': '어느 주의 어느 부분인지 알려 주시면 빠르게 고칩니다.',
+      'form.hint.topic': '다뤄 주었으면 하는 주제나 표현을 적어 주세요.',
+      'form.hint.study': '막힐는 부분과 지금까지 해 본 방법을 알려 주세요.',
+      'form.hint.partner': '어떤 형태의 제휴·광고를 생각하시는지 알려 주세요.',
+      'form.hint.etc': '무엇이든 편하게 적어 주세요.',
+      'form.ph.subscribe': '원하는 주제나 다뤄 주었으면 하는 표현을 적어 주세요.',
+      'form.ph.content': '예) W03 회화에서 오타를 찾았어요',
+      'form.ph.topic': '예) 병원에서 쓰는 표현을 다뤄 주세요',
+      'form.ph.study': '예) 뉴스 듣기가 너무 빠르게 느껴져요',
+      'form.ph.partner': '예) 학습 앱과 함께 소개하고 싶습니다',
+      'form.ph.etc': '자유롭게 적어 주세요',
+      'form.name': '이름 또는 닉네임 (선택)',
+      'form.namePh': '별명이어도 괜찮습니다.',
+      'form.issue': '관련 주 (선택)',
+      'form.issueNone': '해당 없음',
+      'form.messageRequired': '하고 싶은 말 (필수)',
+      'form.needDetail': '내용을 조금만 적어 주세요.',
       'form.email': '답장 받을 이메일',
       'form.emailPh': 'you@example.com',
       'form.message': '하고 싶은 말 (선택)',
-      'form.messagePh': '원하는 주제나 다뤄 주었으면 하는 표현을 적어 주세요.',
       'form.send': '보내기',
       'form.sending': '보내는 중…',
-      'form.sent': '보냈습니다. 다음 호가 나오면 알려드리겠습니다.',
+      'form.sent': '보냈습니다. 다음 주가 나오면 알려드리겠습니다.',
       'form.sendFail': '전송하지 못했습니다. 잠시 후 다시 시도하거나 메일로 보내 주세요.',
       'form.rateLimited': '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
-      'form.privacy': '남겨 주신 주소는 다음 호 안내와 답장에만 씁니다.',
+      'form.privacy': '남겨 주신 주소는 다음 주 안내와 답장에만 씁니다.',
       'mag.theme': '테마',
       'mag.level': '레벨',
       'mag.sections': '섹션',
@@ -164,11 +202,11 @@
       'mag.kind.humor': '유머',
       'mag.kind.note': '해설 노트',
 
-      'mag.pageTitle': 'EngMon — 월간 영어 매거진',
-      'mag.pageDesc': '매월 한 가지 주제를 어휘·구동사·문법·발음·회화·받아쓰기·독해·확인 문제로 끝까지 파고드는 영어 학습 매거진. 브라우저 음성으로 바로 듣습니다.',
+      'mag.pageTitle': 'EngMon — 1년 52주 영어 매거진',
+      'mag.pageDesc': '1년 52주 플랜으로 한 주씩 읽는 영어 학습 매거진. 주마다 한 가지 주제를 어휘·구동사·문법·발음·회화·받아쓰기·독해·확인 문제로 끝까지 파고들니다. 브라우저 음성으로 바로 듣습니다.',
 
       'footer.rights': '모든 권리 보유.',
-      'footer.analytics': '방문 통계는 Google Analytics 로 익명 수집합니다. 학습 기록(단어장·진행률)은 이 브라우저에만 남습니다.'
+      'footer.analytics': '방문 통계(Clarity)는 켠 경우에만 수집하며, 입력창에 적은 내용은 기록되지 않습니다. 학습 기록(단어장·진행률)은 이 브라우저에만 남습니다.'
     },
 
     en: {
@@ -191,20 +229,34 @@
       'accent.ocean': 'Ocean',
       'accent.amber': 'Amber',
 
-      'mag.navIssue': 'This issue',
+      'mag.navIssue': 'This week',
       'mag.navSections': 'Sections',
       'mag.navReview': 'Review',
       'mag.navWords': 'Wordbook',
+      'mag.navPlan': 'Plan',
       'mag.navHome': 'Home',
       'mag.startReading': 'Start reading',
       'mag.openWordbook': 'Wordbook',
       'mag.hideKo': 'Hide translation',
       'mag.hideKoOn': 'Translation hidden',
       'mag.hideKoOff': 'Translation shown again',
-      'mag.issuePicker': 'Choose an issue',
-      'mag.issueSwitched': 'Issue changed',
-      'mag.guideTitle': 'How to use this issue',
-      'mag.guide1': 'Skim the sections on the cover and pick the part for today. One section takes three to eight minutes.',
+      'mag.issuePicker': 'Choose a week',
+      'mag.issueSwitched': 'Week changed',
+      'mag.week': 'Week',
+      'mag.quarter': 'Quarter',
+      'mag.status': 'Status',
+      'mag.published': 'Published',
+      'mag.planned': 'Coming soon',
+      'mag.openPlan': 'See the 52-week plan',
+      'mag.plannedTitle': 'This week is not published yet',
+      'mag.plannedToc': 'It will appear as soon as it is finished.',
+      'mag.plannedLead': 'Weeks five onwards appear as soon as each one is finished. The plan below shows what this week will cover.',
+      'mag.planKicker': '52 WEEKS',
+      'mag.planTitle': 'A 52-week plan',
+      'mag.planLead': 'Fifty-two weeks across four quarters. Published weeks are ready to read; weeks still being written show their topic first.',
+      'mag.sectionSuffix': ' sections',
+      'mag.guideTitle': 'How to use this week',
+      'mag.guide1': 'Skim this week sections on the cover and pick the part for today. One section takes one to eight minutes.',
       'mag.guide2': 'Play the audio once, then read the English again with your eyes only.',
       'mag.guide3': 'Save unknown expressions, then check yourself with the quiz and the dictation.',
       'mag.guide4': 'Turn the cards on the review screen, and mark sections done to fill the progress bar.',
@@ -253,7 +305,7 @@
       'mag.restoreDone': 'Backup restored',
       'mag.restoreFailed': 'That file could not be read',
       'mag.tocKicker': 'CONTENTS',
-      'mag.tocTitle': 'Sections in this issue',
+      'mag.tocTitle': 'Sections this week',
       'mag.tocLead': 'Listen, read, and save the words you do not know. Your progress is stored in this browser.',
       'mag.wbKicker': 'WORDBOOK',
       'mag.wbTitle': 'Saved words',
@@ -271,20 +323,44 @@
       'mag.resume': 'Continue',
       'mag.nextSection': 'Next section',
       'mag.nextNote': 'We usually reply within two to three business days.',
-      'mag.nextTitle': 'Want to hear about the next issue?',
-      'mag.nextLead': 'New issues and feedback both land in the same inbox. Tell us which topics you want.',
+      'mag.nextTitle': 'Want to hear when the next week is out?',
+      'mag.nextLead': 'New weeks and feedback both land in the same inbox. Tell us which topics you want.',
       'mag.subscribe': 'Send an email',
 
+      'form.type': 'What is this about',
+      'form.type.subscribe': 'New week alerts',
+      'form.type.content': 'Report an error or typo',
+      'form.type.topic': 'Suggest a topic or week',
+      'form.type.study': 'Study method question',
+      'form.type.partner': 'Partnership or advertising',
+      'form.type.etc': 'Something else',
+      'form.hint.subscribe': 'We will email you when a new week is out. The message can stay empty.',
+      'form.hint.content': 'Tell us the week and the spot and we will fix it fast.',
+      'form.hint.topic': 'Tell us the topic or expression you want covered.',
+      'form.hint.study': 'Describe where you are stuck and what you have tried.',
+      'form.hint.partner': 'Tell us what kind of partnership you have in mind.',
+      'form.hint.etc': 'Anything at all, just write it here.',
+      'form.ph.subscribe': 'A topic you want covered, or an expression you would like to see.',
+      'form.ph.content': 'For example, a typo in the W03 conversation',
+      'form.ph.topic': 'For example, please cover phrases for a hospital visit',
+      'form.ph.study': 'For example, the news audio feels too fast',
+      'form.ph.partner': 'For example, we would like to feature EngMon',
+      'form.ph.etc': 'Write as much as you like',
+      'form.name': 'Name or nickname (optional)',
+      'form.namePh': 'A nickname is fine.',
+      'form.issue': 'Related week (optional)',
+      'form.issueNone': 'Not about a specific week',
+      'form.messageRequired': 'Your message (required)',
+      'form.needDetail': 'Please add a short message.',
       'form.email': 'Email to reply to',
       'form.emailPh': 'you@example.com',
       'form.message': 'Anything to add (optional)',
-      'form.messagePh': 'A topic you want covered, or an expression you would like to see.',
       'form.send': 'Send',
       'form.sending': 'Sending…',
-      'form.sent': 'Sent — we will email you when the next issue is out.',
+      'form.sent': 'Sent — we will email you when the next week is out.',
       'form.sendFail': 'Could not send. Please try again shortly, or email us instead.',
       'form.rateLimited': 'Too many requests. Please wait a moment and try again.',
-      'form.privacy': 'Your address is used only for replies and next-issue news.',
+      'form.privacy': 'Your address is used only for replies and next-week news.',
       'mag.theme': 'Theme',
       'mag.level': 'Level',
       'mag.sections': 'sections',
@@ -317,11 +393,11 @@
       'mag.kind.humor': 'Humour',
       'mag.kind.note': 'Notes',
 
-      'mag.pageTitle': 'EngMon — Monthly English magazine',
-      'mag.pageDesc': 'A monthly English magazine that digs into one topic through vocabulary, phrasal verbs, grammar, pronunciation, conversation, dictation, reading and quizzes, read alongside browser audio.',
+      'mag.pageTitle': 'EngMon — a 52-week English magazine',
+      'mag.pageDesc': 'A weekly English magazine built as a 52-week plan. Each week digs into one topic through vocabulary, phrasal verbs, grammar, pronunciation, conversation, dictation, reading and quizzes, read alongside browser audio.',
 
       'footer.rights': 'All rights reserved.',
-      'footer.analytics': 'Visit statistics are collected anonymously with Google Analytics. Learning records (wordbook, progress) stay in this browser only.'
+      'footer.analytics': 'Visit statistics (Clarity) are collected only when switched on, and text typed into input fields is never recorded. Learning records (wordbook, progress) stay in this browser only.'
     }
   };
 
@@ -613,7 +689,10 @@
 
     var emailEl = $('cfEmail');
     var msgEl = $('cfMsg');
-    var subjectEl = $('cfSubject');
+    var msgLabelEl = $('cfMsgLabel');
+    var hintEl = $('cfHint');
+    var typeEl = $('cfType');
+    var issueEl = $('cfIssue');
     var statusEl = $('formStatus');
     var submitBtn = $('cfSubmit');
     var sending = false;
@@ -686,6 +765,67 @@
       renderStatus();
     }
 
+    /* ── 문의 유형 ──────────────────────────────────────────────────────
+       유형을 고르면 메일 제목이 'EngMon — <유형>' 으로 바뀌고, 한 줄짜리
+       신청이 아닌 문의는 내용을 적지 않으면 보내지 못하게 합니다.
+       (제목이 항상 EngMon 으로 시작해야 수신합에서 바로 알아봅니다.) */
+    var TYPE_VALUES = ['subscribe', 'content', 'topic', 'study', 'partner', 'etc'];
+    var DEFAULT_TYPE = 'subscribe';
+
+    function currentType() {
+      var value = typeEl ? String(typeEl.value || '') : '';
+      return TYPE_VALUES.indexOf(value) === -1 ? DEFAULT_TYPE : value;
+    }
+
+    function typeLabel() {
+      return currentDict()['form.type.' + currentType()] || '';
+    }
+
+    /* 내용이 있어야 하는 문의인가 — 새 주 신청만 내용을 비워 둘 수 있습니다. */
+    function needsMessage() { return currentType() !== DEFAULT_TYPE; }
+
+    function subjectFor() {
+      var subject = 'EngMon — ' + typeLabel();
+
+      if (issueEl && issueEl.value) {
+        var option = issueEl.options && issueEl.options[issueEl.selectedIndex];
+        var label = option && option.textContent ? option.textContent : issueEl.value;
+        subject += ' · ' + label;
+      }
+
+      return subject;
+    }
+
+    /* 유형에 따라 세 가지가 함께 바뀝니다.
+         1. "하고 싶은 말" 라벨이 (선택)인지 (필수)인지
+         2. 입력란 예시 문구 (무엇을 적으면 되는지)
+         3. 어떤 문의인지 미리 알려 주는 한 줄 안내 */
+    function refreshTypeUI() {
+      var type = currentType();
+
+      if (msgLabelEl) {
+        var key = needsMessage() ? 'form.messageRequired' : 'form.message';
+        msgLabelEl.setAttribute('data-i18n', key);
+        msgLabelEl.textContent = currentDict()[key] || '';
+      }
+
+      if (hintEl) {
+        var hintKey = 'form.hint.' + type;
+        hintEl.setAttribute('data-i18n', hintKey);
+        hintEl.textContent = currentDict()[hintKey] || '';
+      }
+
+      if (msgEl) {
+        var phKey = 'form.ph.' + type;
+        var placeholder = currentDict()[phKey] || '';
+        msgEl.setAttribute('data-i18n-placeholder', phKey);
+        msgEl.setAttribute('placeholder', placeholder);
+      }
+    }
+
+    on(typeEl, 'change', refreshTypeUI);
+    refreshTypeUI();
+
     /* 전송 중에는 버튼을 잠가 중복 전송을 막습니다(Formspree는 분당 20건 제한). */
     function setSending(busy) {
       sending = busy;
@@ -719,19 +859,30 @@
       return params.toString();
     }
 
-    document.addEventListener('langchange', renderStatus);
+    document.addEventListener('langchange', function () {
+      renderStatus();
+      refreshTypeUI();
+    });
 
     on(form, 'submit', function (e) {
       /* 브라우저 기본 검사(required · type=email)를 통과한 뒤에만 submit 이벤트가 옵니다. */
       e.preventDefault();
       if (sending || !emailEl || !msgEl) return;
 
+      /* 신청이 아닌 문의는 내용이 있어야 합니다 — 빈 메일로 보내면 답장할 수 없습니다. */
+      if (needsMessage() && !String(msgEl.value || '').trim()) {
+        setStatus('form.needDetail', true);
+        if (msgEl.focus) msgEl.focus();
+        return;
+      }
+
       /* x-www-form-urlencoded + charset=UTF-8 로 보냅니다 — 문자셋을 본문에 적어
          두어야 수신 쪽이 한글을 UTF-8 로 해석합니다(영어 확장 문자의 깨짐 방지).
          Accept: application/json 이라 페이지 이동 없이 결과를 받습니다.
          source 에 접속 도메인이 담겨, 같은 폼을 다른 사이트에서 써도 구분됩니다. */
       var extra = {
-        '_subject': (subjectEl && subjectEl.value) || 'EngMon 다음 호 알림 요청',
+        'type': currentType(),
+        '_subject': subjectFor(),
         'source': (window.location && window.location.hostname) || 'engmon.monster'
       };
 
@@ -767,6 +918,7 @@
       function finishSent() {
         setSending(false);
         form.reset();
+        refreshTypeUI();
         setStatus('form.sent');
         showToast(currentDict()['form.sent']);
       }
@@ -781,7 +933,10 @@
     var navLinks = nav ? Array.prototype.slice.call(nav.querySelectorAll('a[href^="#"]')) : [];
     var sections = navLinks
       .map(function (a) { return document.querySelector(a.getAttribute('href')); })
-      .filter(Boolean);
+      .filter(Boolean)
+      /* '홈'(#top)은 페이지 맨 위를 가리키므로 스크롤 위치와 무관합니다.
+         강조 대상에 넣으면 항상 켜져서 다른 메뉴가 강조되지 않습니다. */
+      .filter(function (section) { return section.id !== 'top'; });
 
     function syncActiveNav() {
       if (!sections.length) return;

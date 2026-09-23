@@ -852,31 +852,118 @@ a  { color: inherit; text-decoration: none; }
 .wb-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .wb-actions[hidden] { display: none; }
 
-/* ── 호(issue) 선택기 ────────────────────────────────────────────────── */
-.issue-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 0; }
-.issue-btn {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 9px 15px;
+/* ── 주(week) 선택기 ──────────────────────────────────────────────────
+   1년 52주를 작은 번호 칩으로 늘어놓습니다. 발행된 주는 채워지고,
+   아직 구성 중인 주는 테두리만 보입니다(누르면 준비 중 안내가 뜹니다). */
+.issue-nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 24px 0 0; }
+.week-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  padding: 6px 8px;
   font: inherit;
-  text-align: left;
-  color: var(--text-soft);
+  font-size: .78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   cursor: pointer;
-  transition: color .2s ease, border-color .2s ease, background .2s ease;
+  transition: color .18s ease, border-color .18s ease, background .18s ease, transform .18s ease;
 }
-.issue-btn:hover { color: var(--text); border-color: var(--accent); }
-.issue-btn.is-active {
+.week-chip:hover { color: var(--text); border-color: var(--accent); transform: translateY(-1px); }
+.week-chip.is-done { color: var(--accent); border-color: rgb(var(--accent-rgb) / .45); }
+.week-chip.is-reading { color: var(--text); border-color: rgb(var(--accent-rgb) / .3); }
+.week-chip.is-planned { color: var(--text-dim); border-style: dashed; opacity: .82; }
+.week-chip.is-current {
   color: var(--accent-ink);
   background: linear-gradient(135deg, var(--accent), var(--btn-grad-2));
   border-color: transparent;
+  opacity: 1;
 }
-.issue-btn-num { font-size: .66rem; font-weight: 800; letter-spacing: .14em; opacity: .8; }
-.issue-btn-theme { font-size: .88rem; font-weight: 700; }
-.issue-btn-meta { font-size: .72rem; opacity: .8; }
+.week-chip-num { line-height: 1; }
+
+/* ── 1년 52주 플랜 (로드맵) ──────────────────────────────────────────── */
+.plan-list { display: grid; gap: 26px; margin-top: 26px; }
+.plan-quarter {
+  padding: 20px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.plan-quarter-title { margin: 0; font-size: 1.02rem; font-weight: 750; }
+.plan-quarter-lead { margin: 6px 0 0; font-size: .85rem; color: var(--text-dim); }
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+.plan-item { display: flex; }
+.plan-week {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  text-align: left;
+  color: var(--text-soft);
+  background: var(--bg-elevated, var(--bg));
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: color .18s ease, border-color .18s ease, transform .18s ease;
+}
+.plan-week:hover { color: var(--text); border-color: var(--accent); transform: translateY(-1px); }
+.plan-item.is-planned .plan-week { border-style: dashed; }
+.plan-item.is-planned .plan-title { opacity: .82; }
+.plan-item.is-current .plan-week {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.plan-item.is-done .plan-num { color: var(--accent); }
+.plan-num {
+  flex: none;
+  font-size: .74rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+}
+.plan-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.plan-theme { font-size: .82rem; font-weight: 700; color: var(--text); }
+.plan-title { font-size: .78rem; color: var(--text-soft); }
+.plan-meta { font-size: .72rem; color: var(--text-dim); }
+.plan-badge {
+  flex: none;
+  padding: 3px 8px;
+  font-size: .66rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.plan-item.is-done .plan-badge,
+.plan-item.is-reading .plan-badge { color: var(--accent); border-color: rgb(var(--accent-rgb) / .4); }
+
+/* ── 아직 발행되지 않은 주 안내 ──────────────────────────────────────── */
+.m-planned { padding-top: clamp(24px, 4vw, 40px); }
+.m-planned-note {
+  margin-top: 22px;
+  padding: 22px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+}
+.m-planned-title { margin: 0; font-size: 1.02rem; font-weight: 750; }
+.m-planned-lead { margin: 8px 0 18px; font-size: .9rem; color: var(--text-soft); line-height: 1.7; }
+.toc-item.is-planned { padding: 10px 12px; border-left: 2px dashed var(--border); }
+.toc-item.is-planned .toc-title { color: var(--text-soft); }
 
 /* ── 학습 가이드 (표지) ──────────────────────────────────────────────── */
 .guide {
@@ -1068,6 +1155,7 @@ a  { color: inherit; text-decoration: none; }
 .nf-row { display: flex; flex-direction: column; gap: 6px; }
 .nf-row label { font-size: .82rem; font-weight: 650; color: var(--text-soft); }
 .nf-row input,
+.nf-row select,
 .nf-row textarea {
   width: 100%;
   padding: 11px 16px;
@@ -1080,9 +1168,13 @@ a  { color: inherit; text-decoration: none; }
   transition: border-color .2s ease;
 }
 .nf-row textarea { min-height: 84px; resize: vertical; }
+.nf-row select { cursor: pointer; }
 .nf-row input::placeholder,
 .nf-row textarea::placeholder { color: var(--text-dim); }
+/* 유형을 고르면 무엇이 전송되는지 미리 알려 주는 한 줄 안내 */
+.nf-hint { margin: 0; font-size: .78rem; line-height: 1.5; color: var(--text-dim); }
 .nf-row input:focus,
+.nf-row select:focus,
 .nf-row textarea:focus { border-color: var(--accent); outline: none; }
 .nf-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .form-status { margin: 0; font-size: .85rem; font-weight: 620; color: var(--accent); }

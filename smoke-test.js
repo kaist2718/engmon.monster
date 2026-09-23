@@ -779,6 +779,51 @@ if (index) {
     assert(status.textContent === expected, '영어 문구 = ' + status.textContent);
     return '오류 안내가 영어로 다시 그려짐';
   });
+
+  check('문의 유형에 따라 제목·안내가 바뀌고 빈 내용은 막는다', () => {
+    const page = runPage('index.html');
+    const t = page.sandbox.MonsterLab.t;
+    const type = page.dom.byId.get('cfType');
+    const label = page.dom.byId.get('cfMsgLabel');
+
+    assert(type, '#cfType이 없습니다');
+    assert(label, '#cfMsgLabel이 없습니다');
+
+    /* 기본값은 다음 호 알림 신청 — 이때만 내용을 비워 둘 수 있습니다 */
+    type.value = 'subscribe';
+    type.dispatch('change', { target: type });
+    assert(label.textContent === t('form.message', 'ko'), '기본 안내 = ' + label.textContent);
+
+    /* 내용이 필요한 유형으로 바꾸면 안내가 (필수)로 바뀝니다 */
+    type.value = 'content';
+    type.dispatch('change', { target: type });
+    assert(label.textContent === t('form.messageRequired', 'ko'),
+      '유형 변경 후 안내 = ' + label.textContent);
+
+    submitForm(page, { email: 'a@b.com', message: '' });
+    assert(page.sandbox._fetchCalls.length === 0, '빈 내용인데 전송했습니다');
+    assert(page.dom.byId.get('formStatus').textContent === t('form.needDetail', 'ko'),
+      '안내 문구 = ' + page.dom.byId.get('formStatus').textContent);
+
+    /* 내용을 적으면 유형이 본문(type)과 메일 제목에 함께 담깁니다 */
+    submitForm(page, { email: 'a@b.com', message: '3호 문법 설명에 오타가 있어요' });
+    const body = sentBody(page, 0);
+    assert(body.get('type') === 'content', 'type = ' + body.get('type'));
+    assert(body.get('message') === '3호 문법 설명에 오타가 있어요', 'message가 빠졌습니다');
+
+    const subject = body.get('_subject') || '';
+    assert(subject.indexOf('EngMon') === 0, '_subject = ' + subject);
+    assert(subject.indexOf(t('form.type.content', 'ko')) > -1,
+      '제목에 유형이 없습니다: ' + subject);
+
+    /* 관련 호 목록은 issues.js 를 보고 채웁니다 */
+    const issue = page.dom.byId.get('cfIssue');
+    const expected = 1 + (page.sandbox.MAGAZINE_ISSUES || []).length;
+    assert(issue && issue.children.length === expected,
+      '관련 호 목록 = ' + (issue && issue.children.length) + '개 (' + expected + '개여야 함)');
+
+    return '유형 변경 · 빈 내용 차단 · type·제목 확인';
+  });
 }
 
 /* ── 3. 오류 격리 (회귀 테스트) ────────────────────────────────────────── */
@@ -930,18 +975,20 @@ if (magazine) {
     const toc = dom.byId.get('tocList');
     const progress = dom.byId.get('issueProgressText');
 
-    assert(numeral && numeral.textContent === pad2(issue.number),
-      '호 번호 = ' + (numeral && numeral.textContent) + ' (기대: ' + pad2(issue.number) + ')');
+    assert(numeral && numeral.textContent === pad2(issue.week),
+      '주 번호 = ' + (numeral && numeral.textContent) + ' (기대: ' + pad2(issue.week) + ')');
     assert(toc && toc.children.length === issue.sections.length,
       '목차 항목 = ' + (toc && toc.children.length) + '개 (데이터: ' + issue.sections.length + '개)');
     assert(progress && progress.textContent === '0 / ' + issue.sections.length,
       '진행률 = ' + (progress && progress.textContent));
-    return '호 ' + pad2(issue.number) + ' · 목차 ' + toc.children.length + '개 · 진행률 "' + progress.textContent + '"';
+    return 'W' + pad2(issue.week) + ' · 목차 ' + toc.children.length + '개 · 진행률 "' + progress.textContent + '"';
   });
 
-  check('표지 통계(단어 수·퀴즈 수)가 채워진다', () => {
+  check('표지에 52주 위치와 통계가 함께 보인다', () => {
     const chips = dom.byId.get('issueMeta');
-    assert(chips && chips.children.length === 6, '표지 통계 칩 = ' + (chips && chips.children.length) + '개');
+
+    /* 주제 · 레벨 · 분기 · 섹션 · 분 · 단어 · 퀴즈 = 7개 (발행된 주) */
+    assert(chips && chips.children.length === 7, '표지 통계 칩 = ' + (chips && chips.children.length) + '개');
 
     const values = chips.children.map((li) => li.children[1] && li.children[1].textContent);
     values.forEach((v, i) => {
@@ -982,7 +1029,12 @@ if (magazine) {
     const raw = texts.filter((t) => /^(mag\.|form\.|contact\.)/.test(t));
     assert(raw.length === 0, '영어 전환 후 키가 노출: ' + raw.slice(0, 3).join(', '));
     assert(toc && toc.children.length, '목차가 사라졌습니다');
-    return '섹션 ' + before + '개 유지, 미번역 키 0개';
+
+    /* 뒤따르는 검사는 기본 언어(한국어)를 전제로 합니다 — 되돌려 둡니다 */
+    dom.byId.get('langBtn').dispatch('click');
+    assert(dom.documentElement.getAttribute('lang') === 'ko', '한국어로 되돌아오지 않았습니다');
+
+    return '섹션 ' + before + '개 유지, 미번역 키 0개 (en → ko 복귀)';
   });
 
   check('단어장 저장·복사·비우기 요소가 준비돼 있다', () => {
@@ -1019,27 +1071,60 @@ if (magazine) {
     return '1× → 0.75× 저장 및 복원 확인';
   });
 
-  check('호 선택기로 다른 호를 열 수 있다', () => {
-    const data = sandbox.MAGAZINE_ISSUES || [];
+  check('주 선택기에 52주가 모두 있고 다른 주를 열 수 있다', () => {
+    const weeks = sandbox.MAGAZINE_WEEKS || [];
     const nav = dom.byId.get('issueNav');
 
-    assert(data.length > 1, '호가 ' + data.length + '개뿐입니다 (여러 호를 담아야 합니다)');
-    assert(nav && nav.children.length === data.length, '호 버튼 ' + (nav && nav.children.length) + '개');
+    assert(weeks.length === 52, '주가 ' + weeks.length + '개입니다 (52주 플랜이어야 합니다)');
+    assert(nav && nav.children.length === weeks.length, '주 버튼 ' + (nav && nav.children.length) + '개');
 
     const active = nav.children.filter((b) => b.getAttribute('aria-pressed') === 'true')[0];
-    assert(active, '현재 보고 있는 호 표시가 없습니다');
+    assert(active, '현재 보고 있는 주 표시가 없습니다');
 
+    /* 칩은 W01…W52 로 정렬되어 있지만 MAGAZINE_WEEKS 의 배열 순서는 다릅니다.
+       순서가 아니라 data-week 로 짝을 찾습니다. */
     const other = nav.children.filter((b) => b !== active)[0];
-    const next = data[nav.children.indexOf(other)];
+    const next = weeks.filter((w) => String(w.week) === other.getAttribute('data-week'))[0];
+    assert(next, '칩에 짝이 되는 주 데이터가 없습니다: ' + other.getAttribute('data-week'));
     other.dispatch('click');
 
-    assert(dom.byId.get('issueNumeral').textContent === pad2(next.number),
-      '호를 바꿨는데 표지 번호 = ' + dom.byId.get('issueNumeral').textContent);
+    assert(dom.byId.get('issueNumeral').textContent === pad2(next.week),
+      '주를 바꿨는데 표지 번호 = ' + dom.byId.get('issueNumeral').textContent);
     assert(JSON.parse(sandbox.localStorage.getItem('monsterlab.issue')) === next.slug,
-      '선택한 호가 저장되지 않았습니다');
+      '선택한 주가 저장되지 않았습니다');
     assert(dom.byId.get('tocList').children.length === next.sections.length,
-      '목차가 새 호 기준으로 다시 그려지지 않았습니다');
-    return pad2(data[0].number) + ' → ' + pad2(next.number) + ' 전환 · 목차 ' + next.sections.length + '개';
+      '목차가 새 주 기준으로 다시 그려지지 않았습니다');
+    return 'W' + pad2(weeks[0].week) + ' → W' + pad2(next.week) + ' 전환 · 목차 ' + next.sections.length + '개';
+  });
+
+  check('1년 플랜에 4분기와 52주가 그려진다', () => {
+    const weeks = sandbox.MAGAZINE_WEEKS || [];
+    const quarters = sandbox.MAGAZINE_QUARTERS || [];
+    const list = dom.byId.get('planList');
+
+    assert(list && list.children.length === quarters.length,
+      '플랜 묶음 = ' + (list && list.children.length) + '개 (분기 ' + quarters.length + '개)');
+
+    assert(dom.byId.get('planWeekCount').textContent === '52',
+      '주 전체 = ' + dom.byId.get('planWeekCount').textContent);
+    assert(dom.byId.get('planPublishedCount').textContent === String(weeks.filter((w) => w.sections && w.sections.length).length),
+      '발행된 주 = ' + dom.byId.get('planPublishedCount').textContent);
+
+    /* 분기마다 주가 들어 있고, 발행/예정 표시가 갈라져야 합니다 */
+    let planned = 0;
+    let published = 0;
+    list.children.forEach((quarter) => {
+      const grid = (quarter.children || []).filter((c) => c.className === 'plan-grid')[0];
+      assert(grid && grid.children.length, '분기에 주가 없습니다');
+      grid.children.forEach((item) => {
+        if (String(item.className).indexOf('is-planned') > -1) planned++;
+        else published++;
+      });
+    });
+
+    assert(published === 4, '발행으로 표시된 주 = ' + published + '개 (4주여야 합니다)');
+    assert(planned === 48, '발행 예정으로 표시된 주 = ' + planned + '개 (48주여야 합니다)');
+    return '분기 ' + quarters.length + '개 · 발행 ' + published + '주 · 예정 ' + planned + '주';
   });
 
   check('번역 가리기 토글이 상태·저장값·버튼 표시를 바꾼다', () => {
@@ -1271,6 +1356,52 @@ if (magazine) {
     btn.dispatch('click');   /* 테스트 환경에는 window.print가 없습니다 — 가드가 있어야 합니다 */
     return 'window.print 호출 가드 확인';
   });
+
+  /* 아래 두 검사는 주를 바꿔놓으므로 이 블록의 맨 끝에 둡니다 */
+  check('예전 호(issue-01) 기록을 주(week-01)로 이어받는다', () => {
+    const saved = runPage('index.html', {
+      storage: {
+        'monsterlab.issue': '"issue-01"',
+        'monsterlab.progress': '{"issue-01":["theme-words"]}',
+      },
+    });
+
+    assert(JSON.parse(saved.sandbox.localStorage.getItem('monsterlab.issue')) === 'week-01',
+      '마지막으로 본 주 = ' + saved.sandbox.localStorage.getItem('monsterlab.issue'));
+
+    const progress = JSON.parse(saved.sandbox.localStorage.getItem('monsterlab.progress'));
+    assert(progress['week-01'] && progress['week-01'].indexOf('theme-words') > -1,
+      '진행률이 이어지지 않았습니다: ' + JSON.stringify(progress));
+
+    return 'issue-01 → week-01 · 진행률 유지';
+  });
+
+  check('발행 전인 주는 본문 대신 준비 중 안내를 보여 준다', () => {
+    const t = sandbox.MonsterLab.t;
+    const nav = dom.byId.get('issueNav');
+
+    nav.children[4].dispatch('click');          /* W05 — 아직 발행 전 */
+
+    const content = dom.byId.get('issueContent');
+    const texts = [];
+    (function walk(node) {
+      if (node.textContent) texts.push(node.textContent);
+      (node.children || []).forEach(walk);
+    })(content);
+    const joined = texts.join(' ');
+
+    assert(dom.byId.get('issueNumeral').textContent === '05',
+      '표지 번호 = ' + dom.byId.get('issueNumeral').textContent);
+    assert(content.children.length === 1, '본문 영역 = ' + content.children.length + '개 (안내 1개여야 함)');
+    assert(joined.indexOf(t('mag.plannedTitle', 'ko')) > -1, '준비 중 안내가 없습니다');
+    assert(dom.byId.get('issueProgressText').textContent === t('mag.planned', 'ko'),
+      '진행률 = ' + dom.byId.get('issueProgressText').textContent);
+    assert(dom.byId.get('tocList').children.length === 1, '목차가 안내 한 줄도 없습니다');
+    assert(dom.byId.get('issueDateCover').textContent === t('mag.planned', 'ko'),
+      '표지 날짜 = ' + dom.byId.get('issueDateCover').textContent);
+
+    return 'W05 · 준비 중 안내 · 진행률 "' + dom.byId.get('issueProgressText').textContent + '"';
+  });
 }
 
 /* ── 6. HTML 위생 점검 ─────────────────────────────────────────────────── */
@@ -1289,6 +1420,59 @@ PAGES.forEach((file) => {
     assert(refs.length === 0, '버전 없는 참조: ' + refs.join(', '));
     return '모든 css/js 참조에 ?v= 포함';
   });
+});
+
+check('상단 홈 메뉴는 페이지 밖으로 나가지 않는다 (회귀)', () => {
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const nav = /<nav class="nav"[\s\S]*?<\/nav>/.exec(html);
+  assert(nav, '상단 메뉴(<nav class="nav">)를 찾지 못했습니다');
+
+  const home = /<a href="([^"]+)"[^>]*data-i18n="mag.navHome"/.exec(nav[0]);
+  assert(home, '상단 메뉴에 홈 링크가 없습니다');
+
+  /* 예전에는 https://monsterlab.monster 로 나갔습니다 — 이 매거진 안에 머물러야 합니다 */
+  assert(home[1].charAt(0) === '#', '상단 홈이 페이지 밖으로 나갑니다: ' + home[1]);
+
+  const id = home[1].slice(1);
+  assert(html.indexOf('id="' + id + '"') > -1, home[1] + ' 앵커가 HTML에 없습니다');
+
+  /* 그 앵커는 스크롤 강조 대상에서 빠져 있어야 합니다(늘 켜져 있으면 다른 메뉴가 안 켜집니다) */
+  const script = fs.readFileSync(path.join(ROOT, 'script.js'), 'utf8');
+  assert(script.indexOf("section.id !== '" + id + "'") > -1,
+    '스크롤 강조에서 ' + home[1] + ' 를 빼지 않았습니다');
+
+  return home[1] + ' · 강조 대상 제외 확인';
+});
+
+check('확인 문제 보기가 화면 언어를 따라간다', () => {
+  const sandbox = vm.createContext(makeSandbox(makeDom('<html></html>'), {}));
+  vm.runInContext(fs.readFileSync(path.join(ROOT, 'issues.js'), 'utf8'), sandbox);
+
+  const HANGUL = /[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7A3]/;
+  const problems = [];
+  let bilingual = 0;
+
+  (sandbox.MAGAZINE_ISSUES || []).forEach((issue) => {
+    issue.sections.forEach((section) => {
+      (section.quiz || []).forEach((item, qi) => {
+        item.options.forEach((option, oi) => {
+          const where = issue.slug + '/' + section.id + ' Q' + (qi + 1) + ' 보기 ' + (oi + 1);
+
+          /* 문자열 보기는 그대로 쓰이므로 한국어가 남으면 영어 모드에서 새어 나갑니다 */
+          if (typeof option === 'string') {
+            if (HANGUL.test(option)) problems.push(where + ' (영어 모드에 한국어가 남습니다)');
+            return;
+          }
+
+          if (option && option.ko && option.en) { bilingual++; return; }
+          problems.push(where + ' (보기는 문자열이거나 ko·en 을 함께 가져야 합니다)');
+        });
+      });
+    });
+  });
+
+  assert(problems.length === 0, problems.slice(0, 4).join(' / '));
+  return '보기 전부 영어 또는 ko·en (이중 언어 ' + bilingual + '개)';
 });
 
 check('공유 에셋(styles.css / script.js) 버전 표기가 일관된다', () => {
@@ -1360,8 +1544,8 @@ check('매거진 데이터 구조가 올바르다', () => {
   let tables = 0;
 
   issues.forEach((issue) => {
-    ['number', 'slug', 'theme', 'title', 'summary'].forEach((field) => {
-      assert(issue[field] != null, '호에 ' + field + '가 없습니다');
+    ['week', 'slug', 'quarter', 'level', 'published', 'theme', 'title', 'summary'].forEach((field) => {
+      assert(issue[field] != null, 'W' + issue.week + '에 ' + field + '가 없습니다');
     });
     issue.theme.ko && issue.theme.en || assert(false, 'theme에 ko/en이 필요합니다');
 
@@ -1420,8 +1604,58 @@ check('매거진 데이터 구조가 올바르다', () => {
     });
   });
 
-  return issues.length + '호 / 섹션 ' + seen.size + '개 / 항목 ' + items + '개 / 퀴즈 ' + quizzes +
+  return '발행 ' + issues.length + '주 / 섹션 ' + seen.size + '개 / 항목 ' + items + '개 / 퀴즈 ' + quizzes +
     '개 / 받아쓰기 ' + dictation + '개 / 표 ' + tables + '개';
+});
+
+check('52주 플랜 데이터가 온전하다', () => {
+  const sandbox = vm.createContext(makeSandbox(makeDom('<html></html>'), {}));
+  vm.runInContext(fs.readFileSync(path.join(ROOT, 'issues.js'), 'utf8'), sandbox);
+
+  const weeks = sandbox.MAGAZINE_WEEKS || [];
+  const quarters = sandbox.MAGAZINE_QUARTERS || [];
+  const published = sandbox.MAGAZINE_ISSUES || [];
+
+  assert(weeks.length === 52, '52주여야 하는데 ' + weeks.length + '주입니다');
+  assert(quarters.length === 4, '분기 묶음이 ' + quarters.length + '개입니다 (4개여야 합니다)');
+
+  const numbers = weeks.map((w) => w.week).sort((a, b) => a - b);
+  numbers.forEach((n, i) => assert(n === i + 1, '주 번호가 1~52가 아닙니다: ' + numbers.join(', ')));
+
+  const seen = new Set();
+  let withSections = 0;
+
+  weeks.forEach((week) => {
+    assert(!seen.has(week.slug), '중복 slug: ' + week.slug);
+    seen.add(week.slug);
+
+    assert(week.slug === 'week-' + pad2(week.week), 'slug 규칙 오류: ' + week.slug);
+    ['theme', 'title', 'summary'].forEach((field) => {
+      assert(week[field] && week[field].ko && week[field].en,
+        'W' + pad2(week.week) + ' ' + field + '에 ko/en이 필요합니다');
+    });
+    assert(week.level, 'W' + pad2(week.week) + '에 레벨이 없습니다');
+    assert(week.quarter >= 1 && week.quarter <= quarters.length,
+      'W' + pad2(week.week) + ' 분기 값 = ' + week.quarter);
+
+    const hasSections = !!(week.sections && week.sections.length);
+    if (hasSections) withSections++;
+
+    /* 발행된 주만 본문(sections)을 가지므로 두 값은 항상 함께 움직여야 합니다 */
+    assert(hasSections === (week.published != null),
+      'W' + pad2(week.week) + ': sections와 published는 함께 있어야 합니다');
+  });
+
+  assert(withSections === 4, '본문이 있는 주 = ' + withSections + '주 (1~4주여야 합니다)');
+  assert(published.length === 4, '발행된 주 = ' + published.length + '주 (1~4주여야 합니다)');
+
+  /* 5주부터는 아직 구성이 끝나지 않았습니다 */
+  const planned = weeks.filter((w) => !(w.sections && w.sections.length));
+  assert(planned.length === 48, '발행 전인 주 = ' + planned.length + '주 (48주여야 합니다)');
+  assert(planned.every((w) => w.week >= 5), '5주 이전에 발행 전인 주가 있습니다');
+  assert(published.every((w) => w.week <= 4), '1~4주만 발행된 상태여야 합니다');
+
+  return '52주 · 분기 ' + quarters.length + ' · 발행 4주 · 예정 48주';
 });
 
 check('인쇄용 스타일이 있고 번역을 종이에서는 되살린다', () => {
@@ -1459,9 +1693,7 @@ check('좁은 화면에서 섹션 머리가 줄바꿈된다 (CSS 회귀)', () =>
   assert(/\.m-tools\s*\{[^}]*flex\s*:\s*1 1 100%/.test(block),
     '좁은 화면에서 .m-tools가 아랫줄 전체 폭을 차지하지 않습니다');
   return '.m-head 줄바꿈 + .m-tools 전체 폭 확인';
-});
-
-/* ── 8. 방문 분석 (Google Analytics 4) ──────────────────────────────── */
+});/* ── 8. 방문 분석 (Microsoft Clarity) ───────────────────────────────── */
 
 /* analytics.js 를 최소 환경에서 실행해, 무엇을 했는지 돌려줍니다.
    실제로 스크립트를 내려받지 않고 주입 시도만 관찰합니다. */
@@ -1470,12 +1702,19 @@ function runAnalytics(env) {
   const document = {
     head: { appendChild: (node) => appended.push(node) },
     documentElement: { appendChild: (node) => appended.push(node) },
-    createElement: (tag) => ({ tagName: String(tag).toUpperCase(), src: '', async: false }),
+    createElement: (tag) => ({
+      tagName: String(tag).toUpperCase(),
+      src: '',
+      type: '',
+      async: false,
+      attrs: {},
+      setAttribute(name, value) { this.attrs[name] = String(value); },
+    }),
   };
   const location = { protocol: (env && env.protocol) || 'https:' };
   const navigator = { doNotTrack: env && env.dnt };
   const window = {
-    ENGMON_GA4_ID: env ? env.id : undefined,
+    ENGMON_CLARITY_ID: env ? env.id : undefined,
     document: document,
     location: location,
     navigator: navigator,
@@ -1496,21 +1735,24 @@ function runAnalytics(env) {
   return { appended: appended, window: window };
 }
 
-check('방문 분석 — 측정 ID가 없으면 아무 요청도 보내지 않는다', () => {
+const CLARITY_ID = 'kwq1z2abcd';
+
+check('방문 분석 — 프로젝트 ID가 없으면 아무 요청도 보내지 않는다', () => {
   const cases = [
     { label: '설정 없음', env: undefined },
     { label: '빈 문자열', env: { id: '' } },
     { label: '공백', env: { id: '   ' } },
-    { label: '자리표시자', env: { id: 'G-XXXXXXXXXX' } },
-    { label: '형식 오류(짧음)', env: { id: 'G-123' } },
-    { label: '형식 오류(UA-)', env: { id: 'UA-12345678-1' } },
+    { label: '자리표시자', env: { id: 'xxxxxxxxxx' } },
+    { label: '형식 오류(도메인)', env: { id: 'engmon.monster' } },
+    { label: '형식 오류(너무 짧음)', env: { id: 'abc' } },
+    { label: '형식 오류(하이픈)', env: { id: 'kwq1-z2abcd' } },
   ];
 
   cases.forEach((c) => {
     const out = runAnalytics(c.env);
     assert(out.appended.length === 0,
       c.label + ': 스크립트를 붙였습니다 — ID를 채우기 전에는 아무 것도 하지 않아야 합니다');
-    assert(!out.window.gtag, c.label + ': gtag를 만들었습니다');
+    assert(!out.window.clarity, c.label + ': clarity 대기열을 만들었습니다');
   });
 
   return cases.length + '가지 경우 모두 무동작';
@@ -1518,45 +1760,44 @@ check('방문 분석 — 측정 ID가 없으면 아무 요청도 보내지 않�
 
 check('방문 분석 — 로컬(file://)·추적 금지에서는 보내지 않는다', () => {
   const blocked = [
-    { label: 'file://', env: { id: 'G-ABCDE12345', protocol: 'file:' } },
-    { label: 'navigator.doNotTrack', env: { id: 'G-ABCDE12345', dnt: '1' } },
-    { label: 'window.doNotTrack', env: { id: 'G-ABCDE12345', windowDnt: '1' } },
+    { label: 'file://', env: { id: CLARITY_ID, protocol: 'file:' } },
+    { label: 'navigator.doNotTrack', env: { id: CLARITY_ID, dnt: '1' } },
+    { label: 'window.doNotTrack', env: { id: CLARITY_ID, windowDnt: '1' } },
   ];
 
   blocked.forEach((c) => {
     const out = runAnalytics(c.env);
     assert(out.appended.length === 0, c.label + ': 그래도 보냈습니다');
+    /* Clarity 자체는 DNT 를 따르지 않으므로, 우리가 아예 불러오지 않아야 합니다 */
+    assert(!out.window.clarity, c.label + ': clarity 대기열을 만들었습니다');
   });
 
   /* 로컬 확인이 통계에 섞이지 않아야 하고, 브라우저 검증도 조용해야 합니다 */
   return blocked.map((c) => c.label).join(' · ') + ' 차단 확인';
 });
 
-check('방문 분석 — 페이지 방문만 수집하도록 설정한다', () => {
-  const out = runAnalytics({ id: 'G-ABCDE12345' });
+check('방문 분석 — Clarity 스크립트를 한 번만 부르고 ID를 넘긴다', () => {
+  const out = runAnalytics({ id: CLARITY_ID });
   assert(out.appended.length === 1, '스크립트를 붙이지 않았습니다');
 
   const tag = out.appended[0];
-  assert(tag.src === 'https://www.googletagmanager.com/gtag/js?id=G-ABCDE12345',
-    'gtag 스크립트 주소가 다릅니다: ' + tag.src);
+  assert(tag.src === 'https://www.clarity.ms/tag/' + CLARITY_ID,
+    'Clarity 주소가 다릅니다: ' + tag.src);
   assert(tag.async === true, '스크립트가 async가 아닙니다 — 페이지 표시를 막습니다');
 
-  const calls = out.window.dataLayer.map((args) => Array.prototype.slice.call(args));
-  const config = calls.filter((c) => c[0] === 'config')[0];
-  assert(config, "gtag('config', …) 호출이 없습니다");
-  assert(config[1] === 'G-ABCDE12345', '측정 ID가 전달되지 않았습니다');
+  /* 공식 스니펫과 같이 clarity 대기열을 먼저 만듭니다(로드 전 호출도 유실되지 않게) */
+  assert(typeof out.window.clarity === 'function', 'clarity 대기열이 없습니다');
 
-  const opts = config[2] || {};
-  assert(opts.send_page_view === true, '페이지 방문 수집이 꺼져 있습니다');
-  assert(opts.anonymize_ip === true, 'IP 익명화가 꺼져 있습니다');
-  assert(opts.allow_google_signals === false, '광고 신호를 끄지 않았습니다');
-  assert(opts.allow_ad_personalization_signals === false, '광고 맞춤설정 신호를 끄지 않았습니다');
+  /* 예전 도구(GA4·Umami·Cloudflare) 흔적이 남아 있으면 안 됩니다 */
+  assert(!out.window.gtag && !out.window.dataLayer && !out.window.umami,
+    'GA4/Umami 흔적이 남아 있습니다');
 
-  /* 학습 행동을 보내는 코드가 섞여 들어오지 않았는지 — '페이지 방문만' 원칙 */
-  const events = calls.filter((c) => c[0] === 'event').map((c) => c[1]);
-  assert(events.length === 0, '학습 이벤트를 보내고 있습니다: ' + events.join(', '));
+  /* 학습 행동을 보내는 호출이 섞여 들어오지 않았는지 — 방문·히트맵만 수집 */
+  const src = fs.readFileSync(path.join(ROOT, 'analytics.js'), 'utf8');
+  assert(!/clarity\(\s*['"]event/.test(src), '학습 이벤트를 보내는 코드가 있습니다');
+  assert((src.match(/clarity\.ms\/tag/g) || []).length === 1, 'Clarity 주소가 여러 곳에 있습니다');
 
-  return '스크립트 1회 · config 1회 · 이벤트 0회 · IP 익명화';
+  return 'script 1회 · async · clarity 대기열';
 });
 
 check('index.html — 방문 분석 스크립트를 한 번만, ID는 한 곳에서 정한다', () => {
@@ -1565,14 +1806,20 @@ check('index.html — 방문 분석 스크립트를 한 번만, ID는 한 곳에
   assert(refs.length === 1, 'analytics.js 참조가 ' + refs.length + '개입니다 (1개여야 합니다)');
   assert(refs[0][1], 'analytics.js 에 ?v= 캐시 무효화 버전이 없습니다');
 
-  const ids = [...html.matchAll(/ENGMON_GA4_ID\s*=/g)];
-  assert(ids.length === 1, '측정 ID를 정하는 곳이 ' + ids.length + '곳입니다 (한 곳이어야 합니다)');
+  const ids = [...html.matchAll(/ENGMON_CLARITY_ID\s*=/g)];
+  assert(ids.length === 1, '프로젝트 ID를 정하는 곳이 ' + ids.length + '곳입니다 (한 곳이어야 합니다)');
 
   /* 스크립트보다 ID 설정이 먼저 와야 합니다 */
-  assert(html.indexOf('ENGMON_GA4_ID') < html.indexOf('analytics.js'),
-    '측정 ID 설정이 analytics.js 보다 뒤에 있습니다');
+  assert(html.indexOf('ENGMON_CLARITY_ID') < html.indexOf('analytics.js'),
+    '프로젝트 ID 설정이 analytics.js 보다 뒤에 있습니다');
+  assert(html.indexOf('ENGMON_GA4_ID') === -1, '예전 GA4 설정이 남아 있습니다');
+  assert(html.indexOf('ENGMON_UMAMI_ID') === -1, '예전 Umami 설정이 남아 있습니다');
+  assert(html.indexOf('ENGMON_CF_TOKEN') === -1, '예전 Cloudflare 설정이 남아 있습니다');
 
-  return 'analytics.js 1회 · 측정 ID 1곳';
+  /* 인라인 태그를 직접 붙이면 중복 로드가 됩니다 — analytics.js 가 넣습니다 */
+  assert(html.indexOf('clarity.ms') === -1, 'index.html 에 Clarity 스크립트를 직접 넣었습니다');
+
+  return 'analytics.js 1회 · 프로젝트 ID 1곳';
 });
 
 /* ── 결과 ─────────────────────────────────────────────────────────────── */

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   EngMon — 호(issue)와 섹션 데이터
+   EngMon — 1년 52주 플랜과 주(week)별 섹션 데이터
    ==========================================================================
 
    이 파일이 매거진의 "데이터베이스"입니다. magazine.js가 읽어 페이지를 그립니다.
@@ -8,9 +8,21 @@
    (JSON이 아니라 .js인 이유: file:// 로 index를 열어도 fetch가 막히지 않도록.
     데이터만 바꿀 때는 이 파일만 수정하면 됩니다.)
 
-   ── 새 호 추가하기 ────────────────────────────────────────────────────────
-   MAGAZINE_ISSUES 배열의 **맨 앞**에 객체를 하나 더 넣으세요. 배열 순서가
-   그대로 "최신 호 → 지난 호" 순서가 되고, 표지의 호 선택기에 모두 나옵니다.
+   ── 모델 ──────────────────────────────────────────────────────────────
+   1년 52주 플랜입니다. 모든 주가 MAGAZINE_WEEKS 에 들어 있고,
+   **sections 가 있는 주만 "발행된 주"** 입니다. 나머지는 계획(발행 전)입니다.
+
+     MAGAZINE_WEEKS     52주 전체 (계획 + 발행된 주)
+     MAGAZINE_QUARTERS  4분기 묶음 제목 (플랜 화면에서 씁니다)
+     MAGAZINE_ISSUES    발행된 주만, week 순으로 (magazine.js가 씁니다)
+
+   배열 순서는 상관없습니다 — magazine.js가 week 순으로 정렬해 씁니다.
+   (내용이 긴 발행분을 파일 앞에 두었을 뿐입니다.)
+
+   ── 주를 발행하려면 ──────────────────────────────────────────────────────
+   그 주의 객체에 `published`(발행한 달)와 `sections`(아래 필드 조합)를 넣으면
+   표지·목차·진행률·플랜 화면에 "발행됨"으로 바뀍니다. 넣기 전까지는
+   플랜에 주제만 보이고 본문 대신 "아직 준비 중" 안내가 나갑니다.
 
    ── 섹션에서 쓸 수 있는 필드 ───────────────────────────────────────────────
    id          필수. 앵커/진행률 저장에 쓰이는 고유 문자열 (영문/하이픈)
@@ -43,23 +55,22 @@
    · **굵게** 만 지원합니다 (magazine.js의 richText).
    ========================================================================== */
 
-var MAGAZINE_ISSUES = [
-  /* ══ 4호 — 시사·뉴스 영어 ═════════════════════════════════════════════ */
+var MAGAZINE_WEEKS = [
+  /* ══ 4주 — 시사·뉴스 영어 (발행) ═════════════════════════════════════════ */
   {
-    number: 4,
-    slug: 'issue-04',
-    date: '2026-10',
-    status: 'published',
+    week: 4,
+    slug: 'week-04',
+    quarter: 1,
+    published: '2026-10',
     level: 'B2',
-    minutes: 45,
     theme: { ko: '시사·뉴스 영어', en: 'News and current affairs' },
     title: {
       ko: '영어 뉴스, 첫 문단부터 읽기',
       en: 'Reading English news from the first paragraph'
     },
     summary: {
-      ko: '뉴스 문장은 짧고 정보가 빽빽합니다. 뉴스 어휘 8개, 구동사 6개, 연어 6개, 수동태와 헤드라인 문법, 발음 5개, 이디엄 6개, 인터뷰 표현, 회화 1장, 받아쓰기 4문장, 기사 독해와 요약 쓰기, 토론 질문 6개, 확인 문제 6개.',
-      en: 'News sentences are short and dense. Eight news words, six phrasal verbs, six collocations, the passive and headline grammar, five pronunciation points, six idioms, interview language, one conversation, four dictation lines, a full article with a summary task, six discussion questions and six quiz items.'
+      ko: '뉴스 문장은 짧고 정보가 빽빽합니다. 뉴스 어휘 8개, 구동사 6개, 연어 6개, 수동태와 헤드라인 문법, 발음 5개, 이디엄 6개, 인터뷰 표현, 회화 1장, 받아쓰기 5문장, 기사 독해와 요약 쓰기, 토론 질문 6개, 확인 문제 6개.',
+      en: 'News sentences are short and dense. Eight news words, six phrasal verbs, six collocations, the passive and headline grammar, five pronunciation points, six idioms, interview language, one conversation, five dictation lines, a full article with a summary task, six discussion questions and six quiz items.'
     },
 
     sections: [
@@ -262,7 +273,7 @@ var MAGAZINE_ISSUES = [
         id: 'news-listening',
         kind: 'listening',
         level: 'B2',
-        title: { ko: '듣기·받아쓰기 — 보도 문장 4개', en: 'Listening and dictation — four report sentences' },
+        title: { ko: '듣기·받아쓰기 — 보도 문장 5개', en: 'Listening and dictation — five report sentences' },
         intro: {
           ko: '숫자와 날짜가 들어간 문장입니다. 숫자를 놓치지 않는 것이 목표입니다.',
           en: 'These carry numbers and dates. The goal is not to lose the figures.'
@@ -501,14 +512,13 @@ var MAGAZINE_ISSUES = [
     ]
   },
 
-  /* ══ 3호 — 일상 회화 ═════════════════════════════════════════════════ */
+  /* ══ 3주 — 일상 회화 (발행) ═════════════════════════════════════════════ */
   {
-    number: 3,
-    slug: 'issue-03',
-    date: '2026-09',
-    status: 'published',
+    week: 3,
+    slug: 'week-03',
+    quarter: 1,
+    published: '2026-09',
     level: 'B1',
-    minutes: 45,
     theme: { ko: '일상 회화', en: 'Everyday conversation' },
     title: {
       ko: '매일 쓰는 말투로 말하기',
@@ -594,8 +604,8 @@ var MAGAZINE_ISSUES = [
         },
         body: {
           en: [
-            '**used to + 동사원형** is about a past habit that is no longer true. It never appears in the present tense.',
-            '**be used to + 명사/-ing** means you are familiar with something. The **to** here is a preposition, so a noun or an -ing form follows.',
+            '**used to + base verb** is about a past habit that is no longer true. It never appears in the present tense.',
+            '**be used to + noun / -ing** means you are familiar with something. The **to** here is a preposition, so a noun or an -ing form follows.',
             '**get used to** is the process of becoming familiar. It is the one you need when you move somewhere new.'
           ],
           ko: [
@@ -663,7 +673,7 @@ var MAGAZINE_ISSUES = [
           { en: 'No worries.', ko: '괜찮아요.', meaning: 'that is fine, do not apologise', example: 'No worries, it happens.', note: '영국·호주에서 특히 자주 들립니다' },
           { en: 'My bad.', ko: '내 잘못이야.', meaning: 'I made a mistake', example: 'My bad, I sent the old file.', note: '가벼운 사과로만 씁니다' },
           { en: 'Fair enough.', ko: '그럴 만하네요.', meaning: 'that is reasonable', example: 'Fair enough, we can wait.', note: '상대 주장을 인정할 때 씁니다' },
-          { en: 'That works.', ko: '좋아요, 그렇게 하죠.', meaning: 'that is acceptable to me', example: 'Tuesday at three? That works.', note: '일정을 확정할 때 자주 씁니다' },
+          { en: 'Got it.', ko: '알겠어요.', meaning: 'I understand', example: 'Got it, I will send it tonight.', note: '이해했다는 가장 짧은 확인입니다' },
           { en: 'I am down.', ko: '나도 할래.', meaning: 'I want to join', example: 'A movie tonight? I am down.', note: '제안에 동의하는 캐주얼한 표현입니다' },
           { en: 'No big deal.', ko: '별거 아니에요.', meaning: 'it is not important', example: 'No big deal, we can redo it.', note: '감사의 말에 대한 답으로도 씁니다' }
         ]
@@ -983,14 +993,13 @@ var MAGAZINE_ISSUES = [
     ]
   },
 
-  /* ══ 2호 — 직장 영어 ═════════════════════════════════════════════════ */
+  /* ══ 2주 — 직장 영어 (발행) ═════════════════════════════════════════════ */
   {
-    number: 2,
-    slug: 'issue-02',
-    date: '2026-08',
-    status: 'published',
+    week: 2,
+    slug: 'week-02',
+    quarter: 1,
+    published: '2026-08',
     level: 'B1',
-    minutes: 40,
     theme: { ko: '직장 영어', en: 'English at work' },
     title: {
       ko: '회의와 이메일에서 통하는 문장',
@@ -1072,7 +1081,7 @@ var MAGAZINE_ISSUES = [
         body: {
           en: [
             'The further you move from **can** towards **would you mind**, the softer the request. Softness is not always better: with a close colleague, an over-polite sentence sounds distant.',
-            'The most useful pattern for work is **Could you + 동사원형**. It is polite enough for a client and short enough for a chat message.'
+            'The most useful pattern for work is **Could you + base verb**. It is polite enough for a client and short enough for a chat message.'
           ],
           ko: [
             '**can**에서 **would you mind** 쪽으로 갈수록 부탁이 부드러워집니다. 다만 부드러움이 항상 좋은 것은 아닙니다. 가까운 동료에게 지나치게 격식 있는 문장은 오히려 거리를 만듭니다.',
@@ -1287,7 +1296,12 @@ var MAGAZINE_ISSUES = [
           },
           {
             q: { ko: '다섯 줄 이메일에서 둘째 줄에 와야 하는 것은?', en: 'What belongs in the second line of a five-line email?' },
-            options: ['인사말', '요청 한 가지', '첨부 안내', '서명'],
+            options: [
+              { ko: '인사말', en: 'A greeting' },
+              { ko: '요청 한 가지', en: 'One request' },
+              { ko: '첨부 안내', en: 'A note about attachments' },
+              { ko: '서명', en: 'A signature' }
+            ],
             answer: 1,
             explain: {
               ko: '둘째 줄에 요청을 하나만 둡니다. 요청이 많으면 답장이 늦어집니다.',
@@ -1323,14 +1337,13 @@ var MAGAZINE_ISSUES = [
     ]
   },
 
-  /* ══ 1호 — 여행 영어 ═════════════════════════════════════════════════ */
+  /* ══ 1주 — 여행 영어 (발행) ═════════════════════════════════════════════ */
   {
-    number: 1,
-    slug: 'issue-01',
-    date: '2026-07',
-    status: 'published',
+    week: 1,
+    slug: 'week-01',
+    quarter: 1,
+    published: '2026-07',
     level: 'B1',
-    minutes: 40,
     theme: { ko: '여행 영어', en: 'Travel English' },
     title: {
       ko: '공항에서 호텔까지, 여행 영어 한 호',
@@ -1477,7 +1490,7 @@ var MAGAZINE_ISSUES = [
           en: 'Word-for-word translation will not help. Learn these as single chunks.'
         },
         items: [
-          { en: 'catch a flight', ko: '비행기를 타다 (시간 맞춰)', meaning: 'to be in time for a flight', example: 'I have to catch a flight at six.', note: 'catch는 시간에 맞춘다는 느낌입니다' },
+          { en: 'get itchy feet', ko: '여행이 가고 싶어지다', meaning: 'to want to travel', example: 'I get itchy feet every spring.', note: '발이 근질거린다는 이미지에서 온 표현입니다' },
           { en: 'hit the road', ko: '길을 나서다', meaning: 'to start driving or travelling', example: 'Let us hit the road before the traffic builds up.', note: '아침 출발을 재촉할 때 씁니다' },
           { en: 'travel light', ko: '짐을 가볍게 하다', meaning: 'to take very little luggage', example: 'Travel light and you will move faster.', note: '짐을 줄이라는 조언으로 자주 들립니다' },
           { en: 'off the beaten track', ko: '외진 곳의', meaning: 'away from the usual tourist places', example: 'We stayed somewhere off the beaten track.', note: 'beaten track은 사람들이 다니는 길입니다' },
@@ -1628,7 +1641,7 @@ var MAGAZINE_ISSUES = [
         },
         items: [
           { en: 'Is the tip included?', ko: '팁이 포함되어 있나요?', meaning: 'does the bill already include service', example: 'Is the tip included in the total?', note: '계산서의 service included를 먼저 확인하세요' },
-          { en: 'Keep the change.', ko: '거스름돈은 가지세요.', meaning: 'you may keep the rest', example: 'That is twelve, keep the change.', note: '팁을 줄 때 쓰는 짧은 문장입니다' },
+          { en: 'round it up', ko: '잔돈을 올려 계산하다', meaning: 'to pay the next whole amount as a tip', example: 'Just round it up, thanks.', note: '카드로 계산할 때 팁을 얹는 방법입니다' },
           { en: 'No tip, thanks.', ko: '팁은 괜찮습니다.', meaning: 'I will not add a tip', example: 'No tip, thanks, the total is fine.', note: '팁이 불필요한 곳에서' }
         ],
         quote: {
@@ -1755,5 +1768,641 @@ var MAGAZINE_ISSUES = [
         ]
       }
     ]
+  },
+
+  /* ══════════════════════════════════════════════════════════════════════
+     5~52주 — 계획 (아직 발행 전)
+     ══════════════════════════════════════════════════════════════════════
+     구성이 끝난 주부터 차례로 `published`와 `sections`를 채우면
+     표지·플랜 화면에서 "발행됨"으로 바뀍니다. */
+
+  /* ── 1분기 · 생활 밀착 영어 (5~13주) ──────────────────────────────────── */
+  {
+    week: 5,
+    slug: 'week-05',
+    quarter: 1,
+    level: 'A2',
+    theme: { ko: '쇼핑·결제', en: 'Shopping and paying' },
+    title: { ko: '옷 가게에서 사이즈와 환불 말하기', en: 'Sizes and refunds without guessing' },
+    summary: {
+      ko: '옷과 신발을 고르고, 사이즈를 바꾸고, 환불받는 문장을 익힙니다. 숫자와 조건 표현이 중심입니다.',
+      en: 'Choose clothes and shoes, swap sizes and ask for a refund. Numbers and conditions carry the sentences.'
+    }
+  },
+  {
+    week: 6,
+    slug: 'week-06',
+    quarter: 1,
+    level: 'A2',
+    theme: { ko: '음식·주문', en: 'Food and ordering' },
+    title: { ko: '주문부터 알레르기까지 한 번에', en: 'Ordering, allergies and the bill' },
+    summary: {
+      ko: '카페와 식당에서 주문하고, 재료를 묻고, 계산을 나누는 표현을 다룹니다.',
+      en: 'Order at a cafe or restaurant, ask about ingredients and split the bill.'
+    }
+  },
+  {
+    week: 7,
+    slug: 'week-07',
+    quarter: 1,
+    level: 'A2',
+    theme: { ko: '교통·길찾기', en: 'Getting around' },
+    title: { ko: '표 사고 갈아타기', en: 'Tickets, transfers and asking the way' },
+    summary: {
+      ko: '표를 사고, 갈아타고, 길을 묻는 최소한의 문장을 익힙니다.',
+      en: 'The minimum you need to buy a ticket, change lines and ask for directions.'
+    }
+  },
+  {
+    week: 8,
+    slug: 'week-08',
+    quarter: 1,
+    level: 'B1',
+    theme: { ko: '약속·일정', en: 'Plans and schedules' },
+    title: { ko: '시간을 맞추고 미루기', en: 'Setting, moving and cancelling plans' },
+    summary: {
+      ko: '약속을 잡고, 옮기고, 미안하다고 말하는 표현을 다룹니다.',
+      en: 'Make a plan, move it, and apologise for cancelling without sounding stiff.'
+    }
+  },
+  {
+    week: 9,
+    slug: 'week-09',
+    quarter: 1,
+    level: 'B1',
+    theme: { ko: '전화·메시지', en: 'Calls and messages' },
+    title: { ko: '안 들릴 때 되묻는 법', en: 'Asking again when you cannot hear' },
+    summary: {
+      ko: '전화에서 놓친 부분을 되묻고, 요지를 남기는 표현을 익힙니다.',
+      en: 'Ask people to repeat what you missed on a call and leave a clear message.'
+    }
+  },
+  {
+    week: 10,
+    slug: 'week-10',
+    quarter: 1,
+    level: 'B1',
+    theme: { ko: '건강·병원', en: 'Health and the doctor' },
+    title: { ko: '증상을 말하고 예약하기', en: 'Describing symptoms and booking a visit' },
+    summary: {
+      ko: '아픈 곳을 설명하고, 약국에서 약을 묻고, 예약을 잡습니다.',
+      en: 'Describe what hurts, ask at a pharmacy and book an appointment.'
+    }
+  },
+  {
+    week: 11,
+    slug: 'week-11',
+    quarter: 1,
+    level: 'B1',
+    theme: { ko: '집·이웃', en: 'Home and neighbours' },
+    title: { ko: '이사하고 이웃에게 인사하기', en: 'Moving in and greeting neighbours' },
+    summary: {
+      ko: '집을 구하고, 문제를 알리고, 이웃과 가볍게 인사하는 표현을 다룹니다.',
+      en: 'Find a place, report a problem and make small talk with neighbours.'
+    }
+  },
+  {
+    week: 12,
+    slug: 'week-12',
+    quarter: 1,
+    level: 'A2',
+    theme: { ko: '취미·운동', en: 'Hobbies and sport' },
+    title: { ko: '주말 계획과 함께 하기', en: 'Weekend plans and joining in' },
+    summary: {
+      ko: '취미를 소개하고, 같이 하자고 권하고, 일정을 맞추는 표현을 익힙니다.',
+      en: 'Talk about hobbies, invite someone along and agree on a time.'
+    }
+  },
+  {
+    week: 13,
+    slug: 'week-13',
+    quarter: 1,
+    level: 'B1',
+    theme: { ko: '1분기 점검', en: 'Q1 check-up' },
+    title: { ko: '1~12주를 한 번에 되짚기', en: 'Reviewing weeks one to twelve' },
+    summary: {
+      ko: '1분기의 어휘·구동사·문법을 다시 풀며 약한 곳을 찾습니다.',
+      en: 'Revisit the words, phrasal verbs and grammar of Q1 and find the weak spots.'
+    }
+  },
+
+  /* ── 2분기 · 일과 성장 (14~26주) ──────────────────────────────────────── */
+  {
+    week: 14,
+    slug: 'week-14',
+    quarter: 2,
+    level: 'B2',
+    theme: { ko: '업무 이메일', en: 'Work email' },
+    title: { ko: '다섯 줄로 끝내는 메일', en: 'Getting it done in five lines' },
+    summary: {
+      ko: '요청과 기한과 맺음말을 다섯 줄 안에 넣는 메일 공식을 다룹니다.',
+      en: 'Fit the request, the deadline and the sign-off into five lines.'
+    }
+  },
+  {
+    week: 15,
+    slug: 'week-15',
+    quarter: 2,
+    level: 'B2',
+    theme: { ko: '회의·발표', en: 'Meetings and talks' },
+    title: { ko: '끼어들고 정리하기', en: 'Cutting in and wrapping up' },
+    summary: {
+      ko: '회의에서 의견을 내고, 끼어들고, 요약해 마무리하는 표현을 익힙니다.',
+      en: 'Put an idea forward, cut in politely and summarise before you close.'
+    }
+  },
+  {
+    week: 16,
+    slug: 'week-16',
+    quarter: 2,
+    level: 'B2',
+    theme: { ko: '협상·설득', en: 'Negotiating' },
+    title: { ko: '조건을 조율하는 문장', en: 'Trading conditions, not feelings' },
+    summary: {
+      ko: '조건을 제시하고, 양보하고, 대안을 요구하는 표현을 다룹니다.',
+      en: 'Offer terms, give ground and ask for another option.'
+    }
+  },
+  {
+    week: 17,
+    slug: 'week-17',
+    quarter: 2,
+    level: 'B2',
+    theme: { ko: '숫자와 데이터', en: 'Numbers and data' },
+    title: { ko: '그래프를 문장으로', en: 'Putting a chart into words' },
+    summary: {
+      ko: '증가와 감소와 비율을 문장으로 옮기고 근거를 붙이는 법을 익힙니다.',
+      en: 'Turn rises, falls and shares into sentences, and attach the evidence.'
+    }
+  },
+  {
+    week: 18,
+    slug: 'week-18',
+    quarter: 2,
+    level: 'B2',
+    theme: { ko: '면접 영어', en: 'Interviews' },
+    title: { ko: '경험을 결과로 말하기', en: 'Turning experience into results' },
+    summary: {
+      ko: '경험을 결과 중심으로 말하고, 어려운 질문을 되받는 표현을 다룹니다.',
+      en: 'Talk about experience in terms of results and handle hard questions.'
+    }
+  },
+  {
+    week: 19,
+    slug: 'week-19',
+    quarter: 2,
+    level: 'B2',
+    theme: { ko: '자기소개·이력서', en: 'Self-introduction and CV' },
+    title: { ko: '한 문단으로 나를 정리하기', en: 'Your profile in one paragraph' },
+    summary: {
+      ko: '이력서 요약과 30초 자기소개를 영어로 정리합니다.',
+      en: 'Write your summary line and a thirty-second introduction.'
+    }
+  },
+  {
+    week: 20,
+    slug: 'week-20',
+    quarter: 2,
+    level: 'B1',
+    theme: { ko: '재택·협업 도구', en: 'Remote work' },
+    title: { ko: '화면 공유와 화상회의', en: 'Sharing a screen without panic' },
+    summary: {
+      ko: '화상회의에서 순서를 잡고, 화면을 공유하고, 연결 문제를 설명합니다.',
+      en: 'Take turns on a call, share a screen and explain a connection problem.'
+    }
+  },
+  {
+    week: 21,
+    slug: 'week-21',
+    quarter: 2,
+    level: 'B2',
+    theme: { ko: '고객 응대', en: 'Customer service' },
+    title: { ko: '사과하고 대안 주기', en: 'Apologising and offering a fix' },
+    summary: {
+      ko: '불만을 듣고, 사과하고, 대안을 제시하는 표현을 다룹니다.',
+      en: 'Take a complaint, apologise and offer a concrete alternative.'
+    }
+  },
+  {
+    week: 22,
+    slug: 'week-22',
+    quarter: 2,
+    level: 'B2',
+    theme: { ko: '일정·프로젝트', en: 'Schedules and projects' },
+    title: { ko: '마감과 우선순위 말하기', en: 'Deadlines and priorities' },
+    summary: {
+      ko: '진행 상황을 알리고, 지연을 알리고, 우선순위를 합의합니다.',
+      en: 'Report progress, flag a delay and agree on what comes first.'
+    }
+  },
+  {
+    week: 23,
+    slug: 'week-23',
+    quarter: 2,
+    level: 'B2',
+    theme: { ko: '문제 해결', en: 'Problem solving' },
+    title: { ko: '원인부터 차근차근', en: 'From cause to fix' },
+    summary: {
+      ko: '문제를 사실과 추측으로 나눠 설명하고 해결책을 제안합니다.',
+      en: 'Separate facts from guesses and propose a fix.'
+    }
+  },
+  {
+    week: 24,
+    slug: 'week-24',
+    quarter: 2,
+    level: 'B2',
+    theme: { ko: '피드백', en: 'Feedback' },
+    title: { ko: '부드럽게 지적하고 받아들이기', en: 'Giving and taking feedback' },
+    summary: {
+      ko: '상대를 공격하지 않고 지적하고, 같은 말을 받아들이는 표현을 익힙니다.',
+      en: 'Point out a problem without attacking, and take the same in return.'
+    }
+  },
+  {
+    week: 25,
+    slug: 'week-25',
+    quarter: 2,
+    level: 'B1',
+    theme: { ko: '공부 방법', en: 'Study methods' },
+    title: { ko: '하루 10분을 지키는 법', en: 'Keeping ten minutes a day' },
+    summary: {
+      ko: '짧게 매일 하는 학습 계획을 세우고 영어로 설명합니다.',
+      en: 'Build a short daily routine and explain it in English.'
+    }
+  },
+  {
+    week: 26,
+    slug: 'week-26',
+    quarter: 2,
+    level: 'B2',
+    theme: { ko: '2분기 점검', en: 'Q2 check-up' },
+    title: { ko: '13~25주 되짚기', en: 'Reviewing weeks thirteen to twenty-five' },
+    summary: {
+      ko: '2분기의 업무 표현을 다시 풀고 약한 곳을 보완합니다.',
+      en: 'Revisit the work English of Q2 and patch the weak spots.'
+    }
+  },
+
+  /* ── 3분기 · 세상과 문화 (27~39주) ────────────────────────────────────── */
+  {
+    week: 27,
+    slug: 'week-27',
+    quarter: 3,
+    level: 'B2',
+    theme: { ko: '미디어 리터러시', en: 'Media literacy' },
+    title: { ko: '같은 사건, 다른 문장', en: 'One event, two articles' },
+    summary: {
+      ko: '두 기사를 비교하며 사실과 논평을 구분하는 법을 익힙니다.',
+      en: 'Compare two reports and tell fact from opinion.'
+    }
+  },
+  {
+    week: 28,
+    slug: 'week-28',
+    quarter: 3,
+    level: 'B2',
+    theme: { ko: '영화·드라마', en: 'Film and TV' },
+    title: { ko: '줄거리 말하고 추천하기', en: 'Summarising and recommending' },
+    summary: {
+      ko: '스포일러 없이 줄거리를 말하고 추천하는 표현을 다룹니다.',
+      en: 'Describe a plot without spoilers and recommend it.'
+    }
+  },
+  {
+    week: 29,
+    slug: 'week-29',
+    quarter: 3,
+    level: 'B2',
+    theme: { ko: '음악·공연', en: 'Music and shows' },
+    title: { ko: '공연 예매와 감상 나누기', en: 'Booking tickets and comparing notes' },
+    summary: {
+      ko: '공연을 예매하고, 감상을 형용사로 나누는 표현을 익힙니다.',
+      en: 'Book a show and talk about it with the right adjectives.'
+    }
+  },
+  {
+    week: 30,
+    slug: 'week-30',
+    quarter: 3,
+    level: 'B2',
+    theme: { ko: '스포츠', en: 'Sport' },
+    title: { ko: '경기 규칙과 결과 말하기', en: 'Rules, scores and comebacks' },
+    summary: {
+      ko: '경기 규칙과 결과를 설명하고 응원하는 표현을 다룹니다.',
+      en: 'Explain a rule, report a score and cheer someone on.'
+    }
+  },
+  {
+    week: 31,
+    slug: 'week-31',
+    quarter: 3,
+    level: 'C1',
+    theme: { ko: '과학·기술', en: 'Science and tech' },
+    title: { ko: '원리를 쉬운 말로', en: 'Explaining how it works' },
+    summary: {
+      ko: '기술의 원리를 쉬운 문장으로 설명하는 연습을 합니다.',
+      en: 'Practise explaining how a technology works in plain sentences.'
+    }
+  },
+  {
+    week: 32,
+    slug: 'week-32',
+    quarter: 3,
+    level: 'C1',
+    theme: { ko: '환경·기후', en: 'Environment and climate' },
+    title: { ko: '수치와 책임 말하기', en: 'Numbers and responsibility' },
+    summary: {
+      ko: '환경 지표와 책임 주체를 영어로 정확하게 말합니다.',
+      en: 'Talk about environmental figures and who is responsible.'
+    }
+  },
+  {
+    week: 33,
+    slug: 'week-33',
+    quarter: 3,
+    level: 'C1',
+    theme: { ko: '사회 이슈', en: 'Social issues' },
+    title: { ko: '찬반을 근거로 말하기', en: 'Arguing both sides with reasons' },
+    summary: {
+      ko: '찬반 주장을 근거와 함께 정리하는 표현을 익힙니다.',
+      en: 'Lay out both sides of an argument with reasons.'
+    }
+  },
+  {
+    week: 34,
+    slug: 'week-34',
+    quarter: 3,
+    level: 'B2',
+    theme: { ko: '역사·인물', en: 'History and people' },
+    title: { ko: '사건을 시간 순서로', en: 'Events in order' },
+    summary: {
+      ko: '과거 사건을 시간 순서와 인과로 설명하는 표현을 다룹니다.',
+      en: 'Describe past events in order and link cause to effect.'
+    }
+  },
+  {
+    week: 35,
+    slug: 'week-35',
+    quarter: 3,
+    level: 'B2',
+    theme: { ko: '예술·디자인', en: 'Art and design' },
+    title: { ko: '인상과 이유 말하기', en: 'Impressions and reasons' },
+    summary: {
+      ko: '작품에서 받은 인상을 말하고 그 이유를 붙이는 연습을 합니다.',
+      en: 'Say what a piece makes you feel and why.'
+    }
+  },
+  {
+    week: 36,
+    slug: 'week-36',
+    quarter: 3,
+    level: 'C1',
+    theme: { ko: '문학·시', en: 'Literature and poetry' },
+    title: { ko: '문장을 음미해서 읽기', en: 'Reading a line closely' },
+    summary: {
+      ko: '짧은 글과 시를 천천히 읽으며 뉘앙스를 짙어 봅니다.',
+      en: 'Read a short passage or poem slowly and name the nuance.'
+    }
+  },
+  {
+    week: 37,
+    slug: 'week-37',
+    quarter: 3,
+    level: 'B2',
+    theme: { ko: '유머·풍자', en: 'Humour and satire' },
+    title: { ko: '웃음의 지점 찾기', en: 'Finding the punchline' },
+    summary: {
+      ko: '농담이 어디서 웃긴지 영어로 설명할 수 있게 됩니다.',
+      en: 'Explain in English where a joke actually lands.'
+    }
+  },
+  {
+    week: 38,
+    slug: 'week-38',
+    quarter: 3,
+    level: 'C1',
+    theme: { ko: '토론·의견', en: 'Debate and opinion' },
+    title: { ko: '반대해도 관계는 지키기', en: 'Disagreeing and staying friends' },
+    summary: {
+      ko: '동의하지 않는다는 것을 정중하게 말하는 표현을 익힙니다.',
+      en: 'Say you disagree without damaging the relationship.'
+    }
+  },
+  {
+    week: 39,
+    slug: 'week-39',
+    quarter: 3,
+    level: 'B2',
+    theme: { ko: '3분기 점검', en: 'Q3 check-up' },
+    title: { ko: '26~38주 되짚기', en: 'Reviewing weeks twenty-six to thirty-eight' },
+    summary: {
+      ko: '3분기의 읽기와 토론 표현을 다시 점검합니다.',
+      en: 'Revisit the reading and discussion English of Q3.'
+    }
+  },
+
+  /* ── 4분기 · 실전과 마무리 (40~52주) ──────────────────────────────────── */
+  {
+    week: 40,
+    slug: 'week-40',
+    quarter: 4,
+    level: 'C1',
+    theme: { ko: '프레젠테이션', en: 'Presentations' },
+    title: { ko: '열 장을 열 문장으로', en: 'Ten slides, ten lines' },
+    summary: {
+      ko: '슬라이드를 문장으로 옮기고 발표를 여는 표현을 다룹니다.',
+      en: 'Turn slides into lines and open a talk with confidence.'
+    }
+  },
+  {
+    week: 41,
+    slug: 'week-41',
+    quarter: 4,
+    level: 'B2',
+    theme: { ko: '화상회의 실전', en: 'Running a call' },
+    title: { ko: '진행을 맡고 정리하기', en: 'Leading and closing the call' },
+    summary: {
+      ko: '회의를 진행하고, 결정을 정리하고, 다음 단계를 남깁니다.',
+      en: 'Lead the call, record the decisions and leave clear next steps.'
+    }
+  },
+  {
+    week: 42,
+    slug: 'week-42',
+    quarter: 4,
+    level: 'C1',
+    theme: { ko: '협상 실전', en: 'Negotiating in practice' },
+    title: { ko: '가격과 조건 끝까지', en: 'Price, terms and the walk-away' },
+    summary: {
+      ko: '가격과 조건을 끝까지 조율하는 회화를 연습합니다.',
+      en: 'Work through price and terms all the way to your walk-away point.'
+    }
+  },
+  {
+    week: 43,
+    slug: 'week-43',
+    quarter: 4,
+    level: 'C1',
+    theme: { ko: '에세이 쓰기', en: 'Essay writing' },
+    title: { ko: '주장과 근거 세우기', en: 'Claim, evidence, conclusion' },
+    summary: {
+      ko: '한 문단 에세이의 뼈대를 영어로 세우는 연습을 합니다.',
+      en: 'Build the skeleton of a one-paragraph essay in English.'
+    }
+  },
+  {
+    week: 44,
+    slug: 'week-44',
+    quarter: 4,
+    level: 'B2',
+    theme: { ko: '시험 영어: 토익', en: 'Test English: TOEIC' },
+    title: { ko: '파트별 시간 관리', en: 'Time by part' },
+    summary: {
+      ko: '토익 파트별 시간 배분과 자주 나오는 함정을 정리합니다.',
+      en: 'Budget time by part and learn the standard traps.'
+    }
+  },
+  {
+    week: 45,
+    slug: 'week-45',
+    quarter: 4,
+    level: 'B2',
+    theme: { ko: '시험 영어: 말하기', en: 'Test English: speaking' },
+    title: { ko: '15초 안에 답 만들기', en: 'An answer in fifteen seconds' },
+    summary: {
+      ko: '말하기 시험에서 15초 안에 답을 구성하는 틀을 익힙니다.',
+      en: 'Use a frame to build an answer within fifteen seconds.'
+    }
+  },
+  {
+    week: 46,
+    slug: 'week-46',
+    quarter: 4,
+    level: 'B2',
+    theme: { ko: '여행 심화', en: 'Travel, deeper' },
+    title: { ko: '문제가 생겼을 때', en: 'When the trip goes wrong' },
+    summary: {
+      ko: '지연과 분실과 환불처럼 여행 중 생기는 문제를 해결하는 표현을 다룹니다.',
+      en: 'Handle delays, lost luggage and refunds on the road.'
+    }
+  },
+  {
+    week: 47,
+    slug: 'week-47',
+    quarter: 4,
+    level: 'B2',
+    theme: { ko: '네트워킹', en: 'Networking' },
+    title: { ko: '처음 만난 사람과 3분', en: 'Three minutes with a stranger' },
+    summary: {
+      ko: '처음 만난 사람과 자연스럽게 대화를 잇는 표현을 익힙니다.',
+      en: 'Keep a conversation going with someone you just met.'
+    }
+  },
+  {
+    week: 48,
+    slug: 'week-48',
+    quarter: 4,
+    level: 'C1',
+    theme: { ko: '돈과 계약', en: 'Money and contracts' },
+    title: { ko: '조건을 정확히 읽기', en: 'Reading the fine print' },
+    summary: {
+      ko: '계약 조건과 지불 조건을 정확하게 묻고 확인합니다.',
+      en: 'Ask about and confirm terms and payment conditions.'
+    }
+  },
+  {
+    week: 49,
+    slug: 'week-49',
+    quarter: 4,
+    level: 'C1',
+    theme: { ko: '뉴스 심화', en: 'News, deeper' },
+    title: { ko: '사설과 논평 읽기', en: 'Reading editorials' },
+    summary: {
+      ko: '사설과 논평에서 주장과 근거를 분리해 읽습니다.',
+      en: 'Separate argument from evidence in an editorial.'
+    }
+  },
+  {
+    week: 50,
+    slug: 'week-50',
+    quarter: 4,
+    level: 'B2',
+    theme: { ko: '1년 복습', en: 'The year in review' },
+    title: { ko: '52주를 한 권으로', en: 'Fifty-two weeks in one pass' },
+    summary: {
+      ko: '1년 동안 배운 표현을 주제별로 다시 묶어 봅니다.',
+      en: 'Gather a year of expressions back into themes.'
+    }
+  },
+  {
+    week: 51,
+    slug: 'week-51',
+    quarter: 4,
+    level: 'B2',
+    theme: { ko: '최종 점검', en: 'Final check' },
+    title: { ko: '약한 곳만 다시', en: 'Only the weak spots' },
+    summary: {
+      ko: '1년 중 틀렸던 문제와 저장한 단어로 최종 점검합니다.',
+      en: 'Revise with the questions you missed and the words you saved.'
+    }
+  },
+  {
+    week: 52,
+    slug: 'week-52',
+    quarter: 4,
+    level: 'B2',
+    theme: { ko: '다음 해 계획', en: 'Next year' },
+    title: { ko: '영어로 세우는 1년 계획', en: 'A year plan in English' },
+    summary: {
+      ko: '내년 학습 계획을 영어로 세우며 52주를 마무리합니다.',
+      en: 'Write next year plan in English and close the fifty-two weeks.'
+    }
   }
 ];
+
+/* ── 4분기 묶음 ───────────────────────────────────────────────────────────
+   플랜 화면에서 주(week)를 4개 묶음으로 보여 줄 때 씁니다. */
+var MAGAZINE_QUARTERS = [
+  {
+    quarter: 1,
+    level: 'A2~B2',
+    title: { ko: '1분기 · 생활 밀착 영어', en: 'Q1 · Everyday life' },
+    lead: {
+      ko: '여행·일상·직장처럼 바로 쓰는 상황을 다룹니다.',
+      en: 'Situations you meet right away: travel, daily life and work.'
+    }
+  },
+  {
+    quarter: 2,
+    level: 'B1~B2',
+    title: { ko: '2분기 · 일과 성장', en: 'Q2 · Work and growth' },
+    lead: {
+      ko: '업무에서 쓰는 문장과 협업 표현을 넓힙니다.',
+      en: 'Widen your work English and the language of working together.'
+    }
+  },
+  {
+    quarter: 3,
+    level: 'B2~C1',
+    title: { ko: '3분기 · 세상과 문화', en: 'Q3 · The world and culture' },
+    lead: {
+      ko: '읽고 듣고 토론하는 힘을 기릅니다.',
+      en: 'Build the strength to read, listen and discuss.'
+    }
+  },
+  {
+    quarter: 4,
+    level: 'B2~C1',
+    title: { ko: '4분기 · 실전과 마무리', en: 'Q4 · Practice and wrap-up' },
+    lead: {
+      ko: '발표와 시험과 실전 상황으로 1년을 마무리합니다.',
+      en: 'Close the year with presentations, tests and real situations.'
+    }
+  }
+];
+
+/* 발행된 주만, week 순으로. magazine.js 와 검증 스크립트가 씁니다. */
+var MAGAZINE_ISSUES = MAGAZINE_WEEKS
+  .filter(function (w) { return w.sections && w.sections.length; })
+  .sort(function (a, b) { return a.week - b.week; });

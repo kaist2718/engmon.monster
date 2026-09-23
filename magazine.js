@@ -2,7 +2,7 @@
    EngMon — 호(issue) 페이지 렌더링과 학습 도구
    ==========================================================================
 
-   데이터:   issues.js  (MAGAZINE_ISSUES)
+   데이터:   issues.js  (MAGAZINE_WEEKS · MAGAZINE_QUARTERS)
    공통기능: script.js  (테마·강조색·언어·토스트, window.MonsterLab)
    이 파일은 "그리기와 상호작용"만 담당합니다. 문구를 바꾸려면 issues.js를 고치세요.
 
@@ -10,6 +10,8 @@
      monsterlab.wordbook      저장한 표현 [{ en, ko, note, section }]
      monsterlab.progress      섹션 완료 { 'issue-01': ['quiz', ...] }
      monsterlab.srs           복습 기록 { 'word': { box, due } }
+     monsterlab.days          학습한 날짜 ['2026-09-23', ...]
+     monsterlab.daily         오늘 활동 수 { date, count }
      monsterlab.issue         보고 있는 호 slug
      monsterlab.translation   'on' | 'off'  (한국어 번역 표시)
      monsterlab.rate          듣기 속도
@@ -58,8 +60,35 @@
 
   var SRS_INTERVALS = [0, 1, 3, 7, 16, 35];   /* 단계별 복습 간격(일) */
 
-  var ISSUES = window.MAGAZINE_ISSUES || [];
-  var ISSUE = null;
+  /* WEEKS  = 52주 전체(계획 포함) · PUBLISHED = 발행된 주만 (issues.js 가 나눠 둡니다) */
+  var WEEKS = (window.MAGAZINE_WEEKS || []).slice().sort(function (a, b) { return a.week - b.week; });
+  var QUARTERS = window.MAGAZINE_QUARTERS || [];
+  var PUBLISHED = window.MAGAZINE_ISSUES || [];
+  var WEEK = null;
+
+  /* sections 가 있는 주만 발행된 주입니다. 나머지는 계획(발행 전)입니다. */
+  function isPublished(week) { return !!(week && week.sections && week.sections.length); }
+
+  function allProgress() {
+    var all = store(PROGRESS_KEY, {});
+    return all && typeof all === 'object' ? all : {};
+  }
+
+  /* done | reading | new | planned — 주를 한 눈에 구분하려고 */
+  function weekState(week, all) {
+    if (!isPublished(week)) return 'planned';
+
+    var done = (all[week.slug] || []).length;
+    if (done >= week.sections.length) return 'done';
+    return done ? 'reading' : 'new';
+  }
+
+  function quarterOf(number) {
+    for (var i = 0; i < QUARTERS.length; i++) {
+      if (QUARTERS[i].quarter === number) return QUARTERS[i];
+    }
+    return null;
+  }
 
   var api = window.MonsterLab || {
     t: function (key) { return key; },
@@ -78,6 +107,17 @@
   var reviewQueue = [];
   var reviewIndex = 0;
   var reviewRevealed = false;
+
+  /* 언어를 바꾸면 본문을 다시 그립니다(renderContent). 그때 확인 문제 답과
+     받아쓰기 입력이 사라지지 않도록, 푼 결과를 여기에 모아 두고 되돌립니다.
+     키: '주slug/섹션id' → { quiz: {문항번호: 고른 보기}, dict: {문항번호: {...}} } */
+  var answerState = {};
+
+  function answerSlot(sectionId) {
+    var key = (WEEK ? WEEK.slug : 'week') + '/' + sectionId;
+    if (!answerState[key]) answerState[key] = { quiz: {}, dict: {} };
+    return answerState[key];
+  }
 
   /* ── 작은 도우미 ────────────────────────────────────────────────────── */
   function lang() {
@@ -123,6 +163,14 @@
   function trl(node) {
     node.classList.add('trl');
     return langTag(node, 'ko');
+  }
+
+  var HANGUL_RE = /[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7A3]/;
+
+  /* 확인 문제 보기처럼 두 언어가 섞이는 자리는 실제 글자를 보고 lang 을 정합니다.
+     늘 lang="en" 으로 두면 한국어 보기를 화면 낭독기가 영어로 읽습니다. */
+  function langTagAuto(node, text) {
+    return langTag(node, HANGUL_RE.test(String(text)) ? 'ko' : 'en');
   }
 
   function plain(text) { return String(text).replace(/\*\*/g, ''); }
@@ -185,22 +233,16 @@
     return Math.max(1, Math.round(reading + practice));
   }
 
-  function issueWords() {
-    return ISSUE.sections.reduce(function (sum, s) { return sum + sectionWords(s); }, 0);
+  function weekWords() {
+    return (WEEK.sections || []).reduce(function (sum, s) { return sum + sectionWords(s); }, 0);
   }
 
-  function issueMinutes() {
-    return ISSUE.sections.reduce(function (sum, s) { return sum + sectionMinutes(s); }, 0);
+  function weekMinutes() {
+    return (WEEK.sections || []).reduce(function (sum, s) { return sum + sectionMinutes(s); }, 0);
   }
 
-  function issueQuizCount() {
-    return ISSUE.sections.reduce(function (sum, s) { return sum + (s.quiz ? s.quiz.length : 0); }, 0);
-  }
-
-  function issueSentenceCount() {
-    return ISSUE.sections.reduce(function (sum, s) {
-      return sum + (s.dictation ? s.dictation.length : 0);
-    }, 0);
+  function weekQuizCount() {
+    return (WEEK.sections || []).reduce(function (sum, s) { return sum + (s.quiz ? s.quiz.length : 0); }, 0);
   }
 
   /* ── 단어장 ─────────────────────────────────────────────────────────── */
@@ -231,7 +273,7 @@
   }
 
   /* ── 섹션 완료 ──────────────────────────────────────────────────────── */
-  function progressKey() { return ISSUE ? ISSUE.slug : 'issue'; }
+  function progressKey() { return WEEK ? WEEK.slug : 'week'; }
 
   function loadProgress() {
     var all = store(PROGRESS_KEY, {});
@@ -261,24 +303,25 @@
     if (finishing) markStudy();
   }
 
-  /* ── 호(issue) 전환 ─────────────────────────────────────────────────── */
-  function setIssue(issue, announce) {
-    if (!issue) return;
+  /* ── 주(week) 전환 ─────────────────────────────────────────────────── */
+  function setWeek(week, announce) {
+    if (!week) return;
 
     stopSpeaking();
-    ISSUE = issue;
+    WEEK = week;
     reviewQueue = [];
     reviewIndex = 0;
     reviewRevealed = false;
 
-    save(ISSUE_KEY, issue.slug);
+    save(ISSUE_KEY, week.slug);
     loadProgress();
 
     renderCover();
     renderContent();
     renderWordbook();
     renderReview();
-    renderIssueNav();
+    renderWeekPicker();
+    renderPlan();
     updateCounts();
 
     if (announce) {
@@ -287,26 +330,132 @@
     }
   }
 
-  function renderIssueNav() {
+  /* 주 하나에 대한 한 줄 설명 — 툴팁과 화면 낭독기가 함께 씁니다 */
+  function weekTip(week) {
+    return 'W' + pad(week.week) + ' · ' + pick(week.theme) + ' · '
+      + (isPublished(week) ? t('mag.published') : t('mag.planned'));
+  }
+
+  /* 표지의 주 선택기 — 52주를 작게 늘어놓습니다.
+     발행된 주는 채워지고, 아직 구성 중인 주는 테두리만 보입니다. */
+  function renderWeekPicker() {
     var holder = byId('issueNav');
     if (!holder) return;
 
     holder.textContent = '';
-    if (!ISSUES.length) return;
+    if (!WEEKS.length) return;
 
-    ISSUES.forEach(function (issue) {
-      var btn = el('button', 'issue-btn' + (issue === ISSUE ? ' is-active' : ''));
+    var all = allProgress();
+
+    WEEKS.forEach(function (week) {
+      var state = weekState(week, all);
+
+      var btn = el('button', 'week-chip is-' + state + (week === WEEK ? ' is-current' : ''));
       btn.type = 'button';
-      btn.setAttribute('aria-pressed', issue === ISSUE ? 'true' : 'false');
-      btn.appendChild(el('span', 'issue-btn-num', 'ISSUE ' + pad(issue.number)));
-      btn.appendChild(el('span', 'issue-btn-theme', pick(issue.theme)));
-      btn.appendChild(el('span', 'issue-btn-meta', String(issue.date).replace('-', '.') + ' · ' + issue.level));
+      btn.setAttribute('aria-pressed', week === WEEK ? 'true' : 'false');
+      btn.setAttribute('data-week', String(week.week));
+      btn.setAttribute('title', weekTip(week));
+      btn.setAttribute('aria-label', weekTip(week));
+      btn.appendChild(el('span', 'week-chip-num', pad(week.week)));
+
       btn.addEventListener('click', function () {
-        if (issue === ISSUE) return;
-        setIssue(issue, true);
+        if (week === WEEK) return;
+        setWeek(week, true);
       });
+
       holder.appendChild(btn);
     });
+  }
+
+  /* ── 1년 52주 플랜 (로드맵) ────────────────────────────────────────── */
+  function renderPlan() {
+    var holder = byId('planList');
+    if (!holder) return;
+
+    holder.textContent = '';
+    if (!WEEKS.length) return;
+
+    var all = allProgress();
+    var publishedCount = 0;
+
+    QUARTERS.forEach(function (quarter) {
+      var weeks = WEEKS.filter(function (w) { return w.quarter === quarter.quarter; });
+      if (!weeks.length) return;
+
+      var box = el('section', 'plan-quarter');
+      box.appendChild(el('h3', 'plan-quarter-title', pick(quarter.title)));
+      if (quarter.lead) box.appendChild(el('p', 'plan-quarter-lead', pick(quarter.lead)));
+
+      var grid = el('div', 'plan-grid');
+
+      weeks.forEach(function (week) {
+        var state = weekState(week, all);
+        if (state !== 'planned') publishedCount++;
+
+        var item = el('article', 'plan-item is-' + state + (week === WEEK ? ' is-current' : ''));
+
+        var btn = el('button', 'plan-week');
+        btn.type = 'button';
+        btn.setAttribute('aria-pressed', week === WEEK ? 'true' : 'false');
+        btn.setAttribute('title', weekTip(week));
+
+        btn.appendChild(el('span', 'plan-num', 'W' + pad(week.week)));
+
+        var text = el('span', 'plan-text');
+        text.appendChild(el('span', 'plan-theme', pick(week.theme)));
+        text.appendChild(el('span', 'plan-title', pick(week.title)));
+        text.appendChild(el('span', 'plan-meta', state === 'planned'
+          ? week.level + ' · ' + t('mag.planned')
+          : week.level + ' · ' + week.sections.length + t('mag.sectionSuffix')
+            + ' · ' + sectionCount(week) + t('mag.minSuffix')));
+        btn.appendChild(text);
+
+        btn.appendChild(el('span', 'plan-badge', state === 'planned' ? t('mag.planned')
+          : (state === 'done' ? t('mag.done') : t('mag.published'))));
+
+        btn.addEventListener('click', function () { setWeek(week, true); });
+
+        item.appendChild(btn);
+        grid.appendChild(item);
+      });
+
+      box.appendChild(grid);
+      holder.appendChild(box);
+    });
+
+    var countEl = byId('planPublishedCount');
+    var totalEl = byId('planWeekCount');
+    if (countEl) countEl.textContent = String(publishedCount);
+    if (totalEl) totalEl.textContent = String(WEEKS.length);
+  }
+
+  /* 발행된 주의 총 학습 시간 — 로드맵의 한 줄에 씁니다 */
+  function sectionCount(week) {
+    return (week.sections || []).reduce(function (sum, s) { return sum + sectionMinutes(s); }, 0);
+  }
+
+  /* ── 문의 폼의 "관련 주" 목록 ────────────────────────────────────────
+     발행된 주만 넣습니다(오류·오타 제보는 공개된 본문에만 할 수 있습니다).
+     (스크립트가 없으면 index.html 의 '해당 없음' 한 줄만 남습니다) */
+  function renderIssueOptions() {
+    var select = byId('cfIssue');
+    if (!select || !PUBLISHED.length) return;
+
+    var chosen = select.value;
+    select.textContent = '';
+
+    var none = el('option', null, t('form.issueNone'));
+    none.value = '';
+    select.appendChild(none);
+
+    PUBLISHED.forEach(function (week) {
+      var option = el('option', null, 'W' + pad(week.week) + ' · ' + pick(week.theme));
+      option.value = week.slug;
+      select.appendChild(option);
+    });
+
+    /* 다시 그려도 골라 둔 호를 잃지 않습니다 */
+    if (chosen) select.value = chosen;
   }
 
   /* ── 듣기 속도 ────────────────────────────────────────────────────── */
@@ -493,6 +642,12 @@
       chunks = chunks.concat(chunkText(q.en || q.ko, ''));
     });
 
+    /* 받아쓰기 문장도 들을 수 있어야 합니다 — 문항마다 버튼이 있지만
+       "섹션 전체 듣기"로도 이어서 들을 수 있게 포함합니다. */
+    (section.dictation || []).forEach(function (line) {
+      chunks = chunks.concat(chunkText(line.en, line.who));
+    });
+
     return chunks;
   }
 
@@ -505,12 +660,14 @@
     var title = byId('issueTitle');
     var summary = byId('issueSummary');
 
-    if (numeral) numeral.textContent = pad(ISSUE.number);
-    if (dateCover) dateCover.textContent = String(ISSUE.date).replace('-', ' · ');
-    if (themeCover) themeCover.textContent = pick(ISSUE.theme);
-    if (kicker) kicker.textContent = 'ISSUE ' + pad(ISSUE.number);
-    if (title) title.textContent = pick(ISSUE.title);
-    if (summary) summary.textContent = pick(ISSUE.summary);
+    if (numeral) numeral.textContent = pad(WEEK.week);
+    if (dateCover) dateCover.textContent = isPublished(WEEK)
+      ? String(WEEK.published).replace('-', ' · ')
+      : t('mag.planned');
+    if (themeCover) themeCover.textContent = pick(WEEK.theme);
+    if (kicker) kicker.textContent = 'WEEK ' + pad(WEEK.week);
+    if (title) title.textContent = pick(WEEK.title);
+    if (summary) summary.textContent = pick(WEEK.summary);
 
     renderCoverMeta();
     updateProgressUI();
@@ -530,31 +687,41 @@
       meta.appendChild(li);
     }
 
-    chip(t('mag.theme'), pick(ISSUE.theme));
-    chip(t('mag.level'), ISSUE.level);
-    chip(t('mag.sections'), String(ISSUE.sections.length));
-    chip(t('mag.minutes'), String(issueMinutes()));
-    chip(t('mag.words'), String(issueWords()));
-    chip(t('mag.kind.quiz'), String(issueQuizCount()));
+    chip(t('mag.theme'), pick(WEEK.theme));
+    chip(t('mag.level'), WEEK.level);
+    chip(t('mag.quarter'), WEEK.quarter + ' / ' + (QUARTERS.length || 4));
+
+    /* 아직 발행되지 않은 주는 분량 대신 상태만 알려 줍니다 */
+    if (!isPublished(WEEK)) {
+      chip(t('mag.status'), t('mag.planned'));
+      return;
+    }
+
+    chip(t('mag.sections'), String(WEEK.sections.length));
+    chip(t('mag.minutes'), String(weekMinutes()));
+    chip(t('mag.words'), String(weekWords()));
+    chip(t('mag.kind.quiz'), String(weekQuizCount()));
   }
 
   function updateProgressUI() {
-    var total = ISSUE.sections.length;
+    var total = isPublished(WEEK) ? WEEK.sections.length : 0;
     var done = doneSections.length;
     var pct = total ? Math.round((done / total) * 100) : 0;
 
     var text = byId('issueProgressText');
     var fill = byId('issueProgressFill');
 
-    if (text) text.textContent = done + ' / ' + total;
+    if (text) text.textContent = total ? done + ' / ' + total : t('mag.planned');
     if (fill) fill.style.width = pct + '%';
   }
 
   function firstUnfinished() {
-    for (var i = 0; i < ISSUE.sections.length; i++) {
-      if (!isDone(ISSUE.sections[i].id)) return ISSUE.sections[i];
+    if (!isPublished(WEEK)) return null;
+
+    for (var i = 0; i < WEEK.sections.length; i++) {
+      if (!isDone(WEEK.sections[i].id)) return WEEK.sections[i];
     }
-    return ISSUE.sections[0];
+    return WEEK.sections[0];
   }
 
   function updateResumeButton() {
@@ -562,6 +729,13 @@
     if (!btn) return;
 
     var target = firstUnfinished();
+
+    /* 발행 전인 주 — 읽을 본문이 없으니 플랜으로 안내합니다 */
+    if (!target) {
+      btn.href = '#plan';
+      btn.textContent = t('mag.openPlan');
+      return;
+    }
     var label = doneSections.length
       ? t('mag.resume') + ' · ' + pick(target.title)
       : t('mag.startReading');
@@ -584,7 +758,18 @@
 
     list.textContent = '';
 
-    ISSUE.sections.forEach(function (section, i) {
+    /* 발행 전인 주는 목차 대신 안내 한 줄만 남깁니다 */
+    if (!isPublished(WEEK)) {
+      var planned = el('li', 'toc-item is-planned');
+      var plannedBody = el('span', 'toc-body');
+      plannedBody.appendChild(el('span', 'toc-title', t('mag.plannedTitle')));
+      plannedBody.appendChild(el('span', 'toc-kind', t('mag.plannedToc')));
+      planned.appendChild(plannedBody);
+      list.appendChild(planned);
+      return;
+    }
+
+    WEEK.sections.forEach(function (section, i) {
       var item = el('li', 'toc-item' + (isDone(section.id) ? ' is-done' : ''));
 
       var link = el('a', 'toc-link');
@@ -871,19 +1056,19 @@
     /* 받아쓰기 */
     if (section.dictation && section.dictation.length) {
       hasContent = true;
-      inner.appendChild(buildDictation(section.dictation));
+      inner.appendChild(buildDictation(section.dictation, section.id));
     }
 
     /* 확인 문제 */
     if (section.quiz && section.quiz.length) {
       hasContent = true;
-      inner.appendChild(buildQuiz(section.quiz));
+      inner.appendChild(buildQuiz(section.quiz, section.id));
     }
 
     if (!hasContent) inner.appendChild(el('p', 'm-empty', t('mag.emptySection')));
 
     /* 섹션 끝 — 다음 섹션으로 */
-    var next = ISSUE.sections[index + 1];
+    var next = WEEK.sections[index + 1];
     var foot = el('div', 'm-foot');
 
     if (next) {
@@ -958,8 +1143,9 @@
       .trim();
   }
 
-  function buildDictation(list) {
+  function buildDictation(list, sectionId) {
     var box = el('div', 'dict');
+    var slot = answerSlot(sectionId);
 
     list.forEach(function (item, i) {
       var row = el('div', 'dict-item');
@@ -981,6 +1167,10 @@
       input.setAttribute('autocapitalize', 'off');
       input.setAttribute('spellcheck', 'false');
       input.setAttribute('placeholder', t('mag.youTyped'));
+      input.addEventListener('input', function () {
+        slot.dict[i] = slot.dict[i] || {};
+        slot.dict[i].value = input.value;
+      });
       row.appendChild(input);
 
       var actions = el('div', 'dict-actions');
@@ -1039,19 +1229,35 @@
         if (!typed) { api.toast(t('mag.typeFirst')); return; }
 
         var target = stripPunctuation(item.en);
-        if (typed === target) { showResult('ok'); markStudy(); return; }
+        if (typed === target) {
+          slot.dict[i] = { value: input.value, result: 'ok' };
+          showResult('ok');
+          markStudy();
+          return;
+        }
 
         /* 틀린 단어 추출 — 정답에 있는데 내가 쓰지 않은 단어 */
         var typedWords = typed.split(' ');
         var missed = target.split(' ').filter(function (w) { return typedWords.indexOf(w) === -1; });
+        slot.dict[i] = { value: input.value, result: 'bad', missed: missed };
         showResult('bad', missed);
       });
 
-      revealBtn.addEventListener('click', function () { showResult('reveal'); });
+      revealBtn.addEventListener('click', function () {
+        slot.dict[i] = { value: input.value, result: 'reveal' };
+        showResult('reveal');
+      });
 
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') checkBtn.click();
       });
+
+      /* 언어를 바꿔 다시 그린 경우: 적어 둔 답과 채점 결과를 그대로 되살립니다 */
+      var saved = slot.dict[i];
+      if (saved) {
+        input.value = saved.value || '';
+        if (saved.result) showResult(saved.result, saved.missed);
+      }
 
       box.appendChild(row);
     });
@@ -1060,12 +1266,14 @@
   }
 
   /* ── 확인 문제 (즉시 채점 + 점수 + 다시 풀기) ─────────────────────── */
-  function buildQuiz(list) {
+  function buildQuiz(list, sectionId) {
     var box = el('div', 'm-quiz');
     var letters = 'ABCDEFGH';
     var answered = 0;
     var score = 0;
     var items = [];
+    var restorers = [];
+    var slot = answerSlot(sectionId);
 
     var summary = el('div', 'quiz-summary');
     summary.hidden = true;
@@ -1087,6 +1295,7 @@
       retry.addEventListener('click', function () {
         answered = 0;
         score = 0;
+        slot.quiz = {};            /* 다시 풀기는 기억해 둔 답도 지웁니다 */
         items.forEach(function (reset) { reset(); });
         refreshSummary();
       });
@@ -1108,49 +1317,65 @@
 
       var optionButtons = [];
 
+      /* 한 보기를 고른 상태로 만듭니다. 사용자가 누를 때(record=true)와
+         언어를 바꿔 다시 그린 뒤 되살릴 때(record=false) 같은 길로 들어옵니다. */
+      function choose(oi, record) {
+        if (row.getAttribute('data-answered') === 'true') return;
+        row.setAttribute('data-answered', 'true');
+        row.setAttribute('data-chosen', String(oi));
+
+        var correct = oi === item.answer;
+        var chosen = optionButtons[oi];
+        if (chosen) chosen.classList.add(correct ? 'is-correct' : 'is-wrong');
+        answered++;
+        if (correct) score++;
+
+        if (!correct) {
+          var right = optionButtons[item.answer];
+          if (right) right.classList.add('is-correct');
+        }
+
+        feedback = el('div', 'quiz-feedback ' + (correct ? 'is-correct' : 'is-wrong'));
+        feedback.appendChild(el('span', 'quiz-feedback-icon', correct ? '✓' : '!'));
+        feedback.appendChild(langTag(el(
+          'span',
+          null,
+          (correct ? t('mag.quizCorrect') : t('mag.quizWrong')) + ' — ' + (item.explain.en || pick(item.explain))
+        ), 'en'));
+        row.appendChild(feedback);
+
+        if (item.explain.ko && item.explain.en) row.appendChild(trl(el('p', 'quiz-explain-ko', item.explain.ko)));
+
+        refreshSummary();
+
+        if (record) {
+          slot.quiz[qi] = oi;      /* 되돌릴 때 쓰는 기억 */
+          markStudy();
+        }
+      }
+
       item.options.forEach(function (option, oi) {
         var btn = el('button', 'quiz-opt');
         btn.type = 'button';
         btn.appendChild(el('span', 'quiz-letter', letters.charAt(oi) || String(oi + 1)));
-        btn.appendChild(langTag(el('span', 'quiz-text', option), 'en'));
+        var label = pick(option);
+        btn.appendChild(langTagAuto(el('span', 'quiz-text', label), label));
 
-        btn.addEventListener('click', function () {
-          if (row.getAttribute('data-answered') === 'true') return;
-          row.setAttribute('data-answered', 'true');
-
-          var correct = oi === item.answer;
-          btn.classList.add(correct ? 'is-correct' : 'is-wrong');
-          answered++;
-          if (correct) score++;
-
-          if (!correct) {
-            var right = options.children[item.answer];
-            if (right) right.classList.add('is-correct');
-          }
-
-          feedback = el('div', 'quiz-feedback ' + (correct ? 'is-correct' : 'is-wrong'));
-          feedback.appendChild(el('span', 'quiz-feedback-icon', correct ? '✓' : '!'));
-          feedback.appendChild(langTag(el(
-            'span',
-            null,
-            (correct ? t('mag.quizCorrect') : t('mag.quizWrong')) + ' — ' + (item.explain.en || pick(item.explain))
-          ), 'en'));
-          row.appendChild(feedback);
-
-          if (item.explain.ko && item.explain.en) row.appendChild(trl(el('p', 'quiz-explain-ko', item.explain.ko)));
-
-          refreshSummary();
-          markStudy();
-        });
+        btn.addEventListener('click', function () { choose(oi, true); });
 
         optionButtons.push(btn);
         options.appendChild(btn);
+      });
+
+      restorers.push(function () {
+        if (slot.quiz[qi] != null) choose(slot.quiz[qi], false);
       });
 
       row.appendChild(options);
 
       items.push(function reset() {
         row.removeAttribute('data-answered');
+        row.removeAttribute('data-chosen');
         row.classList.remove('is-correct', 'is-wrong');
         optionButtons.forEach(function (btn) { btn.classList.remove('is-correct', 'is-wrong'); });
         if (feedback && feedback.parentNode) feedback.parentNode.removeChild(feedback);
@@ -1163,6 +1388,9 @@
 
       box.appendChild(row);
     });
+
+    /* 언어를 바꿔 다시 그린 경우: 이미 고른 답을 점수까지 그대로 되살립니다 */
+    restorers.forEach(function (restore) { restore(); });
 
     box.appendChild(summary);
     return box;
@@ -1185,13 +1413,57 @@
     });
   }
 
+  /* 아직 발행되지 않은 주 — 플랜의 주제와 상태만 보여 주고 본문 대신 안내를 둡니다. */
+  function buildPlannedNotice() {
+    var box = el('section', 'section m-section m-planned');
+    box.id = 'planned';
+
+    var inner = el('div', 'wrap');
+    box.appendChild(inner);
+
+    var head = el('div', 'm-head');
+    inner.appendChild(head);
+
+    var headMain = el('div', 'm-head-main');
+    var kind = el('p', 'm-kind');
+    kind.appendChild(el('span', 'm-kind-icon', '🗓️'));
+    kind.appendChild(el('span', null, 'WEEK ' + pad(WEEK.week)));
+    kind.appendChild(el('span', 'm-dot', '·'));
+    kind.appendChild(el('span', 'm-level', WEEK.level));
+    headMain.appendChild(kind);
+    headMain.appendChild(el('h2', 'm-title', pick(WEEK.title)));
+    head.appendChild(headMain);
+
+    inner.appendChild(el('p', 'm-intro', pick(WEEK.summary)));
+
+    var note = el('div', 'm-planned-note');
+    note.appendChild(el('p', 'm-planned-title', t('mag.plannedTitle')));
+    note.appendChild(el('p', 'm-planned-lead', t('mag.plannedLead')));
+
+    var link = el('a', 'btn btn-primary');
+    link.href = '#plan';
+    link.textContent = t('mag.openPlan');
+    note.appendChild(link);
+
+    inner.appendChild(note);
+    return box;
+  }
+
   function renderContent() {
     var holder = byId('issueContent');
     if (!holder) return;
 
     holder.textContent = '';
 
-    ISSUE.sections.forEach(function (section, i) {
+    /* 아직 구성이 끝나지 않은 주 — 본문 대신 플랜 안내를 띄웁니다 */
+    if (!isPublished(WEEK)) {
+      holder.appendChild(buildPlannedNotice());
+      renderToc();
+      applyReveal();
+      return;
+    }
+
+    WEEK.sections.forEach(function (section, i) {
       holder.appendChild(buildSection(section, i));
     });
 
@@ -1476,7 +1748,14 @@
       if (data.srs && typeof data.srs === 'object') {
         var srs = loadSrs();
         Object.keys(data.srs).forEach(function (key) {
-          if (!srs[key]) srs[key] = data.srs[key];
+          var rec = data.srs[key];
+          /* box·due 가 숫자가 아니면 복습 간격을 계산할 수 없습니다.
+             (NaN 이 섞이면 그 카드는 이후 다시는 나오지 않습니다) */
+          if (!rec || typeof rec !== 'object') return;
+          if (typeof rec.box !== 'number' || typeof rec.due !== 'number') return;
+          if (!isFinite(rec.box) || !isFinite(rec.due)) return;
+          if (rec.box < 0 || rec.box >= SRS_INTERVALS.length) return;
+          if (!srs[key]) srs[key] = { box: rec.box, due: rec.due };
         });
         save(SRS_KEY, srs);
       }
@@ -1525,7 +1804,8 @@
 
     return savedWords.filter(function (w) {
       var rec = srs[w.en];
-      if (!rec || rec.due == null) return true;
+      /* 기록이 없거나 망가졌으면 오늘 볼 카드로 칩니다 */
+      if (!rec || typeof rec.due !== 'number' || !isFinite(rec.due)) return true;
       return rec.due <= now;
     });
   }
@@ -1533,7 +1813,8 @@
   function gradeCard(word, known) {
     var srs = loadSrs();
     var rec = srs[word.en] || { box: 0 };
-    var box = known ? Math.min(rec.box + 1, SRS_INTERVALS.length - 1) : 0;
+    var from = typeof rec.box === 'number' && isFinite(rec.box) ? rec.box : 0;
+    var box = known ? Math.min(from + 1, SRS_INTERVALS.length - 1) : 0;
     var days = SRS_INTERVALS[box];
 
     srs[word.en] = { box: box, due: Date.now() + days * 24 * 60 * 60 * 1000 };
@@ -1709,11 +1990,37 @@
   }
 
   /* ── 시작 ───────────────────────────────────────────────────────────── */
+  /* 2026-09 이전에는 호(issue-01) 단위였습니다. 주(week-01)로 옱기면서
+     저장해 둔 진행률과 마지막으로 본 주를 그대로 이어받습니다. */
+  function migrateLegacySlugs() {
+    var map = {};
+    WEEKS.forEach(function (w) { map['issue-' + pad(w.week)] = w.slug; });
+
+    var last = store(ISSUE_KEY, '');
+    if (map[last]) save(ISSUE_KEY, map[last]);
+
+    var progress = store(PROGRESS_KEY, {});
+    if (!progress || typeof progress !== 'object') return;
+
+    var changed = false;
+    Object.keys(map).forEach(function (oldSlug) {
+      if (progress[oldSlug]) {
+        progress[map[oldSlug]] = progress[oldSlug];
+        delete progress[oldSlug];
+        changed = true;
+      }
+    });
+
+    if (changed) save(PROGRESS_KEY, progress);
+  }
+
   function init() {
-    if (!ISSUES.length) return;
+    if (!WEEKS.length) return;
+
+    migrateLegacySlugs();
 
     var wanted = store(ISSUE_KEY, '');
-    ISSUE = ISSUES.filter(function (i) { return i.slug === wanted; })[0] || ISSUES[0];
+    WEEK = WEEKS.filter(function (w) { return w.slug === wanted; })[0] || WEEKS[0];
 
     loadWordbook();
     loadProgress();
@@ -1723,7 +2030,9 @@
     renderWordbook();
     renderReview();
     renderDaily();
-    renderIssueNav();
+    renderWeekPicker();
+    renderPlan();
+    renderIssueOptions();
     updateCounts();
     setupReadBar();
     setupRate();
@@ -1736,7 +2045,9 @@
       renderContent();
       renderWordbook();
       renderReview();
-      renderIssueNav();
+      renderWeekPicker();
+      renderPlan();
+      renderIssueOptions();
       updateCounts();
     });
 
