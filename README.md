@@ -6,22 +6,33 @@ MonsterLab(`monsterlab.monster`)의 두 번째 서비스입니다.
 ## 구조
 
 ```
-index.html     # 매거진 본문 (표지·주 선택기·목차·섹션·복습·단어장·52주 플랜·알림 신청 폼)
-issues.js      # 매거진 데이터(52주 플랜 + 발행된 주의 섹션) — 이 파일이 콘텐츠의 "DB"
-magazine.js    # 매거진 렌더링·오디오·받아쓰기·퀴즈·복습 카드·단어장·주 선택기·로드맵
-script.js      # 페이지 공통 (한/영 전환, 테마, 강조색, 모바일 메뉴, 문의 폼 전송)
-styles.css     # 스타일 (다크/라이트 테마, 강조색 프리셋, 인쇄용, 반응형)
-analytics.js   # 방문 분석 (Counter.dev) — 사이트 ID를 넣기 전에는 아무 것도 안 함
-og.png         # 공유 카드 이미지 (1200×630) — og:image / twitter:image
-robots.txt     # 검색엔진 크롤링 허용 + 사이트맵 위치
-sitemap.xml    # 사이트맵 (한 페이지, 주 단위 갱신)
-smoke-test.js  # 검증 스크립트 (배포 전 `node smoke-test.js`)
-browser-test.js# 헤드리스 Chrome 검증 (스크롤·모바일 레이아웃·실제 클릭·네트워크)
-CNAME          # GitHub Pages 커스텀 도메인 (engmon.monster)
+index.html        # 매거진 본문 (표지·주 선택기·목차·섹션·복습·단어장·52주 플랜·알림 신청 폼)
+issues.js         # 매거진 데이터(52주 플랜 + 발행된 주의 섹션) — 이 파일이 콘텐츠의 "DB"
+magazine.js       # 매거진 렌더링·오디오·받아쓰기·퀴즈·복습 카드·단어장·주 선택기·로드맵
+script.js         # 페이지 공통 (한/영 전환, 테마, 강조색, 모바일 메뉴, 문의 폼 전송)
+styles.css        # 스타일 (다크/라이트 테마, 강조색 프리셋, 인쇄용, 반응형)
+analytics.js      # 방문 분석 (Counter.dev) — 사이트 ID를 넣기 전에는 아무 것도 안 함
+manifest.webmanifest # 설치형 앱(PWA) 매니페스트 — 이름·아이콘·테마색
+sw.js             # 서비스 워커 — 오프라인 학습(핵심 에셋 캐시)
+icon.svg · icon-192.png · icon-512.png · icon-maskable-512.png · apple-touch-icon.png  # 아이콘
+404.html          # 없는 주소 안내 (GitHub Pages 커스텀 404)
+privacy.html      # 개인정보처리방침
+terms.html        # 이용약관
+assets/site.css   # 정적 페이지(404·약관) 공용 스타일
+assets/fonts/     # 본문 서체 서브셋(Pretendard) + 라이선스 + charset.json
+og.png            # 공유 카드 이미지 (1200×630) — og:image / twitter:image
+robots.txt        # 검색엔진 크롤링 허용 + 사이트맵 위치
+sitemap.xml       # 사이트맵 (한 페이지, 주 단위 갱신)
+smoke-test.js     # 검증 스크립트 (의존성 없이 Node 로 페이지 스크립트 실행)
+browser-test.js   # 헤드리스 Chrome 검증 (레이아웃·기능·PWA·네트워크)
+tools/            # serve · stage-site · font-charset · make-font-subset · make-icons
+package.json      # npm 스크립트 (serve · test · stage · check) — 런타임 의존성 0
+.github/workflows # CI(ci.yml) · GitHub Pages 배포(deploy.yml)
+CNAME             # GitHub Pages 커스텀 도메인 (engmon.monster)
 ```
 
-- 프레임워크·패키지·빌드 과정 없음. 파일을 그대로 올리면 동작합니다.
-- 외부 의존성 없음(시스템 폰트, CDN 요청 없음). 오디오는 브라우저 내장 음성합성(`speechSynthesis`)을 씁니다.
+- 프레임워크·빌드 과정 없음. 파일을 그대로 올리면 동작합니다. `package.json` 은 npm 스크립트 모음일 뿐 **런타임 의존성은 0**입니다.
+- **외부 요청 0을 지향**합니다 — 본문 서체도 자체 호스팅 서브셋(`assets/fonts/`), 오디오는 브라우저 내장 음성합성(`speechSynthesis`)을 씁니다.
   단, **방문 분석을 켜면**(사이트 ID 입력) Counter.dev 스크립트 1개를 불러옵니다 — 아래 "방문 분석" 참고.
 - `script.js`가 공용 API(`window.MonsterLab`의 `t`·`toast`)와 `langchange` 이벤트를 노출하고,
   `magazine.js`는 그 두 가지로만 연결됩니다.
@@ -132,17 +143,67 @@ CNAME          # GitHub Pages 커스텀 도메인 (engmon.monster)
 
 ## 로컬에서 보기
 
-`index.html`을 브라우저로 열면 됩니다. 로컬 서버로 확인하려면:
+가장 정확한 확인은 **http 로 띄우는 것**입니다(서비스 워커·매니페스트는 http(s) 에서만 동작).
 
 ```bash
-python -m http.server 8000
+npm run serve            # http://localhost:8000 (없는 주소는 404.html 로)
 # 또는
-npx serve .
+node tools/serve.mjs --open
 ```
+
+`index.html` 을 `file://` 로 직접 열어도 화면은 나옵니다. 다만 오프라인·설치(PWA)는 file:// 에서 동작하지 않고,
+브라우저 콘솔에 폰트·매니페스트의 CORS 안내가 남습니다(웹 출처가 아니라 file:// 자체의 제약이라 무해합니다).
+
+## 오프라인 · 설치형 앱 (PWA)
+
+- `manifest.webmanifest` + `sw.js` 로 **홈 화면에 설치**하고 **오프라인에서도** 열 수 있습니다.
+- 서비스 워커 전략(`sw.js`): HTML 문서는 **네트워크 우선**(새 배포가 즉시 반영, 오프라인이면 캐시 폴백),
+  나머지 에셋은 **stale-while-revalidate**(캐시를 바로 주고 뒤에서 갱신). 외부 출처(분석 스크립트)는 손대지 않습니다.
+- 아이콘은 `tools/make-icons.py` 로 만듭니다(192·512·maskable·apple-touch). 도안은 `icon.svg` 와 같습니다.
+- **CSS/JS 를 고쳐 배포할 때는 `sw.js` 의 `CACHE_NAME` 숫자도 함께 올리세요** (`?v=` 를 올리는 것과 같은 시점).
+  그러지 않으면 옛 파일이 캐시에서 계속 나옵니다.
+
+## 본문 서체 (자체 호스팅)
+
+- `assets/fonts/pretendard-variable.woff2` 는 사이트에 **실제로 나오는 글자만** 담은 Pretendard 서브셋입니다(외부 CDN 요청 없음).
+- 글자가 늘었을 때(새 주 발행 등) 다시 만듭니다:
+
+```bash
+python tools/make-font-subset.py     # = node tools/font-charset.mjs + fontTools 서브셋
+```
+
+- 글자 집합의 정의는 `tools/font-charset.mjs` 한 곳입니다. 새 콘텐츠 파일을 추가하면 그 목록에도 넣으세요.
+- 라이선스는 `assets/fonts/LICENSE.txt`(SIL Open Font License)를 따릅니다.
+
+## 404 · 약관 페이지
+
+- `404.html` — GitHub Pages 가 없는 주소에 자동으로 돌려줍니다. `tools/serve.mjs` 도 같은 화면을 404 상태로 줍니다.
+- `privacy.html` · `terms.html` — 학습 데이터(localStorage)·문의 폼(Formspree)·방문 통계(Counter.dev)를 반영한 방침/약관입니다.
+- 이 페이지들은 `assets/site.css`(매거진 `styles.css` 와 분리)를 쓰고, 매거진과 같은 테마 키(`monsterlab.theme`)를 따릅니다.
+- 방문 통계의 사이트 ID 정본은 `index.html` 이고, 정적 페이지에도 같은 값을 둡니다(값을 바꾸면 함께 고치세요).
+
+## 도구 · CI/CD
+
+```bash
+npm run serve         # 로컬 미리보기(http)
+npm test              # smoke-test.js — 페이지 스크립트를 Node 로 실행
+npm run check:browser # browser-test.js — 헤드리스 Chrome 검증
+npm run stage         # tools/stage-site.mjs — 공개 파일만 _site 로 추려 검증
+npm run check:staged  # stage + _site 를 http 로 서빙해 브라우저 검증(레이아웃·기능·PWA)
+npm run check:live    # 배포된 engmon.monster 를 브라우저로 점검
+npm run check:ci      # CI 와 같은 순서(스모크 + 스테이징 검증)
+```
+
+- `.github/workflows/ci.yml` — 푸시·PR 마다 Node 22/24 에서 스모크 + 스테이징 + 브라우저 검증.
+- `.github/workflows/deploy.yml` — `tools/stage-site.mjs` 로 **공개 목록만** `_site` 로 추려 Pages 에 올리고,
+  배포가 끝나면 **실제 주소**를 헤드리스 Chrome 으로 다시 점검합니다.
+  이렇게 해야 `tools/` · `.github/` · `package.json` 같은 운영 자료가 인터넷에 공개되지 않습니다.
 
 ## 검증 (배포 전)
 
 ```bash
+npm test                 # = node smoke-test.js
+# 또는
 node smoke-test.js
 ```
 
@@ -181,8 +242,10 @@ node smoke-test.js
 ### 브라우저 검증
 
 ```bash
-node browser-test.js          # 검증만
-node browser-test.js --shots  # + .shots/ 에 스크린샷
+npm run check:browser                        # 검증만 (file://)
+npm run shots                                # + .shots/ 에 스크린샷
+node browser-test.js --site-root _site       # 배포본 폴더를 http 로 서빙해 검사 (+PWA)
+node browser-test.js --live                  # 배포된 engmon.monster 검사
 ```
 
 헤드리스 Chrome을 띄워 **실제로 렌더링한 화면**을 잽니다(Chrome 경로는 `CHROME` 환경변수로 지정).
@@ -379,15 +442,21 @@ CSS·JS를 참조할 때 `?v=숫자` 같은 버전을 붙여 둡니다(파일마
 
 **CSS나 JS를 고쳐서 배포할 때는 `index.html`의 `?v=` 숫자를 올리세요.**
 그러지 않으면 브라우저나 CDN이 예전 파일을 계속 쓰면서 수정이 반영되지 않은 것처럼 보입니다.
+**서비스 워커(`sw.js`)를 쓰므로 `CACHE_NAME` 숫자도 함께 올리세요** — 두 곳(`?v=` 와 `CACHE_NAME`)이 같은 시점에 움직여야 합니다.
 
 ## 배포
 
-정적 호스팅 아무 곳에나 파일을 올리면 됩니다
-(`index.html`, `issues.js`, `magazine.js`, `script.js`, `analytics.js`, `styles.css`,
-`og.png`, `robots.txt`, `sitemap.xml`, `CNAME`).
+사이트 파일만 정적 호스팅에 올리면 됩니다
+(`index.html`, `404.html`, `privacy.html`, `terms.html`, `issues.js`, `magazine.js`, `script.js`,
+`analytics.js`, `styles.css`, `sw.js`, `manifest.webmanifest`, `assets/`, 아이콘, `og.png`,
+`robots.txt`, `sitemap.xml`, `CNAME`).
 
-- **GitHub Pages**: 이 저장소를 푸시하고 Pages를 활성화 (커스텀 도메인은 `engmon.monster`)
-- **Vercel / Netlify / Cloudflare Pages**: 빌드 명령 없이 루트 디렉터리 지정
+- **GitHub Pages (권장)**: `main` 에 푸시하면 `.github/workflows/deploy.yml` 이
+  `tools/stage-site.mjs` 로 **공개 목록만** `_site` 로 추려 배포하고, 배포 후 실제 주소를 브라우저로 점검합니다.
+  저장소 → Settings → Pages 의 **Source 를 "GitHub Actions"** 로 두세요("Deploy from a branch" 는 브랜치 루트 전체를 공개합니다).
+  커스텀 도메인은 `engmon.monster`.
+- **Vercel / Netlify / Cloudflare Pages**: 빌드 명령 없이 루트 디렉터리를 지정하세요
+  (이 경우 운영 도구도 함께 올라가므로, GitHub Actions 배포를 권장합니다).
 
 > GitHub Pages는 저장소당 커스텀 도메인 하나만 지원합니다. 그래서 MonsterLab(`monsterlab.monster`)과
 > EngMon(`engmon.monster`)은 **저장소를 분리**해 운영합니다.

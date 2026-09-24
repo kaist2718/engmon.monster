@@ -1,0 +1,13 @@
+# 텍스트 파일은 저장소·작업 폴더 모두 LF 로 맞춥니다.
+# (Windows 에서 core.autocrlf=true 인 환경에 CRLF 로 체크아웃되면
+#  생성물 검증·감사 도구가 보는 바이트가 달라져 혼란이 생깁니다.)
+* text=auto eol=lf
+
+# 이미지·압축 파일은 손대지 않습니다.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary

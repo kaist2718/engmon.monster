@@ -1,8 +1,10 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    EngMon 브라우저 검증 (헤드리스 Chrome)
 
-     node browser-test.js              검증만 실행
-     node browser-test.js --shots      + .shots/ 에 스크린샷 저장
+     node browser-test.js                        검증만 실행 (file://)
+     node browser-test.js --shots                + .shots/ 에 스크린샷 저장
+     node browser-test.js --site-root _site      배포본 폴더를 http 로 서빙해 검사
+     node browser-test.js --live [url]           배포된 사이트 검사 (기본 engmon.monster)
 
    smoke-test.js 가 데이터·마크업·CSS 규칙을 검사하는 것과 달리,
    이 스크립트는 실제 Chrome 을 띄워 다음을 확인합니다.
@@ -42,7 +44,19 @@ if (!CHROME) {
   process.exit(0);
 }
 
-const url = 'file:///' + path.join(__dirname, 'index.html').replace(/\\/g, '/');
+/* 인자 — 기본(file://) · --site-root <dir> · --live [url] */
+const RAW_ARGS = process.argv.slice(2);
+const argVal = (name) => {
+  const i = RAW_ARGS.indexOf(name);
+  if (i === -1) return null;
+  const next = RAW_ARGS[i + 1];
+  return next && !next.startsWith('--') ? next : true;
+};
+const LIVE = argVal('--live');
+const SITE_ROOT = argVal('--site-root');
+
+let url = 'file:///' + path.join(__dirname, 'index.html').replace(/\\/g, '/');
+let siteServer = null;
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'engmon-browser-'));
 const WANT_SHOTS = process.argv.indexOf('--shots') !== -1;
 const OUT = path.join(__dirname, '.shots');
@@ -150,6 +164,37 @@ function serveStatic(root) {
   return new Promise((resolve) => server.listen(0, '127.0.0.1', () => resolve({ server, state, port: server.address().port })));
 }
 
+/* 임의의 폴더를 http 로 서빙합니다(--site-root). 서비스워커·매니페스트(PWA)를
+   검사하려면 file:// 가 아니라 http 로 열어야 합니다. */
+function serveDir(root) {
+  const MIME = {
+    '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
+    '.css': 'text/css; charset=utf-8', '.webmanifest': 'application/manifest+json; charset=utf-8',
+    '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png',
+    '.woff2': 'font/woff2', '.xml': 'application/xml; charset=utf-8', '.txt': 'text/plain; charset=utf-8',
+  };
+  const server = http.createServer((req, res) => {
+    let p = decodeURIComponent(req.url.split('?')[0].split('#')[0]);
+    if (p.endsWith('/')) p += 'index.html';
+    const target = path.join(root, p);
+    const rel = path.relative(root, target);
+    if (rel.startsWith('..') || path.isAbsolute(rel)) { res.writeHead(403); return res.end('forbidden'); }
+    fs.readFile(target, (err, buf) => {
+      if (err) {
+        fs.readFile(path.join(root, '404.html'), (e2, notFound) => {
+          if (e2) { res.writeHead(404); res.end('not found'); return; }
+          res.writeHead(404, { 'Content-Type': MIME['.html'] });
+          res.end(notFound);
+        });
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': MIME[path.extname(target).toLowerCase()] || 'application/octet-stream' });
+      res.end(buf);
+    });
+  });
+  return new Promise((resolve) => server.listen(0, '127.0.0.1', () => resolve({ server, port: server.address().port })));
+}
+
 let pass = 0;
 let fail = 0;
 function report(ok, label, detail) {
@@ -250,7 +295,21 @@ const overflowProbe = `(() => {
   await cdp.send('Runtime.enable');
   await cdp.send('Log.enable');
 
+  /* 모드 선택 — file://(기본) · --site-root(배포본 폴더) · --live(배포 주소).
+     서비스워커·매니페스트(PWA)는 http(s) 에서만 동작하므로 기본 모드에서는 건너뜁니다. */
+  if (LIVE) {
+    url = typeof LIVE === 'string' ? LIVE : 'https://engmon.monster/';
+    console.log('\n  대상: ' + url + ' (라이브)');
+  } else if (SITE_ROOT) {
+    const root = path.resolve(__dirname, typeof SITE_ROOT === 'string' ? SITE_ROOT : '.');
+    const s = await serveDir(root);
+    siteServer = s.server;
+    url = 'http://127.0.0.1:' + s.port + '/index.html';
+    console.log('\n  대상: ' + root + ' (http 서빙)');
+  }
+
   const evalv = async (expr) => (await cdp.send('Runtime.evaluate', { expression: expr, returnByValue: true })).result.value;
+  const evalAwait = async (expr) => (await cdp.send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true })).result.value;
   const load = async (w, h, mobile) => {
     await cdp.send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: mobile ? 2 : 1, mobile: !!mobile });
     await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: !!mobile, maxTouchPoints: 5 });
@@ -445,7 +504,46 @@ const overflowProbe = `(() => {
 
   /* ── 6. 콘솔 ─────────────────────────────────────────────────────────── */
   const errors = cdp.events.filter((e) => e.method === 'Log.entryAdded' && e.params.entry.level === 'error');
-  report(errors.length === 0, '콘솔 에러 없음', errors.length ? errors.map((e) => e.params.entry.text).join(' | ') : '');
+  /* file:// 에서는 폰트·매니페스트가 "origin null" CORS 로 막혀 콘솔에 남습니다.
+     웹 출처가 아니라 file:// 자체의 제약이고 화면은 대체 글꼴로 정상 동작하므로,
+     기본 모드에서는 그 두 가지(file:// 자원 + net::ERR_FAILED)만 걸러냅니다.
+     http(s)(--site-root·--live)에서는 하나도 걸러내지 않습니다. */
+  const fileMode = url.indexOf('file:') === 0;
+  const relevant = fileMode
+    ? errors.filter((e) => {
+      const t = e.params.entry.text || '';
+      return !(t.indexOf("origin 'null'") > -1 || t.indexOf('net::ERR_FAILED') > -1);
+    })
+    : errors;
+  report(relevant.length === 0, '콘솔 에러 없음',
+    relevant.length ? relevant.map((e) => e.params.entry.text).join(' | ')
+      : (fileMode && errors.length ? 'file:// 자원 제약 ' + errors.length + '건 제외' : ''));
+
+  /* ── 8. PWA (서비스워커 · 매니페스트) ────────────────────────────────── */
+  if (/^https?:/.test(url)) {
+    console.log('\n[8] PWA — 서비스워커 · 매니페스트');
+    await load(1280, 900, false);
+    await sleep(1400); /* window load 이후 등록되므로 조금 기다립니다 */
+    const pwa = await evalAwait(`(async () => {
+      const out = { hasManifest: !!document.querySelector('link[rel="manifest"]'), regs: 0, supported: 'serviceWorker' in navigator };
+      if (out.supported) { try { out.regs = (await navigator.serviceWorker.getRegistrations()).length; } catch (e) {} }
+      try {
+        const res = await fetch('manifest.webmanifest');
+        out.status = res.status;
+        const m = await res.json();
+        out.name = m.name || '';
+        out.icons = (m.icons || []).length;
+      } catch (e) { out.status = 0; }
+      return out;
+    })()`);
+    report(pwa.hasManifest && pwa.status === 200 && pwa.icons >= 3,
+      '매니페스트가 연결되고 아이콘이 3개 이상',
+      'status=' + pwa.status + ' · 이름="' + pwa.name + '" · 아이콘 ' + pwa.icons + '개');
+    report(pwa.supported && pwa.regs >= 1,
+      '서비스워커가 등록된다(오프라인 지원)', '등록 ' + pwa.regs + '개 · 지원=' + pwa.supported);
+  } else {
+    console.log('\n[8] PWA — file:// 이라 건너뜀 (--site-root 또는 --live 로 확인)');
+  }
 
   /* ── 7. 스크린샷 ─────────────────────────────────────────────────────── */
   if (WANT_SHOTS) {
@@ -478,8 +576,9 @@ const overflowProbe = `(() => {
   /* 실제로 Counter.dev 로 보내지 않도록 모든 요청을 가로챕니다.
      Counter.dev 요청은 붙잡아 확인만 하고 실패시킵니다. */
   const requested = [];
-  const static_ = await serveStatic(__dirname);
-  const local = 'http://127.0.0.1:' + static_.port;
+  const static_ = LIVE ? null : await serveStatic(__dirname);
+  const local = static_ ? 'http://127.0.0.1:' + static_.port : url;
+  const indexUrl = static_ ? local + '/index.html' : url;
   cdp.onEvent = (msg) => {
     if (msg.method !== 'Fetch.requestPaused') return;
     const params = msg.params;
@@ -491,6 +590,7 @@ const overflowProbe = `(() => {
   };
   await cdp.send('Fetch.enable', { patterns: [{ urlPattern: '*' }] });
 
+  if (!LIVE) {
   /* (a) 사이트 ID가 비어 있을 때 — 외부 요청이 하나도 없어야 합니다 */
   requested.length = 0;
   await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
@@ -531,12 +631,13 @@ const overflowProbe = `(() => {
   report(counterTag.traces === 'undefined/undefined/undefined',
     '학습 행동·GA4/Umami 흔적 없이 방문수·유입·국가만 수집한다',
     'gtag/umami/dataLayer=' + counterTag.traces);
+  }
 
   /* (c) 실제 index.html 에 ID가 들어 있으면 그 ID로도 한 번 더 확인합니다 */
   const realId = readCounterId(__dirname);
   if (realId) {
     requested.length = 0;
-    await cdp.send('Page.navigate', { url: local + '/index.html' });
+    await cdp.send('Page.navigate', { url: indexUrl });
     await sleep(1800);
     const liveReqs = requested.filter((u) => u.indexOf('counter.dev') > -1);
     const liveTag = await evalv(`(() => {
@@ -552,15 +653,17 @@ const overflowProbe = `(() => {
 
   await cdp.send('Fetch.disable');
   cdp.onEvent = null;
-  static_.server.close();
+  if (static_) static_.server.close();
 
   console.log('\n  결과: ' + pass + ' 통과 / ' + fail + ' 실패\n');
+  if (siteServer) siteServer.close();
   killChrome();
   await sleep(400);
   try { fs.rmSync(profile, { recursive: true, force: true }); } catch (e) {}
   process.exit(fail ? 1 : 0);
 })().catch(async (err) => {
   console.error('\n브라우저 검증 실패:', err.message, '\n');
+  if (siteServer) siteServer.close();
   killChrome();
   await sleep(400);
   try { fs.rmSync(profile, { recursive: true, force: true }); } catch (e) {}

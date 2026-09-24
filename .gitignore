@@ -1,0 +1,17 @@
+# 헤드리스 Chrome 검증 스크린샷 (browser-test.js --shots 산출물 — 재생성 가능)
+.shots/
+
+# 배포용 스테이징 폴더 (tools/stage-site.mjs 산출물 — 재생성 가능)
+_site/
+
+# 폰트 서브셋 원본(6.7MB) — tools/make-font-subset.py 가 필요할 때 받아 두는 캐시
+.cache/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# 편집기·OS 부산물
+.DS_Store
+Thumbs.db
+*.log

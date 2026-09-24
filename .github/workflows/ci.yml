@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# 같은 브랜치에 연속으로 푸시하면 앞선 실행은 취소해 CI 시간을 아낍니다.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # 스모크 테스트(의존성 없이 Node 로 페이지 스크립트 실행) + 스테이징 + 헤드리스 Chrome 검증.
+  # 이 저장소는 외부 의존성이 0개라 npm install 단계가 필요 없습니다.
+  check:
+    name: check (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # package.json 의 engines(>=22) 를 지키는지 함께 확인합니다.
+        # 20 이하는 EOL 이고, 브라우저 계측 도구가 전역 WebSocket(Node 22+)을 씁니다.
+        node: ["22.x", "24.x"]
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+
+      # 1) smoke-test.js — index.html 의 스크립트를 최소 DOM 위에서 실제로 실행
+      - name: 스모크 테스트
+        run: npm test
+
+      # 2) _site 로 공개 파일만 추려 담고(마스킹·누락 검증) 그 폴더를 http 로 서빙해
+      #    헤드리스 Chrome 으로 레이아웃·기능·PWA(서비스워커·매니페스트)를 검사합니다.
+      #    러너에 Chrome 이 이미 있습니다(/usr/bin/google-chrome).
+      - name: 스테이징 + 브라우저 검증
+        run: npm run check:staged

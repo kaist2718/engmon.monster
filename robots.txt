@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+# 운영 도구(tools/ · .github/ · package.json)는 배포본(_site)에 아예 들어가지 않으므로
+# Disallow 로 막을 필요가 없습니다 — 배포 방식은 .github/workflows/deploy.yml 참고.
+# 개인정보처리방침·이용약관은 색인 대상이 아니어서 그 페이지의 meta robots 로 제외합니다.
+
 Sitemap: https://engmon.monster/sitemap.xml

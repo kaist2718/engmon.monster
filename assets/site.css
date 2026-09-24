@@ -1,0 +1,147 @@
+/* ==========================================================================
+   EngMon — 정적 페이지 공용 스타일 (404 · 개인정보처리방침 · 이용약관)
+   ==========================================================================
+
+   index.html 의 매거진 스타일(styles.css)과 분리했습니다. 이 페이지들은
+   매거진 UI(목차·단어장·퀴즈)를 쓰지 않아 styles.css 를 통째로 내려받을
+   이유가 없습니다. 색 변수 이름만 styles.css 와 맞춰 두었습니다.
+
+   테마는 매거진과 같은 localStorage 키(monsterlab.theme)를 따릅니다.
+   각 페이지가 첫 페인트 전에 <html data-theme="..."> 를 정해 줍니다.
+   ========================================================================== */
+
+@font-face {
+  font-family: "Pretendard Variable";
+  src: url("fonts/pretendard-variable.woff2") format("woff2-variations");
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg:        #0a0e13;
+  --surface:   #141b24;
+  --border:    #232e3b;
+  --text:      #e7edf3;
+  --text-soft: #9aa8b8;
+  --text-dim:  #7d8b9d;
+  --accent:    #6ee7a8;
+  --error:     #ff9d9d;
+  --radius:    14px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Pretendard Variable", "Noto Sans KR", "Apple SD Gothic Neo",
+          "Malgun Gothic", sans-serif;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg:        #fbfcfd;
+  --surface:   #ffffff;
+  --border:    #dfe6ee;
+  --text:      #0e1721;
+  --text-soft: #4b5a6b;
+  --text-dim:  #5f7186;
+  --accent:    #0a7a52;
+  --error:     #b3261e;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); }
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 40px 20px 88px; }
+
+.top-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+  font-size: .92rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.top-link:hover { text-decoration: underline; }
+
+.logo-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--accent);
+  font-weight: 900;
+  font-size: 15px;
+}
+
+header.page-head { margin-bottom: 28px; }
+header.page-head h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+header.page-head .lead { color: var(--text-soft); font-size: .95rem; }
+header.page-head .date { font-size: .8rem; color: var(--text-dim); }
+
+section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 14px;
+}
+section h2 { font-size: 1.05rem; font-weight: 750; margin-bottom: 10px; }
+section h3 { font-size: .92rem; font-weight: 700; margin: 14px 0 6px; }
+p, li { font-size: .92rem; color: var(--text-soft); }
+section p + p { margin-top: 8px; }
+ul { padding-left: 20px; margin: 6px 0; }
+b, strong { color: var(--text); }
+
+code {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: .85em;
+}
+
+.back-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 18px;
+}
+.back-row a {
+  font-size: .9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.back-row a:hover { text-decoration: underline; }
+
+/* ── 404 ───────────────────────────────────────────────────────────────── */
+.notfound { text-align: center; padding: 40px 0; }
+.notfound .code {
+  font-size: clamp(3.4rem, 12vw, 5.6rem);
+  font-weight: 900;
+  letter-spacing: -.03em;
+  color: var(--accent);
+  line-height: 1;
+}
+.notfound h1 { font-size: 1.3rem; font-weight: 800; margin: 14px 0 8px; }
+.notfound p { color: var(--text-soft); max-width: 460px; margin: 0 auto 22px; }
+.btn {
+  display: inline-block;
+  padding: 11px 20px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #052014;
+  font-weight: 800;
+  font-size: .92rem;
+  text-decoration: none;
+}
+:root[data-theme="light"] .btn { color: #ffffff; }
+.btn:hover { filter: brightness(1.05); }

@@ -1,0 +1,39 @@
+{
+  "name": "EngMon - 1년 52주 영어 매거진",
+  "short_name": "EngMon",
+  "description": "1년 52주 플랜으로 읽는 주간 영어 매거진. 어휘·구동사·연어·문법·발음·회화·받아쓰기·확인 문제를 오디오와 함께. 오프라인 학습 지원.",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0e13",
+  "theme_color": "#0a0e13",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

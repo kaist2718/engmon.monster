@@ -1,0 +1,23 @@
+{
+  "name": "engmon",
+  "version": "1.0.0",
+  "private": true,
+  "description": "engmon.monster — 1년 52주 플랜으로 읽는 주간 영어 매거진 정적 사이트",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "serve": "node tools/serve.mjs",
+    "test": "node smoke-test.js",
+    "check:browser": "node browser-test.js",
+    "shots": "node browser-test.js --shots",
+    "stage": "node tools/stage-site.mjs",
+    "check:staged": "npm run stage && node browser-test.js --site-root _site",
+    "check:live": "node browser-test.js --live",
+    "font": "python tools/make-font-subset.py",
+    "icons": "python tools/make-icons.py",
+    "check": "npm run test && npm run check:browser",
+    "check:ci": "npm run test && npm run stage && node browser-test.js --site-root _site"
+  }
+}

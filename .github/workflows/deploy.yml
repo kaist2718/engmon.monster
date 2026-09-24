@@ -1,0 +1,82 @@
+name: Deploy to GitHub Pages
+
+# 사이트 파일만 골라 담은 _site 폴더를 배포합니다.
+# main 브랜치를 그대로 배포하면 tools/ · .github/ · package.json 같은 운영 자료까지
+# 인터넷에 공개되므로(내부 도구 포함), tools/stage-site.mjs 로 공개 목록만 추려 올립니다.
+#
+# 설정 (저장소 → Settings → Pages):
+#   · Build and deployment → Source = "GitHub Actions"
+#     — "Deploy from a branch" 인 동안에는 브랜치 루트 전체가 공개되므로 반드시 이 상태를 유지하세요.
+#   · Custom domain(engmon.monster)은 같은 화면에서 그대로 유지합니다.
+#
+# 기본 브랜치를 main 이 아닌 다른 이름으로 바꿨다면 아래 branches 값도 함께 고쳐 주세요.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# 배포는 동시에 하나만 — 진행 중인 배포를 끊고 새로 시작하지 않습니다.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: build (_site)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22.x"
+
+      # 스모크 테스트가 통과해야 배포합니다.
+      - name: 스모크 테스트
+        run: npm test
+
+      - name: 배포용 사이트 폴더 구성 (공개 목록만)
+        run: node tools/stage-site.mjs
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  # 배포가 끝난 **실제 주소**를 헤드리스 브라우저로 훑습니다.
+  # _site 안에서는 멀쩡한데 배포에서만 깨지는 것(경로·서비스워커·PWA)을 잡습니다.
+  smoke:
+    name: smoke (배포된 사이트)
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22.x"
+
+      # 배포 직후에는 CDN 이 아직 앞선 파일을 돌려줄 수 있어 잠깐 기다립니다.
+      - name: 배포 반영을 잠깐 기다립니다
+        run: sleep 20
+
+      # 러너에 Chrome 이 이미 있습니다(/usr/bin/google-chrome).
+      - name: 배포된 사이트를 실제 브라우저로 점검
+        run: node browser-test.js --live
