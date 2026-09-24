@@ -14,8 +14,8 @@
      3) 터치 스와이프·목차 링크 이동이 동작하는가
      4) 주(week) 전환·52주 플랜·오늘의 학습·복습·백업·인쇄가 동작하는가
      5) 콘솔 에러가 없는가
-     6) 방문 분석(Counter.dev) — 사이트 ID가 없으면 요청이 없는가, 넣으면 한 번만 보내는가
-        (Counter.dev 서버에는 실제로 보내지 않습니다. 요청만 가로채서 확인합니다)
+     6) 방문 분석(자체 호스팅) — 수집 스크립트를 한 번만 부르는가, 도메인이 맞는가
+        (수집 서버에는 실제로 보내지 않습니다. 요청만 가로채서 확인합니다)
 
    Chrome 경로는 CHROME 환경변수로 덮어쓸 수 있습니다.
    ───────────────────────────────────────────────────────────────────────────── */
@@ -122,35 +122,11 @@ function connect(wsUrl) {
   return api;
 }
 
-/* 프로젝트 폴더를 그대로 서빙하는 최소 정적 서버 (http 로 열어야 분석 스크립트가 삽니다).
-   `/analytics-off.html` 은 ID를 비운 사본, `/analytics-on.html` 은 테스트 ID를 넣은 사본입니다 —
-   꺼진/켜진 상태를 실제 index.html 의 설정과 무관하게 검사하려고. */
-const COUNTER_TEST_ID = '93671ad4-a966-4a52-b48f-56c92d10a671';
-
-/* index.html 의 사이트 ID 를 읽습니다 — 꺼진 상태와 켜진 상태를 둘 다 검사하려고. */
-function readCounterId(root) {
-  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-  const m = html.match(/window\.ENGMON_COUNTER_ID\s*=\s*'([^']*)'/);
-  return m ? m[1].trim() : '';
-}
-
+/* 프로젝트 폴더를 그대로 서빙하는 최소 정적 서버 (http 로 열어야 분석 스크립트가 삽니다). */
 function serveStatic(root) {
-  const state = { patched: false };
-  const withId = (id) => fs.readFileSync(path.join(root, 'index.html'), 'utf8')
-    .replace(/window\.ENGMON_COUNTER_ID\s*=\s*'[^']*'/, "window.ENGMON_COUNTER_ID = '" + id + "'");
-
   const server = http.createServer((req, res) => {
     const file = decodeURIComponent(req.url.split('?')[0]);
     const send = (body, type) => { res.writeHead(200, { 'Content-Type': type }); res.end(body); };
-
-    /* ID 를 비운 사본 — 기본(꺼진) 상태 검사용 */
-    if (file === '/analytics-off.html') return send(withId(''), 'text/html; charset=utf-8');
-
-    /* 테스트 ID 를 넣은 사본 — 켠 상태 검사용 (실제 ID 와 무관하게 결정적) */
-    if (file === '/analytics-on.html') {
-      state.patched = true;
-      return send(withId(COUNTER_TEST_ID), 'text/html; charset=utf-8');
-    }
 
     const target = path.join(root, file === '/' ? 'index.html' : file);
     fs.readFile(target, (err, buf) => {
@@ -161,7 +137,7 @@ function serveStatic(root) {
       send(buf, type);
     });
   });
-  return new Promise((resolve) => server.listen(0, '127.0.0.1', () => resolve({ server, state, port: server.address().port })));
+  return new Promise((resolve) => server.listen(0, '127.0.0.1', () => resolve({ server, port: server.address().port })));
 }
 
 /* 임의의 폴더를 http 로 서빙합니다(--site-root). 서비스워커·매니페스트(PWA)를
@@ -308,13 +284,27 @@ const overflowProbe = `(() => {
     console.log('\n  대상: ' + root + ' (http 서빙)');
   }
 
-  const evalv = async (expr) => (await cdp.send('Runtime.evaluate', { expression: expr, returnByValue: true })).result.value;
+  const evalv = async (expr) => {
+    const r = await cdp.send('Runtime.evaluate', { expression: expr, returnByValue: true });
+    if (r.exceptionDetails) {
+      const e = r.exceptionDetails.exception;
+      throw new Error('페이지 평가 실패: ' + ((e && e.description) || r.exceptionDetails.text || 'unknown'));
+    }
+    return r.result.value;
+  };
   const evalAwait = async (expr) => (await cdp.send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true })).result.value;
   const load = async (w, h, mobile) => {
     await cdp.send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: mobile ? 2 : 1, mobile: !!mobile });
     await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: !!mobile, maxTouchPoints: 5 });
     await cdp.send('Page.navigate', { url });
-    await sleep(1500);
+    /* 고정 대기 대신 매거진이 실제로 그려질 때까지 기다립니다.
+       외부 수집 스크립트가 느리면 고정 대기로는 첫 화면을 놓칩니다(플레이크). */
+    for (let i = 0; i < 40; i++) {
+      const ready = await evalv('!!document.querySelector(".issue-aside")').catch(() => false);
+      if (ready) break;
+      await sleep(150);
+    }
+    await sleep(300); /* 레이아웃 안정화 */
   };
 
   /* ── 1. 목차 스크롤 ──────────────────────────────────────────────────── */
@@ -509,12 +499,14 @@ const overflowProbe = `(() => {
      기본 모드에서는 그 두 가지(file:// 자원 + net::ERR_FAILED)만 걸러냅니다.
      http(s)(--site-root·--live)에서는 하나도 걸러내지 않습니다. */
   const fileMode = url.indexOf('file:') === 0;
-  const relevant = fileMode
-    ? errors.filter((e) => {
-      const t = e.params.entry.text || '';
-      return !(t.indexOf("origin 'null'") > -1 || t.indexOf('net::ERR_FAILED') > -1);
-    })
-    : errors;
+  const relevant = errors.filter((e) => {
+    const t = e.params.entry.text || '';
+    /* file:// 자원 제약(폰트·매니페스트)은 무해합니다. */
+    if (fileMode && (t.indexOf("origin 'null'") > -1 || t.indexOf('net::ERR_FAILED') > -1)) return false;
+    /* 자체 수집 서버가 잠시 안 닿는 것은 사이트 문제가 아닙니다(태그 자체는 7번 항목에서 검사). */
+    if (t.indexOf('visitor-analytics-a5bp.onrender.com') > -1) return false;
+    return true;
+  });
   report(relevant.length === 0, '콘솔 에러 없음',
     relevant.length ? relevant.map((e) => e.params.entry.text).join(' | ')
       : (fileMode && errors.length ? 'file:// 자원 제약 ' + errors.length + '건 제외' : ''));
@@ -570,11 +562,13 @@ const overflowProbe = `(() => {
     console.log('  .shots/b-*.png 저장');
   }
 
-  /* ── 7. 방문 분석 (Counter.dev) ─────────────────────────────────────── */
-  console.log('\n[7] 방문 분석 (Counter.dev) — 네트워크 확인');
+  /* ── 7. 방문 분석 (자체 호스팅) ─────────────────────────────────────── */
+  console.log('\n[7] 방문 분석 (자체 호스팅) — 네트워크 확인');
 
-  /* 실제로 Counter.dev 로 보내지 않도록 모든 요청을 가로챕니다.
-     Counter.dev 요청은 붙잡아 확인만 하고 실패시킵니다. */
+  /* 실제 수집 서버로 보내지 않도록 모든 요청을 가로챕니다.
+     수집 스크립트 요청은 붙잡아 확인만 하고 실패시킵니다. */
+  const ANALYTICS_HOST = 'visitor-analytics-a5bp.onrender.com';
+  const ANALYTICS_SRC = 'https://' + ANALYTICS_HOST + '/analytics.js';
   const requested = [];
   const static_ = LIVE ? null : await serveStatic(__dirname);
   const local = static_ ? 'http://127.0.0.1:' + static_.port : url;
@@ -583,73 +577,41 @@ const overflowProbe = `(() => {
     if (msg.method !== 'Fetch.requestPaused') return;
     const params = msg.params;
     requested.push(params.request.url);
-    const fail = params.request.url.indexOf('counter.dev') > -1;
+    const fail = params.request.url.indexOf(ANALYTICS_HOST) > -1;
     cdp.send(fail ? 'Fetch.failRequest' : 'Fetch.continueRequest', fail
       ? { requestId: params.requestId, errorReason: 'Failed' }
       : { requestId: params.requestId }).catch(() => {});
   };
   await cdp.send('Fetch.enable', { patterns: [{ urlPattern: '*' }] });
 
-  if (!LIVE) {
-  /* (a) 사이트 ID가 비어 있을 때 — 외부 요청이 하나도 없어야 합니다 */
+  /* (a) 페이지를 열면 수집 스크립트를 한 번만 부르는가 */
   requested.length = 0;
   await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
-  await cdp.send('Page.navigate', { url: local + '/analytics-off.html' });
+  await cdp.send('Page.navigate', { url: indexUrl });
   await sleep(1800);
-  const offExternal = requested.filter((u) => u.indexOf('127.0.0.1') === -1);
-  const offGlobals = await evalv('typeof window.gtag + "/" + typeof window.umami + "/" + typeof window.clarity');
-  report(offExternal.length === 0 && offGlobals.indexOf('function') === -1, 'ID가 없으면 외부 요청이 없다',
-    '외부 요청 ' + offExternal.length + '개' + (offExternal.length ? ': ' + offExternal.join(', ') : '') + ' · gtag/umami/clarity=' + offGlobals);
+  const trackerReqs = requested.filter((u) => u.indexOf(ANALYTICS_HOST) > -1);
+  report(trackerReqs.length === 1, '수집 스크립트를 한 번만 부른다',
+    '요청 ' + trackerReqs.length + '회' + (trackerReqs.length ? ': ' + trackerReqs.join(', ') : ''));
 
-  /* (b) 사이트 ID를 넣었을 때 — Counter.dev 스크립트 1회 + ID 전달 */
-  requested.length = 0;
-  await cdp.send('Page.navigate', { url: local + '/analytics-on.html' });
-  await sleep(1800);
-  const counterReqs = requested.filter((u) => u.indexOf('counter.dev') > -1);
-  report(static_.state.patched && counterReqs.length > 0, 'ID를 채운 사본을 만들 수 있다',
-    static_.state.patched ? 'index.html 의 ID 한 줄만 교체해 켤 수 있음'
-      : 'index.html 에서 ENGMON_COUNTER_ID 를 찾지 못했습니다 — ID를 정하는 곳이 바뀌었는지 확인하세요');
-
-  const counterTag = await evalv(`(() => {
-    const tags = Array.prototype.slice.call(document.querySelectorAll('script[src*="counter.dev"]'));
+  /* (b) 태그의 주소·도메인이 맞고, 다른 도구 흔적이 없는가 */
+  const trackerTag = await evalv(`(() => {
+    const tags = Array.prototype.slice.call(document.querySelectorAll('script[data-domain]'));
     return {
       count: tags.length,
       src: tags[0] ? tags[0].src : null,
-      async: tags[0] ? tags[0].async : null,
-      dataId: tags[0] ? tags[0].getAttribute('data-id') : null,
-      utc: tags[0] ? tags[0].getAttribute('data-utcoffset') : null,
-      traces: typeof window.gtag + '/' + typeof window.umami + '/' + typeof window.dataLayer,
+      domain: tags[0] ? tags[0].getAttribute('data-domain') : null,
+      traces: typeof window.gtag + '/' + typeof window.umami + '/' + typeof window.dataLayer + '/' + typeof window.clarity,
     };
   })()`);
 
-  report(counterTag.count === 1 && counterTag.src === 'https://cdn.counter.dev/script.js',
-    'ID를 넣으면 Counter.dev 스크립트를 한 번만 부른다',
-    '스크립트 ' + counterTag.count + '개 · ' + (counterTag.src || '').replace('https://', ''));
-  report(counterTag.async === true && counterTag.dataId === COUNTER_TEST_ID && /^-?\d+(\.\d+)?$/.test(counterTag.utc || ''),
-    'ID와 UTC 시차가 스크립트 속성으로 전달된다',
-    'async=' + counterTag.async + ' · data-id=' + counterTag.dataId + ' · data-utcoffset=' + counterTag.utc);
-  report(counterTag.traces === 'undefined/undefined/undefined',
-    '학습 행동·GA4/Umami 흔적 없이 방문수·유입·국가만 수집한다',
-    'gtag/umami/dataLayer=' + counterTag.traces);
-  }
-
-  /* (c) 실제 index.html 에 ID가 들어 있으면 그 ID로도 한 번 더 확인합니다 */
-  const realId = readCounterId(__dirname);
-  if (realId) {
-    requested.length = 0;
-    await cdp.send('Page.navigate', { url: indexUrl });
-    await sleep(1800);
-    const liveReqs = requested.filter((u) => u.indexOf('counter.dev') > -1);
-    const liveTag = await evalv(`(() => {
-      const tags = Array.prototype.slice.call(document.querySelectorAll('script[src*="counter.dev"]'));
-      return { count: tags.length, dataId: tags[0] ? tags[0].getAttribute('data-id') : null };
-    })()`);
-    report(liveReqs.length === 1 && liveTag.count === 1 && liveTag.dataId === realId,
-      '실제 index.html 의 ID로 Counter.dev 를 한 번만 부른다',
-      '요청 ' + liveReqs.length + '회 · data-id=' + liveTag.dataId);
-  } else {
-    report(true, '실제 index.html 은 아직 꺼진 상태', 'ID를 채우면 이 검사가 자동으로 켜집니다');
-  }
+  report(trackerTag.count === 1 && trackerTag.src === ANALYTICS_SRC, '태그가 수집 서버를 한 번만 가리킨다',
+    '태그 ' + trackerTag.count + '개 · ' + (trackerTag.src || '(없음)'));
+  report(trackerTag.domain === 'engmon.monster', '추적 도메인이 이 사이트로 지정된다',
+    'data-domain=' + trackerTag.domain);
+  report(trackerTag.traces === 'undefined/undefined/undefined/undefined', 'GA4/Umami/Clarity 흔적이 없다',
+    'gtag/umami/dataLayer/clarity=' + trackerTag.traces);
+  report(requested.filter((u) => /counter\.dev|clarity\.ms|google-analytics/.test(u)).length === 0,
+    '이전 도구(Counter.dev 등)로 나가는 요청이 없다', '이전 도구 요청 0건');
 
   await cdp.send('Fetch.disable');
   cdp.onEvent = null;

@@ -4,7 +4,7 @@
    전략 (toeic.monster 와 같은 방식):
      · HTML 문서(페이지 이동): 네트워크 우선 → 새 배포가 즉시 반영, 오프라인이면 캐시 폴백
      · 그 밖의 에셋: stale-while-revalidate → 캐시를 즉시 응답하고 백그라운드에서 갱신
-     · 외부 출처(Counter.dev 분석 스크립트)는 손대지 않습니다
+     · 외부 출처(방문 분석 수집 스크립트)는 손대지 않습니다
 
    캐시 주의:
      index.html 은 `styles.css?v=11` 처럼 버전 쿼리를 붙여 부릅니다.
@@ -25,7 +25,6 @@ var CORE_ASSETS = [
   "./script.js",
   "./magazine.js",
   "./issues.js",
-  "./analytics.js",
   "./manifest.webmanifest",
   "./icon.svg",
   "./icon-192.png",

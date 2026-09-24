@@ -23,9 +23,8 @@
   })();
 </script>
 <link rel="stylesheet" href="/assets/site.css" />
-<!-- 방문 통계 (Counter.dev — 쿠키 미사용, 익명). 정본 ID 는 index.html 과 같습니다. -->
-<script>window.ENGMON_COUNTER_ID = '06f22600-98d6-4fae-923e-c5d1f6ea8307';</script>
-<script defer src="/analytics.js"></script>
+<!-- 방문 분석 (자체 호스팅) — index.html 과 같은 태그입니다. 쿠키를 쓰지 않습니다. -->
+<script defer src="https://visitor-analytics-a5bp.onrender.com/analytics.js" data-domain="engmon.monster"></script>
 </head>
 <body>
 <main class="wrap">
@@ -63,18 +62,19 @@
   </section>
 
   <section>
-    <h2>4. 익명 방문 통계 (Counter.dev)</h2>
-    <p>서비스 개선을 위해 오픈소스 분석 도구 <b>Counter.dev</b>(counter.dev)로 익명 통계를 수집합니다: 페이지뷰, 방문자 수, 유입 경로, 국가, 화면 크기.</p>
+    <h2>4. 익명 방문 통계 (자체 수집)</h2>
+    <p>서비스 개선을 위해 <b>운영자가 직접 운영하는 수집 서버</b>(visitor-analytics-a5bp.onrender.com)로 익명 통계를 수집합니다: 페이지뷰, 순 방문자 수, 페이지 체류 시간, 유입 경로, 기기·브라우저, 접속 국가, 세션.</p>
     <ul>
-      <li><b>쿠키를 사용하지 않으며</b>, IP·이름·이메일 같은 개인 식별 정보를 수집하지 않습니다. 동의 배너가 필요 없습니다.</li>
+      <li><b>쿠키를 사용하지 않습니다</b>(방문 세션 구분에 <code>sessionStorage</code>만 씁니다). 동의 배너가 필요 없습니다.</li>
+      <li><b>IP 주소는 원본을 저장하지 않습니다</b> — 매일 바뀌는 salt 로 만든 해시로 순방문자 수만 셉니다.</li>
       <li>받아쓰기 답·문의 내용 등 <b>입력창에 적은 값은 전송되지 않습니다.</b></li>
-      <li>사이트 ID 를 비워 두면 스크립트를 내려받지도, 요청을 보내지도 않습니다.</li>
+      <li>학습 데이터(섹션 완료·단어 저장·정답률)를 보내는 호출은 하지 않습니다.</li>
     </ul>
   </section>
 
   <section>
     <h2>5. 쿠키</h2>
-    <p>서비스는 광고·분석용 쿠키를 쓰지 않습니다. 방문 통계(Counter.dev)는 쿠키 없이 동작하고, 학습 데이터는 브라우저 로컬 저장소에만 남습니다.</p>
+    <p>서비스는 광고·분석용 쿠키를 쓰지 않습니다. 방문 통계(자체 수집 서버)는 쿠키 없이 동작하고, 학습 데이터는 브라우저 로컬 저장소에만 남습니다.</p>
   </section>
 
   <section>

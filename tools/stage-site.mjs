@@ -55,7 +55,6 @@ const PUBLIC_FILES = [
   "script.js",
   "magazine.js",
   "issues.js",
-  "analytics.js",
 ];
 
 /** 사이트로 그대로 배포하는 폴더. */

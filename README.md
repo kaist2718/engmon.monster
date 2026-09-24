@@ -11,7 +11,6 @@ issues.js         # 매거진 데이터(52주 플랜 + 발행된 주의 섹션) 
 magazine.js       # 매거진 렌더링·오디오·받아쓰기·퀴즈·복습 카드·단어장·주 선택기·로드맵
 script.js         # 페이지 공통 (한/영 전환, 테마, 강조색, 모바일 메뉴, 문의 폼 전송)
 styles.css        # 스타일 (다크/라이트 테마, 강조색 프리셋, 인쇄용, 반응형)
-analytics.js      # 방문 분석 (Counter.dev) — 사이트 ID를 넣기 전에는 아무 것도 안 함
 manifest.webmanifest # 설치형 앱(PWA) 매니페스트 — 이름·아이콘·테마색
 sw.js             # 서비스 워커 — 오프라인 학습(핵심 에셋 캐시)
 icon.svg · icon-192.png · icon-512.png · icon-maskable-512.png · apple-touch-icon.png  # 아이콘
@@ -33,7 +32,7 @@ CNAME             # GitHub Pages 커스텀 도메인 (engmon.monster)
 
 - 프레임워크·빌드 과정 없음. 파일을 그대로 올리면 동작합니다. `package.json` 은 npm 스크립트 모음일 뿐 **런타임 의존성은 0**입니다.
 - **외부 요청 0을 지향**합니다 — 본문 서체도 자체 호스팅 서브셋(`assets/fonts/`), 오디오는 브라우저 내장 음성합성(`speechSynthesis`)을 씁니다.
-  단, **방문 분석을 켜면**(사이트 ID 입력) Counter.dev 스크립트 1개를 불러옵니다 — 아래 "방문 분석" 참고.
+  다만 방문 분석 태그가 자체 수집 서버에서 수집 스크립트 1개를 불러옵니다 — 아래 "방문 분석" 참고.
 - `script.js`가 공용 API(`window.MonsterLab`의 `t`·`toast`)와 `langchange` 이벤트를 노출하고,
   `magazine.js`는 그 두 가지로만 연결됩니다.
 - `script.js`는 **공용 API를 먼저 노출한 뒤, 기능별로 `guard()` 안에서 초기화**합니다.
@@ -178,9 +177,9 @@ python tools/make-font-subset.py     # = node tools/font-charset.mjs + fontTools
 ## 404 · 약관 페이지
 
 - `404.html` — GitHub Pages 가 없는 주소에 자동으로 돌려줍니다. `tools/serve.mjs` 도 같은 화면을 404 상태로 줍니다.
-- `privacy.html` · `terms.html` — 학습 데이터(localStorage)·문의 폼(Formspree)·방문 통계(Counter.dev)를 반영한 방침/약관입니다.
+- `privacy.html` · `terms.html` — 학습 데이터(localStorage)·문의 폼(Formspree)·방문 통계(자체 수집)를 반영한 방침/약관입니다.
 - 이 페이지들은 `assets/site.css`(매거진 `styles.css` 와 분리)를 쓰고, 매거진과 같은 테마 키(`monsterlab.theme`)를 따릅니다.
-- 방문 통계의 사이트 ID 정본은 `index.html` 이고, 정적 페이지에도 같은 값을 둡니다(값을 바꾸면 함께 고치세요).
+- 방문 분석 태그(수집 서버 주소 · `data-domain`)의 정본은 `index.html` 한 곳이며, 정적 페이지에도 같은 태그를 둡니다(바꾸면 함께 고치세요).
 
 ## 도구 · CI/CD
 
@@ -236,8 +235,8 @@ node smoke-test.js
 - **문의 폼**: UTF-8 본문(`x-www-form-urlencoded`) 전송 값(`type`·`email`·`name`·`issue`·`message`·`_subject`·`source`),
   허니팟 칸이 비어 있는지, reCAPTCHA 키가 없을 때 **외부 요청이 0** 인지, 성공/실패/한도 초과(429) 문구,
   전송 후 입력값 초기화, 언어를 바꿨을 때 안내 문구가 함께 바뀌는지 확인합니다.
-- **방문 분석**: 웹사이트 ID가 없을 때 **아무 요청도 보내지 않는지**, `file://`·추적 금지에서 멈추는지,
-  켜졌을 때 Counter.dev 스크립트를 한 번만 부르고 사이트 ID·UTC 시차가 속성으로 넘어가는지 확인합니다.
+- **방문 분석**: `index.html`에 태그가 **한 번만** 있고 주소·`data-domain`이 맞는지,
+  이전 도구(Counter.dev·Clarity·GA4·Umami) 잔재가 남아 있지 않은지 확인합니다.
 
 ### 브라우저 검증
 
@@ -255,60 +254,57 @@ node browser-test.js --live                  # 배포된 engmon.monster 검사
 - 터치 스와이프 스크롤, 목차 항목 탭 이동
 - 주 전환(52개 칩) · 52주 플랜 · 발행 전인 주 안내 · 오늘의 학습 · 단어장 · 복습 카드 · 인쇄 버튼 · 백업 파일 생성
 - 인쇄 미디어에서 헤더·버튼이 숨고 한국어 해설은 남는지, 콘솔 에러가 없는지
-- 방문 분석(Counter.dev)이 ID 유무에 따라 **요청을 보내는지/안 보내는지**
-  (모든 요청을 가로채 확인, Counter.dev로는 실제로 보내지 않음)
+- 방문 분석(자체 호스팅)이 수집 스크립트를 **한 번만** 부르고 도메인이 맞는지,
+  이전 도구로 나가는 요청이 없는지 (모든 요청을 가로채 확인, 수집 서버로는 실제로 보내지 않음)
 
 > `freePort()`로 빈 포트를 잡아 씁니다. 포트를 고정하면 **이전 실행의 Chrome이 남아 있을 때
 > 그 인스턴스(옛 프로필)에 붙어** 검사 결과가 엉킵니다.
 
-## 방문 분석 — Counter.dev
+## 방문 분석 — 자체 호스팅
 
-누가 얼마나 들어오는지, 어디에서 왔는지 보려면 `analytics.js`가 있습니다.
-[Counter.dev](https://counter.dev) 기준으로 맞춰 두었습니다.
-**Clarity 의 히트맵·세션 리플레이가 어렵게 느껴져서**, 방문자 수·유입 경로·국가만 보는
-가벼운 도구로 바꿨습니다.
+누가 얼마나 들어오는지, 어디에서 왔는지, **얼마나 오래 머물다 갔는지** 보려면
+`index.html`의 방문 분석 태그가 있습니다. 외부 업체(Counter.dev)에 맡기는 대신
+**우리가 직접 운영하는 수집 서버**(FastAPI + Postgres)로 받습니다.
 
-**현재 연결 상태:** 사이트 ID가 비어 있어 **꺼져 있습니다**(`''`).
-ID를 채우면 켜지고, 그 전에는 어떤 요청도 나가지 않습니다.
-
-**무료이고 오픈소스**(AGPL-v3, pay-what-you-want)입니다. **쿠키를 쓰지 않고**(No Cookies)
-IP도 저장하지 않아 **동의 배너가 필요 없습니다.** 화면이 단순해 배울 것이 거의 없습니다.
-
-### 켜는 법
-
-1. [counter.dev](https://counter.dev)에서 **Get started** 로 계정을 만듭니다.
-2. 대시보드에서 사이트를 추가하고 **Settings(톱니) → tracking script** 에서
-   **사이트 ID(UUID)** 를 복사합니다 (예: `93671ad4-a966-4a52-b48f-56c92d10a671`).
-3. `index.html`의 한 줄에 붙여 넣고 배포합니다. 그게 전부입니다.
+**현재 연결 상태:** `index.html`의 태그 한 줄로 **켜져 있습니다.**
 
 ```html
-<script>window.ENGMON_COUNTER_ID = '여기에-사이트-ID';</script>
+<script defer src="https://visitor-analytics-a5bp.onrender.com/analytics.js" data-domain="engmon.monster"></script>
 ```
 
-> ID를 정하는 곳은 이 한 곳뿐입니다. `analytics.js`가 스크립트 태그를 대신 넣습니다
-> (직접 `<script>`를 넣지 마세요 — 두 번 부르게 됩니다). 통계는 몇 분 뒤부터 보입니다.
+`analytics.js` 파일은 **더 이상 없습니다.** 수집 코드는 위 주소에서 서버가 내려줍니다.
+설정은 **수집 서버 주소**와 **`data-domain`** 두 값뿐이고, 태그는 **한 곳에만** 둡니다
+(여러 번 넣으면 요청이 중복됩니다). 대시보드는 같은 주소의 `/`에 있습니다(HTTP Basic 인증).
 
-### 도메인이 여러 개면
+### 무슨 뜻인가
 
-Counter.dev 는 **사이트마다 ID가 다릅니다.** `monsterlab.monster` · `toeic.monster` 대시보드에서
-사이트를 각각 만들고, 그 도메인의 `index.html`에 **각자의 ID**를 넣습니다.
-같은 ID를 여러 도메인에 붙이면 그 도메인들이 **한 칸에 합쳐서** 잡힙니다 — 합계만 보려면 그렇게 해도 됩니다.
+- **쿠키를 쓰지 않습니다.** 방문 세션 구분에 `sessionStorage`만 씁니다 → **동의 배너가 필요 없습니다.**
+- **IP 주소는 원본을 저장하지 않습니다.** 매일 바뀌는 salt로 만든 해시로 순방문자 수만 셉니다
+  → 날이 바뀌면 같은 방문자도 이전 기록과 이어지지 않습니다.
+- **입력창에 적은 값은 보내지 않습니다.** 받아쓰기 답·이메일·이름은 가지 않습니다.
+- 학습 데이터(섹션 완료·단어 저장·정답률)를 보내는 호출은 **하지 않습니다** — 학습 기록은
+  여전히 이 브라우저 안에만 남습니다(`localStorage`).
 
 ### 안 켜지는 경우 (의도된 동작)
 
 | 상황 | 왜 |
 | --- | --- |
-| ID가 비어 있거나 자리표시자(`00000000-0000-0000-0000-000000000000`)·형식 오류 | 실수로 남의 사이트에 보내는 일을 막습니다 |
 | `file://`로 열었을 때 | 로컬 확인이 통계에 섞이지 않게 합니다 |
-| 브라우저의 추적 금지(Do Not Track)가 켜짐 | 우리가 아예 불러오지 않습니다 |
+| 브라우저의 추적 금지(Do Not Track)·GPC가 켜짐 | 우리가 아예 불러오지 않습니다 |
+| 수집 서버의 `ALLOWED_DOMAINS`에 없는 도메인 | 서버가 403으로 거부하고 아무것도 저장하지 않습니다 |
 
-이 경우 **스크립트를 내려받지도, 요청을 보내지도 않습니다.** (브라우저 검증으로 확인합니다)
+### 다른 사이트도 같은 방식
+
+`monsterlab.monster` · `toeic.monster`도 **같은 수집 서버**로 보내되 `data-domain`만
+자기 도메인으로 둡니다. 서버가 도메인별로 나눠 저장하므로 대시보드에서 사이트별로도,
+전체 합계로도 볼 수 있습니다.
 
 ### 무료 분석 도구 비교 (2026-09 확인)
 
 | 도구 | 무료 범위 | 여러 사이트 | 쿠키·동의 배너 | 성격 |
 | --- | --- | --- | --- | --- |
-| **Counter.dev** ← 지금 연결됨 | **무료**(오픈소스, pay-what-you-want) | 사이트마다 ID(같은 ID로 합칠 수도) | 없음(쿠키 안 씀) | 방문수·유입·국가. 화면이 가장 단순 |
+| **자체 호스팅** ← **지금 연결됨** | 수집 서버 운영비만(Render 무료 + Neon 무료) | **무제한** | 없음(쿠키 안 씀) | 방문수·유입·국가 + **체류시간·세션·기기·실시간**. 대시보드 직접 운영 |
+| **Counter.dev**(이전에 씀) | **무료**(오픈소스, pay-what-you-want) | 사이트마다 ID(같은 ID로 합칠 수도) | 없음(쿠키 안 씀) | 방문수·유입·국가. 화면이 가장 단순 |
 | **GoatCounter** | 개인·중소 사이트는 무료 호스팅 | 계정 하나에 여러 사이트 | 없음(쿠키 안 씀) | 비슷하게 단순. 3.5KB 스크립트 |
 | **Cloudflare Web Analytics** | 사이트·트래픽 제한 사실상 없음 | **미프록시 10개까지**(Cloudflare 프록시를 쓰면 무제한) | 없음(쿠키·localStorage 안 씀) | 페이지뷰·방문·유입·국가·Core Web Vitals. 대시보드 6개월 보관 |
 | **Umami 자체 호스팅** | 완전 무료(서버 비용만) | 무제한 | 없음 | Umami Cloud와 같은 화면. 사이트별 `data-website-id`만 다르게 |
@@ -319,30 +315,28 @@ Counter.dev 는 **사이트마다 ID가 다릅니다.** `monsterlab.monster` · 
 
 **고를 때 기준**
 
-- **지금(Counter.dev)** — 무료·오픈소스이고, 쿠키 없이 **방문수·유입·국가만** 단순하게 보고 싶을 때.
+- **지금(자체 호스팅)** — 무료·오픈소스이고, 쿠키 없이 **체류시간·세션·기기·실시간까지** 직접 보고 싶을 때.
 - **대시보드가 더 필요하면** — 무료로는 GoatCounter, 유료로는 Plausible·Simple Analytics·Fathom.
-- **히트맵·세션 리플레이까지 필요하면** — Clarity로 되돌리면 됩니다(`analytics.js`의 도구만 교체).
+- **히트맵·세션 리플레이까지 필요하면** — Clarity를 따로 붙이면 됩니다(방문 분석 태그와 별개).
 
 ### 무엇을 보내나
 
-일별 순 방문자 수 · 페이지뷰 · 유입 경로(referrer) · 국가 · 화면 크기 · UTC 시차(방문자 지역 시간대).
+일별 순 방문자 수 · 페이지뷰 · 페이지에 머문 시간 · 유입 경로(referrer·UTM) · 기기·브라우저·OS · 접속 국가 · 세션.
 
 - **입력창에 적은 값은 보내지 않습니다.** 받아쓰기 답·이메일·이름은 가지 않습니다.
-- **쿠키를 쓰지 않고** IP 주소를 저장하지 않습니다 — 그래서 EEA·영국 방문자에게도 동의 배너가 필요 없습니다.
+- **쿠키를 쓰지 않고** IP 주소도 원본을 저장하지 않습니다(매일 바뀌는 salt로 만든 해시만 씁니다) — 그래서 EEA·영국 방문자에게도 동의 배너가 필요 없습니다.
 - 우리 코드가 **학습 데이터(섹션 완료·단어 저장·정답률)를 보내는 호출은 하지 않습니다.**
 - 학습 기록(단어장·진행률)은 여전히 **이 브라우저 안에만** 남습니다 (`localStorage`).
 
 ### 다른 도구로 바꾸려면
 
-`analytics.js`가 하는 일은 스크립트 태그를 하나 붙이는 것뿐입니다.
-GoatCounter · Cloudflare Web Analytics · Umami 자체 호스팅 같은 도구도
-`analytics.js`의 주소와 넘기는 값만 바꾸면 됩니다.
-끄고 싶으면 ID를 `''`로 비우세요 (파일은 그대로 둡니다).
+`<script>` 태그 하나뿐입니다. 다른 도구로 바꾸려면 그 태그의 `src`(도구 주소)와
+도구가 요구하는 속성만 바꾸면 됩니다. 잠시 멈추려면 태그를 지우거나 주석 처리하세요.
 
 ### 확인하는 법
 
 ```bash
-node smoke-test.js     # 무동작 8가지 + file://·추적금지 차단 + 스크립트 1회·ID 전달 검사
+node smoke-test.js     # 태그가 한 번만 있는지 · 도메인이 맞는지 · 이전 도구 잔재가 없는지
 node browser-test.js   # 실제 네트워크 요청 검사 (7번 항목)
 ```
 
@@ -448,7 +442,7 @@ CSS·JS를 참조할 때 `?v=숫자` 같은 버전을 붙여 둡니다(파일마
 
 사이트 파일만 정적 호스팅에 올리면 됩니다
 (`index.html`, `404.html`, `privacy.html`, `terms.html`, `issues.js`, `magazine.js`, `script.js`,
-`analytics.js`, `styles.css`, `sw.js`, `manifest.webmanifest`, `assets/`, 아이콘, `og.png`,
+`styles.css`, `sw.js`, `manifest.webmanifest`, `assets/`, 아이콘, `og.png`,
 `robots.txt`, `sitemap.xml`, `CNAME`).
 
 - **GitHub Pages (권장)**: `main` 에 푸시하면 `.github/workflows/deploy.yml` 이

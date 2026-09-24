@@ -206,7 +206,7 @@
       'mag.pageDesc': '1년 52주 플랜으로 한 주씩 읽는 영어 학습 매거진. 주마다 한 가지 주제를 어휘·구동사·문법·발음·회화·받아쓰기·독해·확인 문제로 끝까지 파고들니다. 브라우저 음성으로 바로 듣습니다.',
 
       'footer.rights': '모든 권리 보유.',
-      'footer.analytics': '방문 통계(Counter.dev)는 켠 경우에만 수집하며, 쿠키를 쓰지 않고 입력창에 적은 내용도 기록되지 않습니다. 학습 기록(단어장·진행률)은 이 브라우저에만 남습니다.'
+      'footer.analytics': '방문 통계는 쿠키를 쓰지 않고 익명으로만 수집하며, 입력창에 적은 내용도 기록되지 않습니다. 학습 기록(단어장·진행률)은 이 브라우저에만 남습니다.'
     },
 
     en: {
@@ -397,7 +397,7 @@
       'mag.pageDesc': 'A weekly English magazine built as a 52-week plan. Each week digs into one topic through vocabulary, phrasal verbs, grammar, pronunciation, conversation, dictation, reading and quizzes, read alongside browser audio.',
 
       'footer.rights': 'All rights reserved.',
-      'footer.analytics': 'Visit statistics (Counter.dev) are collected only when switched on, use no cookies, and text typed into input fields is never recorded. Learning records (wordbook, progress) stay in this browser only.'
+      'footer.analytics': 'Visit statistics are anonymous, use no cookies, and text typed into input fields is never recorded. Learning records (wordbook, progress) stay in this browser only.'
     }
   };
 
