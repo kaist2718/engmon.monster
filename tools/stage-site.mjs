@@ -66,6 +66,7 @@ const NEVER_PUBLIC = [
   "docs",
   ".github",
   "_site",
+  "_workbook",
   ".gitignore",
   ".gitattributes",
   "package.json",

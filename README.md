@@ -24,10 +24,14 @@ robots.txt        # 검색엔진 크롤링 허용 + 사이트맵 위치
 sitemap.xml       # 사이트맵 (한 페이지, 주 단위 갱신)
 smoke-test.js     # 검증 스크립트 (의존성 없이 Node 로 페이지 스크립트 실행)
 browser-test.js   # 헤드리스 Chrome 검증 (레이아웃·기능·PWA·네트워크)
-tools/            # serve · stage-site · font-charset · make-font-subset · make-icons
+tools/            # serve · stage-site · font-charset · make-font-subset · make-icons · make-workbook
 package.json      # npm 스크립트 (serve · test · stage · check) — 런타임 의존성 0
 .github/workflows # CI(ci.yml) · GitHub Pages 배포(deploy.yml)
 docs/RESEARCH.md  # 영어 학습 서비스 조사·분석 (기획 근거 · 배포 대상 아님)
+docs/MONETIZATION.md # 수익화 플랜 — 단건 판매(주·분기 묶음) · 결제 수단 비교 (배포 대상 아님)
+docs/PRODUCT-COPY.md # 상품 이름·소개문·가격·환불 문구 원본 (배포 대상 아님)
+docs/PRICING.md  # 가격 정책 정본 — 정가·할인·환불·인상 조건 (배포 대상 아님)
+_workbook/        # 판매용 워크북 HTML·PDF (npm run workbook 산출물 — 재생성 가능 · 배포 대상 아님)
 CNAME             # GitHub Pages 커스텀 도메인 (engmon.monster)
 ```
 
@@ -161,6 +165,22 @@ CNAME             # GitHub Pages 커스텀 도메인 (engmon.monster)
 | Blinkist류 구독 | 호 단위 목차·진행률 | 52주 로드맵, 읽기 진행률, 진행 바, 섹션 완료 표시 |
 | 해커스/시원스쿨류 | 한/영 대조, 한국어 해설 | 영어 본문 + **번역 가리기** 토글, 한국어 해설 노트 |
 
+## 수익화 (단건 판매)
+
+본문은 **계속 전부 무료·공개**합니다. 페이월을 만들지 않습니다.
+수익은 **인쇄·필기용 워크북(PDF)** 과 거기에만 담기는 정답·해설집·모범 답안·누적 어휘 색인으로 냅니다.
+자세한 결정·결제 수단 비교·90일 계획은 [`docs/MONETIZATION.md`](docs/MONETIZATION.md)에,
+가격·할인·환불·인상 조건의 정본은 [`docs/PRICING.md`](docs/PRICING.md)에 있습니다.
+
+- 모델: **주 단권 · 분기 묶음(13주) · 1년 패스** (구독 아님 — 서버·계정이 필요해 이 구조와 충돌합니다).
+- 결제: **Gumroad**(글로벌 카드·파일 자동 배송·세금 처리 대행) + **크몽**(국내 결제) 병행.
+  Stripe는 국내 사업자 명의로 판매자 계정을 열 수 없어 선택지에서 제외했습니다.
+- 고정비가 0이라 **첫 판매부터 마진**이 남습니다.
+- 구매 링크는 `index.html` 의 `#buy` 안 `data-shop-url` **한 곳**에서 정합니다.
+  비어 있으면 표지 버튼과 구매 화면이 함께 숨겨져, 팔 상품이 없을 때 죽은 링크가 남지 않습니다.
+- 워크북 파일은 `npm run workbook` 으로 만듭니다(학습편 + 정답·해설편 + 누적 어휘 색인).
+  상품 문구 원본은 [`docs/PRODUCT-COPY.md`](docs/PRODUCT-COPY.md)입니다.
+
 ## 로컬에서 보기
 
 가장 정확한 확인은 **http 로 띄우는 것**입니다(서비스 워커·매니페스트는 http(s) 에서만 동작).
@@ -208,6 +228,8 @@ python tools/make-font-subset.py     # = node tools/font-charset.mjs + fontTools
 npm run serve         # 로컬 미리보기(http)
 npm test              # smoke-test.js — 페이지 스크립트를 Node 로 실행
 npm run check:browser # browser-test.js — 헤드리스 Chrome 검증
+npm run workbook      # tools/make-workbook.mjs — 판매용 워크북(학습편·정답편) HTML + PDF
+npm run workbook -- --no-pdf   # PDF 없이 HTML만 (Chrome 없이도 동작)
 npm run stage         # tools/stage-site.mjs — 공개 파일만 _site 로 추려 검증
 npm run check:staged  # stage + _site 를 http 로 서빙해 브라우저 검증(레이아웃·기능·PWA)
 npm run check:live    # 배포된 engmon.monster 를 브라우저로 점검
@@ -230,7 +252,7 @@ node smoke-test.js
 브라우저 없이 페이지 스크립트를 **실제로 실행**해 보는 테스트입니다(의존성 없음, Node만 있으면 됩니다).
 `index.html`의 인라인 스크립트 → `issues.js` → `script.js` → `magazine.js`를 최소 DOM 위에서 돌리고
 언어 전환·테마·강조색·매거진 렌더링·주 전환·52주 플랜·번역 토글·받아쓰기 채점·퀴즈 점수·복습 카드·단어장 검색까지
-클릭을 흉내 내 확인합니다. 현재 **61개 항목**을 검사합니다.
+클릭을 흉내 내 확인합니다. 현재 **64개 항목**을 검사합니다.
 
 특히 다음을 지켜줍니다.
 
@@ -247,6 +269,10 @@ node smoke-test.js
 - **표준 골격**: 발행된 주가 `docs/RESEARCH.md`의 표준 골격 14종(학습목표·어휘·구동사·연어·문법·발음·
   회화·듣기·독해·쓰기·토론·문화·확인 문제·해설 노트)을 모두 갖고 있는지 검사합니다
   (한 호만 빼고 발행되는 일을 막습니다 — 예전에 W01·W02에 독해·쓰기가 빠졌습니다).
+- **유료 기준 분량**: 발행된 주가 골격만 갖추고 속이 빈 채로 나오지 않는지 검사합니다 —
+  어휘 12개 이상, 구동사·연어·이디엄·발음 8개 이상, 확인 문제 12문항(문항마다 ko·en 해설),
+  받아쓰기 8문장, 이해·토론 질문 5개 이상, 해설 노트 8항목 이상.
+  분량 기준은 `docs/RESEARCH.md` 5.2가 정본이고, 테스트는 그 기준을 코드로 잠급니다.
 - **발행 전인 주**: 본문 대신 "준비 중" 안내 1개만 나오고 목차·진행률이 발행 예정으로 바뀌고,
   **표지 오른쪽이 그 주 번호(`WEEK 05`)로** 표시되는지 검사합니다.
   그 안의 **계획 카드**(학습목표·핵심 문법·구성 예정 섹션)가 함께 그려지는지도 확인합니다.
@@ -264,6 +290,11 @@ node smoke-test.js
   전송 후 입력값 초기화, 언어를 바꿨을 때 안내 문구가 함께 바뀌는지 확인합니다.
 - **방문 분석**: `index.html`에 태그가 **한 번만** 있고 주소·`data-domain`이 맞는지,
   이전 도구(Counter.dev·Clarity·GA4·Umami) 잔재가 남아 있지 않은지 확인합니다.
+- **구매 화면**: 판매 링크를 정하는 자리가 **한 곳**인지, 외부 링크에 `target="_blank"`·`rel="noopener"`가
+  붙는지, 링크가 비어 있으면 표지 버튼과 구매 화면이 **함께 숨겨지는지**(죽은 링크 방지),
+  링크를 채우면 둘 다 열리고 **같은 주소**로 나가는지 검사합니다.
+- **유료 상품 조건**: `terms.html`에 결제·환불(7일)·재배포 금지·결제 정보 미보관 조항이,
+  `privacy.html`에 결제 대행사와 카드 정보 미수집 안내가 있는지 확인합니다.
 
 ### 브라우저 검증
 
@@ -375,7 +406,8 @@ node browser-test.js   # 실제 네트워크 요청 검사 (7번 항목)
 
 - 수신처를 바꾸려면 **`index.html` 의 `<form ... action>` 한 줄**의 폼 ID만 바꾸면 됩니다.
 - **문의 유형** (`type`): `subscribe` 새 주 알림 · `content` 오류·오타 제보 · `topic` 주제·주차 제안 ·
-  `study` 학습 방법 질문 · `partner` 제휴·광고 · `etc` 그 외. 유형을 고르면 메일 제목이
+  `study` 학습 방법 질문 · `purchase` 워크북 구매 문의 · `partner` 제휴·광고 · `etc` 그 외.
+  유형을 고르면 메일 제목이
   `EngMon — <유형> · <관련 주>` 로 바뀝니다(제목은 늘 `EngMon` 으로 시작해야 수신함에서 바로 보입니다).
 - **내용이 필요한 유형**: 새 주 알림 신청(`subscribe`)만 내용을 비워 둘 수 있습니다.
   나머지 유형은 내용이 비어 있으면 전송하지 않고 안내 문구를 띄웁니다(빈 메일은 답장할 수 없습니다).

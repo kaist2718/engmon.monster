@@ -149,6 +149,8 @@
           </a>
           <button class="btn btn-ghost" type="button" data-tr-toggle aria-pressed="true" data-i18n="mag.hideKo">번역 가리기</button>
           <button class="btn btn-ghost" type="button" id="printBtn" data-i18n="mag.print">인쇄 · PDF</button>
+          <!-- 워크북 구매 — 판매 링크(#buy 의 data-shop-url)가 채워질 때만 나타납니다. -->
+          <a class="btn btn-primary" id="buyHero" target="_blank" rel="noopener" hidden data-i18n="mag.buyHero">워크북 구매</a>
         </div>
 
         <div class="rate-set" role="group" data-i18n-aria-label="mag.rateGroup">
@@ -264,6 +266,35 @@
     </div>
   </section>
 
+  <!-- ── 워크북 구매 (선택) ───────────────────────────
+       판매 링크는 아래 <section> 의 속성 **한 곳**에서만 정합니다.
+       값이 비어 있으면 이 화면과 표지의 구매 버튼이 함께 숨겨져 죽은 링크가 남지 않습니다.
+       가격·할인·환불의 정본: docs/PRICING.md · 상품 문구: docs/PRODUCT-COPY.md · 결정 근거: docs/MONETIZATION.md -->
+  <section class="section section-buy" id="buy" hidden data-shop-url="">
+    <div class="wrap buy-inner">
+      <p class="section-kicker" data-i18n="mag.buyKicker">WORKBOOK</p>
+      <h2 class="section-title" data-i18n="mag.buyTitle">종이로 푸는 1분기 워크북</h2>
+      <p class="section-lead" data-i18n="mag.buyLead">
+        웹에서는 계속 무료로 읽습니다. 워크북은 종이에 풀고 채점하기 위한 형태입니다.
+      </p>
+
+      <ul class="buy-points">
+        <li data-i18n="mag.buyPoint1">발행된 주 전체를 인쇄용으로 다시 조판했습니다.</li>
+        <li data-i18n="mag.buyPoint2">확인 문제와 받아쓰기를 먼저 풀고, 정답·해설로 바로 채점합니다.</li>
+        <li data-i18n="mag.buyPoint3">1분기가 완성되는 대로 같은 파일을 다시 받습니다(추가 결제 없음).</li>
+        <li data-i18n="mag.buyPoint4">오프라인에서도 쓰고, 1년 누적 어휘 색인을 함께 받습니다.</li>
+      </ul>
+
+      <p class="buy-price" data-i18n="mag.buyPrice">₩39,000</p>
+
+      <div class="buy-actions">
+        <a class="btn btn-primary" id="buyMain" target="_blank" rel="noopener" data-i18n="mag.buyButton">워크북 구매하기</a>
+      </div>
+
+      <p class="buy-note" data-i18n="mag.buyNote">7일 안에 환불 요청할 수 있습니다. 결제는 외부 결제 대행사에서 처리하며, 이 사이트는 카드 정보를 받지 않습니다.</p>
+    </div>
+  </section>
+
   <!-- ── 새 주 알림 신청 ────────────────────────────── -->
   <section class="section section-cta" id="next">
     <div class="wrap cta-inner">
@@ -290,6 +321,7 @@
             <option value="content" data-i18n="form.type.content">콘텐츠 오류·오타 제보</option>
             <option value="topic" data-i18n="form.type.topic">새 주제·주차 제안</option>
             <option value="study" data-i18n="form.type.study">학습 방법 질문</option>
+            <option value="purchase" data-i18n="form.type.purchase">워크북 구매 문의</option>
             <option value="partner" data-i18n="form.type.partner">제휴·광고 문의</option>
             <option value="etc" data-i18n="form.type.etc">그 외 문의</option>
           </select>
@@ -391,8 +423,8 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="issues.js?v=9"></script>
-<script src="script.js?v=13"></script>
+<script src="issues.js?v=10"></script>
+<script src="script.js?v=14"></script>
 <script src="magazine.js?v=10"></script>
 <!-- 서비스워커 — 오프라인 학습과 설치형 앱(PWA) 지원.
      file:// 로 열면 등록하지 않습니다(서비스워커는 http(s) 에서만 동작합니다).

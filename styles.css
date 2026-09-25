@@ -361,6 +361,58 @@ a  { color: inherit; text-decoration: none; }
 .btn-sm { padding: 9px 17px; font-size: .84rem; }
 .contact-note { margin: 18px 0 0; font-size: .82rem; color: var(--text-dim); }
 
+/* ── 워크북 구매 ───────────────────────────────────────────────────────
+   판매 링크가 없으면 index.html 의 스크립트가 이 묶음을 통째로 숨깁니다
+   (죽은 링크를 남기지 않기 위해서). 스타일은 링크가 있을 때만 의미가 있습니다. */
+.section-buy {
+  background:
+    radial-gradient(60% 100% at 50% 0%, rgb(var(--accent2-rgb) / .10), transparent 70%),
+    var(--bg-alt);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+.buy-inner { display: flex; flex-direction: column; align-items: center; }
+.buy-inner .section-title { max-width: 620px; }
+.buy-inner .section-lead { margin-inline: auto; max-width: 640px; }
+.buy-points {
+  display: grid;
+  gap: 10px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+  max-width: 640px;
+}
+.buy-points li {
+  position: relative;
+  padding: 11px 16px 11px 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: .92rem;
+}
+.buy-points li::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.buy-price {
+  margin: 24px 0 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  color: var(--accent);
+}
+.buy-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 18px 0 0; }
+.buy-note { margin: 16px 0 0; font-size: .82rem; color: var(--text-dim); }
+
 /* ══ Magazine (issue page) ═══════════════════════════════════════════════ */
 
 /* ── 표지 ─────────────────────────────────────────────────────────────── */
@@ -1508,7 +1560,7 @@ html.reveal-ready .reveal.is-visible { opacity: 1; transform: none; }
   .issue-nav, .hero-actions, .rate-set, .guide .guide-steps,
   .m-tools, .m-next, .m-btn, .m-bubble-play, .m-dialogue-tools,
   .quiz-opt, .dict-actions, .wb-tools, .review-actions, .aside-tr,
-  .count-pill { display: none !important; }
+  .section-buy, .count-pill { display: none !important; }
 
   .wrap { max-width: none; padding: 0; }
   .cover { padding: 0 0 12pt; }

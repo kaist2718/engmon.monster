@@ -138,6 +138,17 @@
       'mag.rateSaved': '듣기 속도를 바꿨습니다',
       'mag.resume': '이어서 읽기',
       'mag.nextSection': '다음 섹션',
+      'mag.buyKicker': 'WORKBOOK',
+      'mag.buyTitle': '종이로 푸는 1분기 워크북',
+      'mag.buyLead': '웹에서는 계속 무료로 읽습니다. 워크북은 종이에 풀고 채점하기 위한 형태입니다.',
+      'mag.buyPoint1': '발행된 주 전체를 인쇄용으로 다시 조판했습니다.',
+      'mag.buyPoint2': '확인 문제와 받아쓰기를 먼저 풀고, 정답·해설로 바로 채점합니다.',
+      'mag.buyPoint3': '1분기가 완성되는 대로 같은 파일을 다시 받습니다(추가 결제 없음).',
+      'mag.buyPoint4': '오프라인에서도 쓰고, 1년 누적 어휘 색인을 함께 받습니다.',
+      'mag.buyPrice': '₩39,000',
+      'mag.buyButton': '워크북 구매하기',
+      'mag.buyHero': '워크북 구매',
+      'mag.buyNote': '7일 안에 환불을 요청할 수 있습니다. 결제는 외부 결제 대행사에서 처리하며, 이 사이트는 카드 정보를 받지 않습니다.',
       'mag.nextNote': '보통 영업일 기준 2~3일 안에 답장드립니다.',
       'mag.nextTitle': '새 주가 나오면 알려드릴까요?',
       'mag.nextLead': '새 주 소식과 피드백은 모두 같은 메일로 받습니다. 원하는 주제가 있으면 함께 적어 보내주세요.',
@@ -148,18 +159,21 @@
       'form.type.content': '콘텐츠 오류·오타 제보',
       'form.type.topic': '새 주제·주차 제안',
       'form.type.study': '학습 방법 질문',
+      'form.type.purchase': '워크북 구매 문의',
       'form.type.partner': '제휴·광고 문의',
       'form.type.etc': '그 외 문의',
       'form.hint.subscribe': '새 주가 나오면 알려드립니다. 내용은 비워 두어도 됩니다.',
       'form.hint.content': '어느 주의 어느 부분인지 알려 주시면 빠르게 고칩니다.',
       'form.hint.topic': '다뤄 주었으면 하는 주제나 표현을 적어 주세요.',
       'form.hint.study': '막힐는 부분과 지금까지 해 본 방법을 알려 주세요.',
+      'form.hint.purchase': '결제·환불·파일 다시 받기에 대해 물어보세요. 주문 번호가 있으면 함께 적어 주세요.',
       'form.hint.partner': '어떤 형태의 제휴·광고를 생각하시는지 알려 주세요.',
       'form.hint.etc': '무엇이든 편하게 적어 주세요.',
       'form.ph.subscribe': '원하는 주제나 다뤄 주었으면 하는 표현을 적어 주세요.',
       'form.ph.content': '예) W03 회화에서 오타를 찾았어요',
       'form.ph.topic': '예) 병원에서 쓰는 표현을 다뤄 주세요',
       'form.ph.study': '예) 뉴스 듣기가 너무 빠르게 느껴져요',
+      'form.ph.purchase': '예) 1분기 묶음을 샀는데 파일을 다시 받고 싶어요',
       'form.ph.partner': '예) 학습 앱과 함께 소개하고 싶습니다',
       'form.ph.etc': '자유롭게 적어 주세요',
       'form.name': '이름 또는 닉네임 (선택)',
@@ -337,6 +351,17 @@
       'mag.rateSaved': 'Listening speed updated',
       'mag.resume': 'Continue',
       'mag.nextSection': 'Next section',
+      'mag.buyKicker': 'WORKBOOK',
+      'mag.buyTitle': 'The first-quarter workbook, on paper',
+      'mag.buyLead': 'Everything stays free to read here. The workbook is the paper version you fill in and mark.',
+      'mag.buyPoint1': 'Every published week, laid out again for print.',
+      'mag.buyPoint2': 'Answer the quiz and dictation first, then mark them against the answer key.',
+      'mag.buyPoint3': 'You get the same file again as quarter one fills up, at no extra cost.',
+      'mag.buyPoint4': 'Works offline, and comes with a running vocabulary index for the year.',
+      'mag.buyPrice': 'US$29 (₩39,000)',
+      'mag.buyButton': 'Buy the workbook',
+      'mag.buyHero': 'Workbook',
+      'mag.buyNote': 'Refunds inside seven days. Payment is handled by an outside checkout provider, and this site never receives your card details.',
       'mag.nextNote': 'We usually reply within two to three business days.',
       'mag.nextTitle': 'Want to hear when the next week is out?',
       'mag.nextLead': 'New weeks and feedback both land in the same inbox. Tell us which topics you want.',
@@ -347,18 +372,21 @@
       'form.type.content': 'Report an error or typo',
       'form.type.topic': 'Suggest a topic or week',
       'form.type.study': 'Study method question',
+      'form.type.purchase': 'Workbook purchase',
       'form.type.partner': 'Partnership or advertising',
       'form.type.etc': 'Something else',
       'form.hint.subscribe': 'We will email you when a new week is out. The message can stay empty.',
       'form.hint.content': 'Tell us the week and the spot and we will fix it fast.',
       'form.hint.topic': 'Tell us the topic or expression you want covered.',
       'form.hint.study': 'Describe where you are stuck and what you have tried.',
+      'form.hint.purchase': 'Ask about payment, refunds or downloading the files again. Add your order number if you have it.',
       'form.hint.partner': 'Tell us what kind of partnership you have in mind.',
       'form.hint.etc': 'Anything at all, just write it here.',
       'form.ph.subscribe': 'A topic you want covered, or an expression you would like to see.',
       'form.ph.content': 'For example, a typo in the W03 conversation',
       'form.ph.topic': 'For example, please cover phrases for a hospital visit',
       'form.ph.study': 'For example, the news audio feels too fast',
+      'form.ph.purchase': 'For example, I bought the quarter bundle and need the files again',
       'form.ph.partner': 'For example, we would like to feature EngMon',
       'form.ph.etc': 'Write as much as you like',
       'form.name': 'Name or nickname (optional)',
@@ -785,7 +813,7 @@
        유형을 고르면 메일 제목이 'EngMon — <유형>' 으로 바뀌고, 한 줄짜리
        신청이 아닌 문의는 내용을 적지 않으면 보내지 못하게 합니다.
        (제목이 항상 EngMon 으로 시작해야 수신합에서 바로 알아봅니다.) */
-    var TYPE_VALUES = ['subscribe', 'content', 'topic', 'study', 'partner', 'etc'];
+    var TYPE_VALUES = ['subscribe', 'content', 'topic', 'study', 'purchase', 'partner', 'etc'];
     var DEFAULT_TYPE = 'subscribe';
 
     function currentType() {
@@ -941,7 +969,36 @@
     });
   });
 
-  /* ── 9. 헤더 그림자 · 맨 위로 · 현재 섹션 ────────────────────────── */
+  /* ── 9. 워크북 구매 (판매 링크) ──────────────────────────────────────
+     판매 링크는 index.html 의 #buy 안 데이터 속성 **한 곳**에서 정합니다.
+     비어 있으면 구매 화면과 표지 버튼을 함께 숨겨, 팔 상품이 없을 때
+     죽은 링크가 사이트에 남지 않게 합니다. */
+  guard('워크북 구매', function () {
+    var section = $('buy');
+    if (!section) return;
+
+    var url = String(section.getAttribute('data-shop-url') || '').trim();
+    var hero = $('buyHero');
+    var main = $('buyMain');
+
+    if (!url) {
+      section.hidden = true;
+      if (hero) hero.hidden = true;
+      return;
+    }
+
+    /* 외부 결제 페이지로 나가는 링크입니다 — 새 창 + noopener를 다시 못 밖아 둡니다. */
+    [hero, main].forEach(function (a) {
+      if (!a) return;
+      a.setAttribute('href', url);
+      a.setAttribute('rel', 'noopener');
+      a.hidden = false;
+    });
+
+    section.hidden = false;
+  });
+
+  /* ── 10. 헤더 그림자 · 맨 위로 · 현재 섹션 ────────────────────────── */
   guard('스크롤 반응', function () {
     var header = $('siteHeader');
     var toTop = $('toTop');
@@ -985,7 +1042,7 @@
     on(window, 'scroll', onScroll, { passive: true });
   });
 
-  /* ── 10. 푸터 연도 ─────────────────────────────────────────────────── */
+  /* ── 11. 푸터 연도 ─────────────────────────────────────────────────── */
   guard('푸터 연도', function () {
     var yearEl = $('year');
     if (yearEl) yearEl.textContent = String(new Date().getFullYear());

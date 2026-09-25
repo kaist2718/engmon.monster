@@ -158,6 +158,11 @@ function makeDom(html, options) {
   const byId = new Map();
   const bySelector = {};
 
+  /* opts.shopUrl — 판매 링크가 채워진 상태를 흑내 냅니다.
+     index.html 은 그 값을 한 곳(#buy 의 데이터 속성)에만 두므로 여기서 바꾸면
+     화면 전체가 링크가 있는 상태로 초기화됩니다. */
+  if (opts.shopUrl) html = html.replace(/data-shop-url="[^"]*"/, 'data-shop-url="' + opts.shopUrl + '"');
+
   const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
   const duplicateIds = ids.filter((id, i) => ids.indexOf(id) !== i);
 
@@ -1638,6 +1643,115 @@ check('발행된 주는 표준 골격을 따른다', () => {
   });
 
   return issues.length + '주 × 골격 ' + CORE.length + '종 확인';
+});
+
+check('발행된 주는 유료 기준 분량을 지킨다', () => {
+  const sandbox = vm.createContext(makeSandbox(makeDom('<html></html>'), {}));
+  vm.runInContext(fs.readFileSync(path.join(ROOT, 'issues.js'), 'utf8'), sandbox);
+
+  const issues = sandbox.MAGAZINE_ISSUES || [];
+
+  /* 주 하나가 값을 하려면 이만큼은 있어야 합니다 (docs/RESEARCH.md 5.2 의 분량 기준).
+     한 주만 얇게 발행되어도 기준이 무너지므로 스크립트로 막습니다. */
+  const MIN_ITEMS = { vocabulary: 12, phrasal: 8, collocation: 8, idioms: 8, pronunciation: 8 };
+  const MIN_QUIZ = 12;
+  const MIN_DICTATION = 8;
+  const MIN_QUESTIONS = 5;
+  const MIN_NOTE = 8;
+
+  const countOf = (issue, kind, field) => issue.sections
+    .filter((s) => s.kind === kind)
+    .reduce((sum, s) => sum + ((s[field] || []).length), 0);
+
+  issues.forEach((issue) => {
+    const tag = 'W' + pad2(issue.week);
+
+    Object.keys(MIN_ITEMS).forEach((kind) => {
+      const count = countOf(issue, kind, 'items');
+      assert(count >= MIN_ITEMS[kind],
+        tag + ' ' + kind + ' 항목 = ' + count + '개 (' + MIN_ITEMS[kind] + '개 이상이어야 합니다)');
+    });
+
+    const quiz = countOf(issue, 'quiz', 'quiz');
+    assert(quiz >= MIN_QUIZ, tag + ' 확인 문제 = ' + quiz + '문항 (' + MIN_QUIZ + '문항 이상이어야 합니다)');
+
+    const dictation = countOf(issue, 'listening', 'dictation');
+    assert(dictation >= MIN_DICTATION,
+      tag + ' 받아쓰기 = ' + dictation + '문장 (' + MIN_DICTATION + '문장 이상이어야 합니다)');
+
+    const questions = issue.sections.reduce((sum, s) => sum + ((s.questions || []).length), 0);
+    assert(questions >= MIN_QUESTIONS,
+      tag + ' 이해·토론 질문 = ' + questions + '개 (' + MIN_QUESTIONS + '개 이상이어야 합니다)');
+
+    const note = countOf(issue, 'note', 'bullets');
+    assert(note >= MIN_NOTE, tag + ' 해설 노트 = ' + note + '항목 (' + MIN_NOTE + '항목 이상이어야 합니다)');
+
+    /* 채점이 끝나려면 문항마다 오답 이유가 있어야 합니다 */
+    issue.sections.forEach((section) => {
+      (section.quiz || []).forEach((item, qi) => {
+        assert(item.explain && item.explain.ko && item.explain.en,
+          section.id + ' ' + (qi + 1) + '번 문제에 해설(ko·en)이 없습니다');
+      });
+    });
+  });
+
+  return issues.length + '주 × 어휘 12·문제 ' + MIN_QUIZ + '문항·받아쓰기 ' + MIN_DICTATION +
+    '문장·해설 노트 ' + MIN_NOTE + '항목 확인';
+});
+
+check('구매 화면은 상품 링크 한 곳으로만 켜진다', () => {
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const SHOP_URL = 'https://example.gumroad.com/l/engmon-q1';
+
+  /* 1) 링크를 정하는 자리는 한 곳이어야 합니다 (여러 곳에 두면 하나를 고치고 지나갑니다) */
+  const sources = [...html.matchAll(/data-shop-url=/g)].length;
+  assert(sources === 1, '판매 링크를 정하는 자리가 ' + sources + '곳입니다 (한 곳이어야 합니다)');
+
+  /* 2) 외부 결제 페이지로 나가는 링크는 새 창 + noopener */
+  ['buyHero', 'buyMain'].forEach((id) => {
+    const tag = (html.match(new RegExp('<a[^>]*id="' + id + '"[^>]*>')) || [''])[0];
+    assert(tag, id + ' 링크를 찾지 못했습니다');
+    assert(/target="_blank"/.test(tag), id + '에 target="_blank"가 없습니다');
+    assert(/rel="noopener"/.test(tag), id + '에 rel="noopener"가 없습니다');
+  });
+
+  /* 3) 링크가 비어 있으면 구매 화면을 통째로 숨깁니다 — 죽은 링크를 남기지 않습니다 */
+  const empty = runPage('index.html');
+  assert(empty.dom.byId.get('buy').hidden === true, '상품 링크가 비었는데 구매 화면이 보입니다');
+  assert(empty.dom.byId.get('buyHero').hidden === true, '상품 링크가 비었는데 표지 버튼이 보입니다');
+  assert(!empty.dom.byId.get('buyMain').getAttribute('href'), '상품 링크가 비었는데 href가 채워졌습니다');
+
+  /* 4) 링크를 채우면 표지 버튼과 구매 화면이 함께 열리고 같은 주소로 나갑니다 */
+  const filled = runPage('index.html', { shopUrl: SHOP_URL });
+  ['buyHero', 'buyMain'].forEach((id) => {
+    const el = filled.dom.byId.get(id);
+    assert(el.hidden === false, id + '가 열리지 않았습니다');
+    assert(el.getAttribute('href') === SHOP_URL, id + ' href = ' + el.getAttribute('href'));
+  });
+  assert(filled.dom.byId.get('buy').hidden === false, '상품 링크를 넣어도 구매 화면이 숨어 있습니다');
+
+  return '판매 링크 1곳 · 빈 값=숨김 · 채우면 버튼 2개 열림';
+});
+
+check('유료 상품의 결제·환불 조건이 약관과 방침에 있다', () => {
+  const terms = fs.readFileSync(path.join(ROOT, 'terms.html'), 'utf8');
+  const privacy = fs.readFileSync(path.join(ROOT, 'privacy.html'), 'utf8');
+
+  ['환불', '7일', '재배포', '결제 대행사'].forEach((word) => {
+    assert(terms.indexOf(word) !== -1, '이용약관에 "' + word + '"가 없습니다');
+  });
+
+  ['결제 대행사', '카드 번호', '이메일 주소'].forEach((word) => {
+    assert(privacy.indexOf(word) !== -1, '개인정보처리방침에 "' + word + '"가 없습니다');
+  });
+
+  /* 결제 정보를 받지 않는다는 문장은 약관과 방침 양쪽에 있어야 합니다 */
+  assert(terms.indexOf('카드 정보를 받거나 저장하지 않습니다') !== -1,
+    '약관에 결제 정보 미보관 안내가 없습니다');
+  assert(privacy.indexOf('저장하지도 않습니다') !== -1,
+    '방침에 결제 정보 미보관 안내가 없습니다');
+
+  return '약관 제3조(결제·환불 7일·재배포 금지) · 방침 4항(결제 대행·카드 미보관)';
 });
 
 check('52주 플랜 데이터가 온전하다', () => {

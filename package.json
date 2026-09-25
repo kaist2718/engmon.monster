@@ -12,6 +12,7 @@
     "test": "node smoke-test.js",
     "check:browser": "node browser-test.js",
     "shots": "node browser-test.js --shots",
+    "workbook": "node tools/make-workbook.mjs",
     "stage": "node tools/stage-site.mjs",
     "check:staged": "npm run stage && node browser-test.js --site-root _site",
     "check:live": "node browser-test.js --live",
