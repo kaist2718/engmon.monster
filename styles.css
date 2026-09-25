@@ -948,6 +948,7 @@ a  { color: inherit; text-decoration: none; }
 .plan-theme { font-size: .82rem; font-weight: 700; color: var(--text); }
 .plan-title { font-size: .78rem; color: var(--text-soft); }
 .plan-meta { font-size: .72rem; color: var(--text-dim); }
+.plan-focus { font-size: .72rem; color: var(--text-soft); }
 .plan-badge {
   flex: none;
   padding: 3px 8px;
@@ -974,6 +975,23 @@ a  { color: inherit; text-decoration: none; }
 }
 .m-planned-title { margin: 0; font-size: 1.02rem; font-weight: 750; }
 .m-planned-lead { margin: 8px 0 18px; font-size: .9rem; color: var(--text-soft); line-height: 1.7; }
+
+/* ── 발행 전인 주의 계획 카드 ────────────────────────────────────────── */
+.m-plan-card {
+  margin-top: 20px;
+  padding: 20px 22px;
+  background: var(--bg-elevated, var(--bg));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.m-plan-card-title { margin: 0 0 14px; font-size: .82rem; font-weight: 750; letter-spacing: .05em; color: var(--accent); }
+.m-plan-block { margin-bottom: 14px; }
+.m-plan-block:last-child { margin-bottom: 0; }
+.m-plan-label { margin: 0 0 4px; font-size: .72rem; font-weight: 800; letter-spacing: .06em; color: var(--text-dim); }
+.m-plan-value { margin: 0; font-size: .92rem; color: var(--text-soft); line-height: 1.7; }
+.m-plan-goals { margin: 0; padding-left: 18px; font-size: .92rem; color: var(--text-soft); line-height: 1.7; }
+.m-plan-goals li { margin-bottom: 5px; }
+.m-plan-goals li:last-child { margin-bottom: 0; }
 .toc-item.is-planned { padding: 10px 12px; border-left: 2px dashed var(--border); }
 .toc-item.is-planned .toc-title { color: var(--text-soft); }
 

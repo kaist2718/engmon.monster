@@ -63,6 +63,7 @@ const PUBLIC_DIRS = ["assets"];
 /** _site 안에 절대 있으면 안 되는 것들(개발·운영 자료). */
 const NEVER_PUBLIC = [
   "tools",
+  "docs",
   ".github",
   "_site",
   ".gitignore",

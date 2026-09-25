@@ -1400,7 +1400,19 @@ if (magazine) {
     assert(dom.byId.get('issueDateCover').textContent === 'WEEK 05',
       '표지 주 표시 = ' + dom.byId.get('issueDateCover').textContent);
 
-    return 'W05 · 준비 중 안내 · 진행률 "' + dom.byId.get('issueProgressText').textContent + '"';
+    /* 계획 카드 — 학습목표와 구성 예정이 준비 중 안내와 함께 보여야 합니다 */
+    const cards = collect(content, 'm-plan-card');
+    assert(cards.length === 1, '계획 카드 = ' + cards.length + '개');
+
+    const goals = collect(cards[0], 'm-plan-goals');
+    const week = (sandbox.MAGAZINE_WEEKS || []).filter((w) => w.week === 5)[0];
+    assert(goals.length === 1 && goals[0].children.length === week.plan.goals.ko.length,
+      '계획 카드의 학습목표 = ' + (goals[0] && goals[0].children.length) + '개');
+    assert(joined.indexOf(t('mag.planCardTitle', 'ko')) > -1, '계획 카드 제목이 없습니다');
+    assert(joined.indexOf(t('mag.planParts', 'ko')) > -1, '구성 예정 섹션이 없습니다');
+
+    return 'W05 · 준비 중 안내 · 계획 카드(학습목표 ' + goals[0].children.length + '개) · 진행률 "'
+      + dom.byId.get('issueProgressText').textContent + '"';
   });
 }
 
@@ -1608,6 +1620,26 @@ check('매거진 데이터 구조가 올바르다', () => {
     '개 / 받아쓰기 ' + dictation + '개 / 표 ' + tables + '개';
 });
 
+check('발행된 주는 표준 골격을 따른다', () => {
+  const sandbox = vm.createContext(makeSandbox(makeDom('<html></html>'), {}));
+  vm.runInContext(fs.readFileSync(path.join(ROOT, 'issues.js'), 'utf8'), sandbox);
+
+  const issues = sandbox.MAGAZINE_ISSUES || [];
+
+  /* 모든 발행 주가 갖춰야 하는 섹션 종류 (docs/RESEARCH.md 의 표준 골격).
+     한 호만 뺴고 발행되는 일을 막습니다 — 예전에 W01·W02 에 독해·쓰기가 빠졌습니다. */
+  const CORE = ['goals', 'vocabulary', 'phrasal', 'collocation', 'grammar', 'pronunciation',
+    'conversation', 'listening', 'reading', 'writing', 'discussion', 'culture', 'quiz', 'note'];
+
+  issues.forEach((issue) => {
+    const kinds = new Set(issue.sections.map((s) => s.kind));
+    const missing = CORE.filter((kind) => !kinds.has(kind));
+    assert(missing.length === 0, 'W' + pad2(issue.week) + ' 표준 골격 누락: ' + missing.join(', '));
+  });
+
+  return issues.length + '주 × 골격 ' + CORE.length + '종 확인';
+});
+
 check('52주 플랜 데이터가 온전하다', () => {
   const sandbox = vm.createContext(makeSandbox(makeDom('<html></html>'), {}));
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'issues.js'), 'utf8'), sandbox);
@@ -1655,7 +1687,31 @@ check('52주 플랜 데이터가 온전하다', () => {
   assert(planned.every((w) => w.week >= 5), '5주 이전에 발행 전인 주가 있습니다');
   assert(published.every((w) => w.week <= 4), '1~4주만 발행된 상태여야 합니다');
 
-  return '52주 · 분기 ' + quarters.length + ' · 발행 4주 · 예정 48주';
+  /* 발행된 주는 맨 앞에 학습목표 섹션을 둡니다 */
+  published.forEach((week) => {
+    assert(week.sections[0].kind === 'goals',
+      'W' + pad2(week.week) + ' 첫 섹션이 학습목표가 아닙니다');
+  });
+
+  /* 발행 전인 주는 계획(plan)이 있어야 합니다 — 학습목표 3개 + 다섯 항목 */
+  const PLAN_FIELDS = ['grammar', 'words', 'pron', 'output', 'parts'];
+  planned.forEach((week) => {
+    const tag = 'W' + pad2(week.week);
+    assert(week.plan, tag + '에 계획(plan)이 없습니다');
+
+    ['ko', 'en'].forEach((lang) => {
+      const goals = week.plan.goals && week.plan.goals[lang];
+      assert(Array.isArray(goals) && goals.length >= 3,
+        tag + ' 계획의 학습목표(' + lang + ')가 ' + (goals ? goals.length : 0) + '개입니다');
+    });
+
+    PLAN_FIELDS.forEach((field) => {
+      assert(week.plan[field] && week.plan[field].ko && week.plan[field].en,
+        tag + ' 계획의 ' + field + '에 ko/en이 필요합니다');
+    });
+  });
+
+  return '52주 · 분기 ' + quarters.length + ' · 발행 4주 · 예정 48주(계획 ' + planned.length + '개)';
 });
 
 check('인쇄용 스타일이 있고 번역을 종이에서는 되살린다', () => {

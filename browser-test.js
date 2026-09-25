@@ -298,13 +298,15 @@ const overflowProbe = `(() => {
     await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: !!mobile, maxTouchPoints: 5 });
     await cdp.send('Page.navigate', { url });
     /* 고정 대기 대신 매거진이 실제로 그려질 때까지 기다립니다.
-       외부 수집 스크립트가 느리면 고정 대기로는 첫 화면을 놓칩니다(플레이크). */
-    for (let i = 0; i < 40; i++) {
-      const ready = await evalv('!!document.querySelector(".issue-aside")').catch(() => false);
+       기준은 **목차 항목**입니다 — .issue-aside 는 index.html 에 정적으로 있어서
+       그것만 보면 아직 스크립트가 돌기 전에 검사가 시작됩니다(매거진 데이터가
+       커지면 렌더링이 300ms 를 넘겨 tocList 가 비어 있는 채로 잡히기도 합니다). */
+    for (let i = 0; i < 60; i++) {
+      const ready = await evalv('!!document.querySelector(".issue-aside") && !!document.querySelector("#tocList li")').catch(() => false);
       if (ready) break;
-      await sleep(150);
+      await sleep(100);
     }
-    await sleep(300); /* 레이아웃 안정화 */
+    await sleep(200); /* 레이아웃 안정화 */
   };
 
   /* ── 1. 목차 스크롤 ──────────────────────────────────────────────────── */

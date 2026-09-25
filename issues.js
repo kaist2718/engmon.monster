@@ -21,14 +21,31 @@
 
    ── 주를 발행하려면 ──────────────────────────────────────────────────────
    그 주의 객체에 `published`(발행한 달)와 `sections`(아래 필드 조합)를 넣으면
-   표지·목차·진행률·플랜 화면에 "발행됨"으로 바뀍니다. 넣기 전까지는
-   플랜에 주제만 보이고 본문 대신 "아직 준비 중" 안내가 나갑니다.
+   표지·목차·진행률·플랜 화면에 "발행됨"으로 바뀝니다. 넣기 전까지는
+   플랜에 주제와 계획(plan)이 보이고 본문 대신 "아직 준비 중" 안내가 나갑니다.
+
+   ── 발행 전인 주의 계획(plan) ────────────────────────────────────────────
+   sections 가 없는 주는 plan 을 함께 적습니다. 로드맵과 "준비 중" 화면의
+   계획 카드가 이 값으로 그려집니다(없는 항목은 그리지 않습니다).
+
+     plan: {
+       goals:  { ko: [ '목표1', '목표2', '목표3' ], en: [ ... ] },  // 3개 이상
+       grammar:{ ko, en },   // 핵심 문법 — 로드맵에도 한 줄로 나옵니다
+       words:  { ko, en },   // 핵심 어휘
+       pron:   { ko, en },   // 발음 포인트
+       output: { ko, en },   // 학습자가 직접 만들어 내는 과제
+       parts:  { ko, en }    // 구성할 섹션 요약
+     }
+
+   발행되면 plan 은 그대로 두어도 되고(화면에 쓰이지 않음) 지워도 됩니다.
 
    ── 섹션에서 쓸 수 있는 필드 ───────────────────────────────────────────────
    id          필수. 앵커/진행률 저장에 쓰이는 고유 문자열 (영문/하이픈)
-   kind        vocabulary | phrasal | collocation | grammar | pronunciation |
-               idioms | slang | natural | conversation | listening | reading |
-               writing | discussion | culture | quiz | humor | note
+   kind        goals | vocabulary | phrasal | collocation | grammar |
+               pronunciation | idioms | slang | natural | conversation |
+               listening | reading | writing | discussion | culture | quiz |
+               humor | note
+                 goals = "이 주의 학습목표". 발행된 주는 맨 앞에 하나 둡니다.
    level       A2 | B1 | B2 | C1
    title       { ko, en }  섹션 제목
    intro       { ko, en }  한 줄 도입 (선택)
@@ -74,6 +91,28 @@ var MAGAZINE_WEEKS = [
     },
 
     sections: [
+      /* 0. 학습목표 */
+      {
+        id: 'news-goals',
+        kind: 'goals',
+        level: 'B2',
+        title: { ko: '이 주의 학습목표', en: 'What you will be able to do this week' },
+        intro: {
+          ko: '이 주를 마치면 아래 네 가지를 영어로 할 수 있게 됩니다. 읽기 전에 한 번, 다 읽고 한 번 확인하세요.',
+          en: 'By the end of this week you should be able to do the four things below. Check them once before you read and once after.'
+        },
+        bullets: [
+          { en: 'Turn a clipped headline back into a full sentence and say who did what.', ko: '줄어든 헤드라인을 온전한 문장으로 되돌려 누가 무엇을 했는지 말합니다.' },
+          { en: 'Use the eight news words and six collocations without stopping to translate.', ko: '뉴스 어휘 8개와 연어 6개를 번역 없이 씁니다.' },
+          { en: 'Find the conclusion in the first paragraph and separate fact from objection.', ko: '첫 문단에서 결론을 찾고 사실과 반대 의견을 구분합니다.' },
+          { en: 'Summarise one article in three English sentences, with a figure in the middle.', ko: '숫자 하나를 넣어 기사 한 편을 영어 세 문장으로 요약합니다.' }
+        ],
+        quote: {
+          ko: '뉴스는 모든 문장을 읽는 글이 아니라, 필요한 문장을 찾는 글입니다.',
+          en: 'News is not read sentence by sentence. It is searched for the sentence you need.'
+        }
+      },
+
       /* 1. 뉴스 어휘 */
       {
         id: 'news-words',
@@ -530,6 +569,28 @@ var MAGAZINE_WEEKS = [
     },
 
     sections: [
+      /* 0. 학습목표 */
+      {
+        id: 'daily-goals',
+        kind: 'goals',
+        level: 'B1',
+        title: { ko: '이 주의 학습목표', en: 'What you will be able to do this week' },
+        intro: {
+          ko: '이 주를 마치면 아래 네 가지를 영어로 할 수 있게 됩니다. 읽기 전에 한 번, 다 읽고 한 번 확인하세요.',
+          en: 'By the end of this week you should be able to do the four things below. Check them once before you read and once after.'
+        },
+        bullets: [
+          { en: 'Keep a conversation going with someone you have not seen for a long time.', ko: '오랜만에 만난 사람과 대화를 끊기지 않게 이어 갑니다.' },
+          { en: 'React with short, natural responses instead of silence or a nod.', ko: '침묵이나 고개 끄덕임 대신 짧고 자연스러운 반응을 붙입니다.' },
+          { en: 'Recognise the most common everyday shortenings when you hear them.', ko: '일상에서 자주 들리는 줄임말을 귀로 알아듣습니다.' },
+          { en: 'Turn what the other person said into your next question.', ko: '상대가 한 말을 받아 다음 질문으로 되돌립니다.' }
+        ],
+        quote: {
+          ko: '회화는 문장을 외우는 일이 아니라 주고받는 리듬을 익히는 일입니다.',
+          en: 'Conversation is not memorising sentences. It is learning the rhythm of taking turns.'
+        }
+      },
+
       /* 1. 일상 어휘 */
       {
         id: 'daily-words',
@@ -1006,17 +1067,39 @@ var MAGAZINE_WEEKS = [
       en: 'Sentences that work in meetings and email'
     },
     summary: {
-      ko: '돌려 말하지 않고도 정중하게 말하는 법. 업무 어휘 7개, 구동사 6개, 연어 6개, 정중 표현 문법, 비즈니스 이디엄 5개, 회의 대화 2장, 이메일 작문, 받아쓰기 4문장, 확인 문제 6개.',
-      en: 'Being polite without being vague: seven work words, six phrasal verbs, six collocations, a grammar point on polite forms, five business idioms, two meetings, one email template, four dictation lines and six quiz items.'
+      ko: '돌려 말하지 않고도 정중하게 말하는 법. 업무 어휘 9개, 구동사 8개, 연어 6개, 정중 표현 문법, 발음 5개, 비즈니스 이디엄 7개, 회의 대화 2장, 이메일 작문, 받아쓰기 4문장, 독해 1편, 회사 문화, 확인 문제 6개.',
+      en: 'Being polite without being vague: nine work words, eight phrasal verbs, six collocations, a grammar point on polite forms, five pronunciation points, seven business idioms, two meetings, one email template, four dictation lines, one reading passage, a culture note and six quiz items.'
     },
 
     sections: [
+      /* 0. 학습목표 */
+      {
+        id: 'work-goals',
+        kind: 'goals',
+        level: 'B1',
+        title: { ko: '이 주의 학습목표', en: 'What you will be able to do this week' },
+        intro: {
+          ko: '이 주를 마치면 아래 네 가지를 영어로 할 수 있게 됩니다. 읽기 전에 한 번, 다 읽고 한 번 확인하세요.',
+          en: 'By the end of this week you should be able to do the four things below. Check them once before you read and once after.'
+        },
+        bullets: [
+          { en: 'Report progress and flag a delay in one clear sentence.', ko: '진행 상황과 지연을 한 문장으로 분명하게 알립니다.' },
+          { en: 'Pick the right rung of politeness for a request, from a chat message to a client email.', ko: '메신저부터 고객 메일까지 상황에 맞는 정중함의 단계를 골라 부탁합니다.' },
+          { en: 'Read a short internal email quickly and answer what it actually asks.', ko: '짧은 업무 메일을 빠르게 읽고 요구 사항에 정확히 답합니다.' },
+          { en: 'Say meeting language clearly enough to be understood on a call.', ko: '회의 표현을 통화에서도 들리게 또렷하게 말합니다.' }
+        ],
+        quote: {
+          ko: '업무 영어는 유창함보다 정확한 한 문장이 먼저입니다.',
+          en: 'In work English, one accurate sentence beats a fluent guess.'
+        }
+      },
+
       /* 1. 업무 어휘 */
       {
         id: 'work-words',
         kind: 'vocabulary',
         level: 'B1',
-        title: { ko: '업무 어휘 — 회의에서 매일 나오는 7단어', en: 'Work words — seven that come up daily' },
+        title: { ko: '업무 어휘 — 회의에서 매일 나오는 9단어', en: 'Work words — nine that come up daily' },
         intro: {
           ko: '한국어로는 다르게 들려도, 영어 회의에서는 이 단어들이 반복됩니다.',
           en: 'They sound different in Korean, but in English meetings these come back constantly.'
@@ -1028,7 +1111,9 @@ var MAGAZINE_WEEKS = [
           { en: 'scope', ko: '범위', meaning: 'the work included in a project', example: 'That is outside the scope of this release.', note: '정중한 거절로도 아주 유용합니다' },
           { en: 'bandwidth', ko: '(업무를 할) 여력', meaning: 'the time and energy available', example: 'I do not have the bandwidth this week.', note: '원어민도 회의에서 자주 쓰는 비유입니다' },
           { en: 'escalate', ko: '상위에 보고하다', meaning: 'to raise an issue to a higher level', example: 'Let us escalate this to the manager.', note: '문제를 키운다는 뜻이 아니라 올린다는 뜻입니다' },
-          { en: 'alignment', ko: '방향 일치', meaning: 'agreement on the plan', example: 'We need alignment before we start.', note: 'We are aligned라고도 합니다' }
+          { en: 'alignment', ko: '방향 일치', meaning: 'agreement on the plan', example: 'We need alignment before we start.', note: 'We are aligned라고도 합니다' },
+          { en: 'blocker', ko: '진행을 막는 문제', meaning: 'something that stops progress', example: 'Any blockers before Friday?', note: '상태를 물을 때 자주 씁니다' },
+          { en: 'takeaway', ko: '핵심 요점', meaning: 'the main point to remember', example: 'What is the main takeaway from today?', note: '식당 포장 음식이라는 뜻도 있습니다' }
         ]
       },
 
@@ -1037,7 +1122,7 @@ var MAGAZINE_WEEKS = [
         id: 'work-phrasal',
         kind: 'phrasal',
         level: 'B1',
-        title: { ko: '구동사 — 이메일을 짧게 만드는 6개', en: 'Phrasal verbs — six that shorten your email' },
+        title: { ko: '구동사 — 이메일을 짧게 만드는 8개', en: 'Phrasal verbs — eight that shorten your email' },
         intro: {
           ko: '긴 문장을 한 단어로 줄여 줍니다. 다만 격식이 필요한 문서에서는 풀어 쓰는 편이 안전합니다.',
           en: 'They shrink long sentences into one unit. In very formal documents, the full form is safer.'
@@ -1048,7 +1133,9 @@ var MAGAZINE_WEEKS = [
           { en: 'loop in', ko: '끼워 넣다, 공유하다', meaning: 'to include someone in a conversation', example: 'Please loop in the design team.', note: 'keep in the loop는 계속 알려 준다는 뜻입니다' },
           { en: 'circle back', ko: '나중에 다시 논의하다', meaning: 'to return to a topic later', example: 'Let us circle back after lunch.', note: '정중하게 결론을 미루는 표현입니다' },
           { en: 'run by', ko: '한번 봐 주다, 확인받다', meaning: 'to show something for approval', example: 'Let me run this by my manager.', note: 'run it by me는 나에게 확인시켜 달라는 뜻입니다' },
-          { en: 'take over', ko: '넘겨받다', meaning: 'to take responsibility for something', example: 'Mina will take over the client account.', note: 'hand over는 넘겨주는 쪽입니다' }
+          { en: 'take over', ko: '넘겨받다', meaning: 'to take responsibility for something', example: 'Mina will take over the client account.', note: 'hand over는 넘겨주는 쪽입니다' },
+          { en: 'roll out', ko: '단계적으로 출시하다', meaning: 'to release something gradually', example: 'We roll out the update on Monday.', note: '명사형은 a rollout입니다' },
+          { en: 'sign off on', ko: '최종 승인하다', meaning: 'to give final approval', example: 'The director has to sign off on the budget.', note: 'sign off는 퇴근하다는 뜻도 있습니다' }
         ]
       },
 
@@ -1111,18 +1198,43 @@ var MAGAZINE_WEEKS = [
         }
       },
 
-      /* 5. 이디엄 */
+      /* 5. 발음 */
+      {
+        id: 'work-pron',
+        kind: 'pronunciation',
+        level: 'B2',
+        title: { ko: '발음 — 통화에서 문장이 또렷하게 들리게', en: 'Pronunciation — sounding clear on a call' },
+        intro: {
+          ko: '화상회의와 전화에서는 표정과 손짓이 없습니다. 강세와 끊어 읽기가 뜻을 나릅니다.',
+          en: 'On a call nobody can see your face or hands. Stress and pausing carry the meaning.'
+        },
+        items: [
+          { en: 'I will send it by end of day.', ko: '오늘 안으로 보내겠습니다.', note: 'send it by는 붙여 읽지 말고 by 앞에서 아주 짧게 쉽니다.' },
+          { en: 'Could we push the deadline to Friday?', ko: '마감을 금요일로 미룰 수 있을까요?', note: 'push the deadline에서 deadline에 강세를 둡니다.' },
+          { en: 'Sorry, you are breaking up.', ko: '죄송하지만 연결이 끊기네요.', note: 'breaking up은 통화 품질이 나쁠 때 쓰는 정형 표현입니다.' },
+          { en: 'Let me share my screen.', ko: '화면을 공유하겠습니다.', note: 'share my를 한 덩어리로 붙여 말합니다.' },
+          { en: 'I did not catch the last part.', ko: '마지막 부분을 못 들었습니다.', note: 'catch에 강세를 둡니다. did not은 약하게 지나갑니다.' }
+        ],
+        bullets: [
+          { en: 'Stress the noun that matters, then pause. Flat, fast sentences are the ones people ask you to repeat.', ko: '중요한 명사에 강세를 두고 짧게 쉽니다. 평평하고 빠른 문장이 되물음을 부릅니다.' },
+          { en: 'Numbers and dates need a clear pause before and after.', ko: '숫자와 날짜는 앞뒤에 또렷한 쉼을 둡니다.' }
+        ]
+      },
+
+      /* 6. 이디엄 */
       {
         id: 'work-idioms',
         kind: 'idioms',
         level: 'B2',
-        title: { ko: '비즈니스 이디엄 — 회의에서 들리는 5개', en: 'Business idioms — five you hear in meetings' },
+        title: { ko: '비즈니스 이디엄 — 회의에서 들리는 7개', en: 'Business idioms — seven you hear in meetings' },
         items: [
           { en: 'touch base', ko: '짧게 상황을 공유하다', meaning: 'to make brief contact', example: 'Let us touch base on Friday.', note: '길게 논의하지 않고 확인만 하는 느낌입니다' },
           { en: 'ballpark figure', ko: '대략적인 수치', meaning: 'a rough estimate', example: 'Can you give me a ballpark figure?', note: '정확한 값이 아니어도 된다는 신호입니다' },
           { en: 'on the same page', ko: '같은 이해를 가진', meaning: 'sharing the same understanding', example: 'Let us make sure we are on the same page.', note: '회의 마무리에 자주 씁니다' },
           { en: 'move the needle', ko: '실질적인 변화를 만들다', meaning: 'to make a real difference', example: 'This feature will not move the needle.', note: '성과가 크지 않다는 뜻으로도 씁니다' },
-          { en: 'in the loop', ko: '정보를 공유받는', meaning: 'informed about something', example: 'Please keep me in the loop.', note: 'out of the loop은 반대 상황입니다' }
+          { en: 'in the loop', ko: '정보를 공유받는', meaning: 'informed about something', example: 'Please keep me in the loop.', note: 'out of the loop은 반대 상황입니다' },
+          { en: 'low-hanging fruit', ko: '당장 성과를 내기 쉬운 일', meaning: 'the easiest wins', example: 'Let us start with the low-hanging fruit.', note: '쉬운 것부터 하자는 뜻입니다' },
+          { en: 'cut corners', ko: '대충 넘어가다', meaning: 'to skip steps to save time', example: 'We cannot cut corners on testing.', note: '거의 항상 부정문으로 씁니다' }
         ]
       },
 
@@ -1236,7 +1348,36 @@ var MAGAZINE_WEEKS = [
         ]
       },
 
-      /* 10. 토론 */
+      /* 10. 독해 */
+      {
+        id: 'work-reading',
+        kind: 'reading',
+        level: 'B2',
+        title: { ko: '독해 — 업무 메일 한 통', en: 'Reading — one short internal email' },
+        intro: {
+          ko: '학습용으로 새로 쓴 메일입니다. 요청이 몇 가지인지 세면서 읽어 보세요.',
+          en: 'A practice email written for this issue. Read it and count how many requests it makes.'
+        },
+        reading: [
+          'Hi Jiwon,',
+          'Thanks for the draft you sent yesterday. I went through it quickly and the structure works well, so no need to rework the opening.',
+          'Two things before we send it to the client. First, could you replace the March figures with the April ones? The numbers in section two are now out of date. Second, please loop in Dana from design, since the layout questions are hers to answer.',
+          'I have copied the client on the timeline only. Nothing goes out until you have had a chance to check the wording, so take the morning if you need it.',
+          'Best regards, Chris'
+        ],
+        items: [
+          { en: 'went through it quickly', ko: '빠르게 훑어봤다', meaning: 'read it briefly', example: 'I went through the report on the train.', note: 'go through는 검토하다는 뜻의 기본 동사입니다' },
+          { en: 'no need to rework the opening', ko: '도입부를 다시 손댈 필요는 없다', meaning: 'the start is fine as it is', example: 'No need to rewrite the summary.', note: '확인과 안심을 함께 주는 문장입니다' },
+          { en: 'out of date', ko: '시효가 지난', meaning: 'no longer correct', example: 'That price list is out of date.', note: 'up to date는 반대말입니다' },
+          { en: 'are hers to answer', ko: '그녀가 답할 몫이다', meaning: 'she is the one responsible', example: 'The budget questions are hers to answer.', note: '담당을 분명히 하는 표현입니다' }
+        ],
+        questions: [
+          { ko: '이 메일이 요청하는 일은 정확히 몇 가지인가요?', en: 'Exactly how many things does the email ask for?' },
+          { ko: '보내는 사람이 시간을 준 이유는 무엇인가요?', en: 'Why does the sender leave time before anything goes out?' }
+        ]
+      },
+
+      /* 11. 토론 */
       {
         id: 'work-discussion',
         kind: 'discussion',
@@ -1251,7 +1392,29 @@ var MAGAZINE_WEEKS = [
         ]
       },
 
-      /* 11. 확인 문제 */
+      /* 12. 문화 */
+      {
+        id: 'work-culture',
+        kind: 'culture',
+        level: 'B2',
+        title: { ko: '문화 — 이름을 부르는 거리', en: 'Culture — how close a name sounds' },
+        intro: {
+          ko: '영어권 회사에서는 직함보다 이름을 먼저 씁니다. 다만 부르는 방식에는 아직 단계가 있습니다.',
+          en: 'English-speaking offices put first names before titles, but there is still a ladder in how you address people.'
+        },
+        items: [
+          { en: 'Hi Chris,', ko: '크리스님,', meaning: 'a normal, neutral opening', example: 'Hi Chris, thanks for the note.', note: '업무 메일의 기본 인사입니다' },
+          { en: 'Dear Ms Park,', ko: '박 부장님께,', meaning: 'formal, first contact', example: 'Dear Ms Park, I am writing about the proposal.', note: '모르는 상대나 첫 메일에 씁니다' },
+          { en: 'first-name basis', ko: '이름을 부르는 사이', meaning: 'close enough to use first names', example: 'We are on a first-name basis now.', note: '관계의 가까움을 나타내는 관용 표현입니다' },
+          { en: 'by their job title', ko: '직함으로 부르는', meaning: 'using the role instead of the name', example: 'In some teams people are called by their job title.', note: '문화에 따라 이름과 직함 중 무엇을 앞세우는지가 다릅니다' }
+        ],
+        quote: {
+          ko: '처음에는 격식으로, 익숙해지면 이름으로. 상대가 먼저 낮추면 따라가면 됩니다.',
+          en: 'Start formal, move to first names. When the other side moves first, follow.'
+        }
+      },
+
+      /* 13. 확인 문제 */
       {
         id: 'work-quiz',
         kind: 'quiz',
@@ -1320,7 +1483,7 @@ var MAGAZINE_WEEKS = [
         ]
       },
 
-      /* 12. 해설 노트 */
+      /* 14. 해설 노트 */
       {
         id: 'work-note',
         kind: 'note',
@@ -1350,11 +1513,33 @@ var MAGAZINE_WEEKS = [
       en: 'From airport to hotel — one issue of travel English'
     },
     summary: {
-      ko: '여행에서 실제로 쓰는 표현만 모았습니다. 테마 어휘 8개, 문법 1가지, 구동사 6개, 연어 6개, 발음 5개, 이디엄 6개, 대화 3장, 받아쓰기 4문장, 토론 질문 6개, 확인 문제 6개.',
-      en: 'Only the expressions you actually use on a trip: eight theme words, one grammar point, six phrasal verbs, six collocations, five pronunciation points, six idioms, three dialogues, four dictation lines, six discussion questions and six quiz items.'
+      ko: '여행에서 실제로 쓰는 표현만 모았습니다. 학습목표, 테마 어휘 8개, 문법 1가지, 구동사 6개, 연어 6개, 발음 5개, 이디엄 6개, 대화 3장, 받아쓰기 4문장, 독해 1편, 예약 메일 쓰기, 토론 질문 6개, 확인 문제 6개.',
+      en: 'Only the expressions you actually use on a trip: learning goals, eight theme words, one grammar point, six phrasal verbs, six collocations, five pronunciation points, six idioms, three dialogues, four dictation lines, one reading passage, a booking email task, six discussion questions and six quiz items.'
     },
 
     sections: [
+      /* ── 0. 학습목표 ──────────────────────────────────────────────── */
+      {
+        id: 'travel-goals',
+        kind: 'goals',
+        level: 'B1',
+        title: { ko: '이 주의 학습목표', en: 'What you will be able to do this week' },
+        intro: {
+          ko: '이 주를 마치면 아래 네 가지를 영어로 할 수 있게 됩니다. 읽기 전에 한 번, 다 읽고 한 번 확인하세요.',
+          en: 'By the end of this week you should be able to do the four things below. Check them once before you read and once after.'
+        },
+        bullets: [
+          { en: 'Get eight airport and hotel words and six phrasal verbs into your mouth.', ko: '공항·호텔에서 쓰는 8단어와 구동사 6개를 입에 붙입니다.' },
+          { en: 'Choose between the present perfect and the past simple while you are speaking.', ko: '말하는 도중에 현재완료와 과거시제를 골라 씁니다.' },
+          { en: 'Catch the numbers, gates and times in an announcement, and pull the key details out of a booking email.', ko: '안내 방송의 숫자·게이트·시간을 놓치지 않고, 예약 메일에서 핵심 정보를 골라냅니다.' },
+          { en: 'Keep a check-in or taxi exchange going for three sentences or more.', ko: '체크인이나 택시에서 세 문장 이상 주고받습니다.' }
+        ],
+        quote: {
+          ko: '목표는 아는 단어 수가 아니라 입 밖으로 나오는 문장 수입니다.',
+          en: 'The goal is not the number of words you know, but the sentences that come out of your mouth.'
+        }
+      },
+
       /* ── 1. 테마 어휘 ─────────────────────────────────────────────── */
       {
         id: 'theme-words',
@@ -1603,7 +1788,61 @@ var MAGAZINE_WEEKS = [
         ]
       },
 
-      /* ── 11. 토론 ────────────────────────────────────────────────── */
+      /* ── 11. 독해 ─────────────────────────────────────────────────── */
+      {
+        id: 'travel-reading',
+        kind: 'reading',
+        level: 'B1',
+        title: { ko: '독해 — 예약 확인 메일 한 통', en: 'Reading — one booking confirmation' },
+        intro: {
+          ko: '학습용으로 새로 쓴 예약 메일입니다. 실제로 확인해야 할 세부 사항을 세면서 읽어 보세요.',
+          en: 'A practice confirmation written for this issue. Read it and count the details a guest actually has to check.'
+        },
+        reading: [
+          'Thank you for your booking. Check-in begins at three in the afternoon, and the front desk stays open all night for late arrivals.',
+          'Breakfast is included on weekdays only. At the weekend the kitchen is closed, and guests receive a voucher for the cafe next door.',
+          'Please note that the lift will be serviced on Thursday morning, so guests on the upper floors should use the stairs between nine and eleven.',
+          'Everything else is standard: free cancellation up to forty-eight hours before arrival, and a small charge for any checkout after one in the afternoon.'
+        ],
+        items: [
+          { en: 'the front desk stays open all night', ko: '프런트는 밤새 열려 있다', meaning: 'someone is there through the night', example: 'The desk stays open all night for late flights.', note: '늦은 도착을 안심시키는 문장입니다' },
+          { en: 'a voucher for the cafe next door', ko: '옆 카페에서 쓸 수 있는 교환권', meaning: 'a ticket you can exchange for something', example: 'We were given a voucher for the cafe.', note: '조식 대신 주는 경우가 많습니다' },
+          { en: 'the lift will be serviced', ko: '엘리베이터를 점검할 예정이다', meaning: 'it will be checked or repaired', example: 'The lift will be serviced on Monday.', note: '수동태로 알림을 전달합니다' },
+          { en: 'free cancellation up to forty-eight hours before arrival', ko: '도착 48시간 전까지 무료 취소', meaning: 'you can cancel without paying until that time', example: 'Free cancellation up to seven days before arrival.', note: 'up to는 그 시점까지라는 뜻입니다' }
+        ],
+        questions: [
+          { ko: '이 메일에서 실제로 확인해야 할 세부 사항 세 가지를 찾아보세요.', en: 'Find the three details in the email that a guest actually has to check.' },
+          { ko: '주말에 도착한다면 아침 식사는 어떻게 해결해야 하나요?', en: 'If you arrive at the weekend, what should you do about breakfast?' }
+        ]
+      },
+
+      /* ── 12. 쓰기 ────────────────────────────────────────────────── */
+      {
+        id: 'travel-writing',
+        kind: 'writing',
+        level: 'B1',
+        title: { ko: '쓰기 — 예약 문의 메일 세 줄', en: 'Writing — a three-line booking email' },
+        intro: {
+          ko: '여행 예약 메일은 길수록 답이 늦습니다. 세 줄 틀을 그대로 써 보세요.',
+          en: 'Long booking emails get slow replies. Reuse this three-line shape.'
+        },
+        bullets: [
+          { en: 'Line 1 — what you want, in one sentence.', ko: '1줄 — 원하는 것을 한 문장으로.' },
+          { en: 'Line 2 — the dates, the number of guests and one condition.', ko: '2줄 — 날짜·인원·조건 하나.' },
+          { en: 'Line 3 — a polite close and one clear question.', ko: '3줄 — 정중한 마무리와 분명한 질문 하나.' }
+        ],
+        items: [
+          { en: 'I would like to book a room for two nights.', ko: '2박으로 방을 예약하고 싶습니다.', note: '1줄 예시 — 요청을 앞에 둡니다' },
+          { en: 'We arrive on Friday and leave on Sunday, two adults.', ko: '금요일에 도착해 일요일에 떠나고, 성인 두 명입니다.', note: '2줄 예시 — 날짜와 인원을 함께' },
+          { en: 'Could you confirm whether breakfast is included?', ko: '조식이 포함되는지 확인해 주시겠어요?', note: '3줄 예시 — 질문 하나로 닫습니다' }
+        ],
+        quote: {
+          ko: '세 줄이면 충분합니다. 길게 쓰면 상대가 무엇을 답해야 할지 놓칩니다.',
+          en: 'Three lines are enough. A long email hides the one thing you need answered.'
+        }
+      },
+
+      /* ── 13. 토론 ────────────────────────────────────────────────── */
       {
         id: 'group-talk',
         kind: 'discussion',
@@ -1623,7 +1862,7 @@ var MAGAZINE_WEEKS = [
         ]
       },
 
-      /* ── 12. 문화 ────────────────────────────────────────────────── */
+      /* ── 14. 문화 ────────────────────────────────────────────────── */
       {
         id: 'culture',
         kind: 'culture',
@@ -1650,7 +1889,7 @@ var MAGAZINE_WEEKS = [
         }
       },
 
-      /* ── 13. 확인 문제 ───────────────────────────────────────────── */
+      /* ── 15. 확인 문제 ───────────────────────────────────────────── */
       {
         id: 'quiz',
         kind: 'quiz',
@@ -1718,7 +1957,7 @@ var MAGAZINE_WEEKS = [
         ]
       },
 
-      /* ── 14. 유머 ────────────────────────────────────────────────── */
+      /* ── 16. 유머 ────────────────────────────────────────────────── */
       {
         id: 'humor',
         kind: 'humor',
@@ -1748,7 +1987,7 @@ var MAGAZINE_WEEKS = [
         }
       },
 
-      /* ── 15. 해설 노트 ───────────────────────────────────────────── */
+      /* ── 17. 해설 노트 ───────────────────────────────────────────── */
       {
         id: 'note',
         kind: 'note',
@@ -1774,7 +2013,7 @@ var MAGAZINE_WEEKS = [
      5~52주 — 계획 (아직 발행 전)
      ══════════════════════════════════════════════════════════════════════
      구성이 끝난 주부터 차례로 `published`와 `sections`를 채우면
-     표지·플랜 화면에서 "발행됨"으로 바뀍니다. */
+     표지·플랜 화면에서 "발행됨"으로 바뀝니다. */
 
   /* ── 1분기 · 생활 밀착 영어 (5~13주) ──────────────────────────────────── */
   {
@@ -1787,6 +2026,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '옷과 신발을 고르고, 사이즈를 바꾸고, 환불받는 문장을 익힙니다. 숫자와 조건 표현이 중심입니다.',
       en: 'Choose clothes and shoes, swap sizes and ask for a refund. Numbers and conditions carry the sentences.'
+    },
+    plan: {
+      goals: {
+        ko: ['옷과 신발의 사이즈를 말하고 다른 사이즈를 요청합니다.', '가격과 할인을 묻고 계산 방법을 고릅니다.', '환불과 교환 조건을 확인하고 요청합니다.'],
+        en: ['Ask for a size and request a different one.', 'Ask about the price and discounts, then choose how to pay.', 'Check the refund and exchange conditions, then ask for one.']
+      },
+      grammar: { ko: '셀 수 있는 명사와 some·any의 구분', en: 'countable nouns with some and any' },
+      words: { ko: '옷·신발·결제 어휘 10개', en: 'ten words for clothes, shoes and paying' },
+      pron: { ko: '가격의 숫자와 -teen / -ty 구분', en: 'numbers in prices, and telling -teen from -ty' },
+      output: { ko: '옷 가게에서 다른 사이즈를 요청하는 세 문장 만들기', en: 'Ask for a different size in three sentences' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1799,6 +2049,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '카페와 식당에서 주문하고, 재료를 묻고, 계산을 나누는 표현을 다룹니다.',
       en: 'Order at a cafe or restaurant, ask about ingredients and split the bill.'
+    },
+    plan: {
+      goals: {
+        ko: ['카페와 식당에서 주문하고 옵션을 바꿉니다.', '재료와 알레르기를 묻고 답합니다.', '계산을 나누고 팁을 남깁니다.'],
+        en: ['Order at a cafe or restaurant and change the options.', 'Ask and answer about ingredients and allergies.', 'Split the bill and leave a tip.']
+      },
+      grammar: { ko: '조동사 would와 부탁의 형태', en: 'would and the shape of a request' },
+      words: { ko: '음식·주문·결제 어휘 10개', en: 'ten words for food, ordering and paying' },
+      pron: { ko: '주문 문장의 억양과 would의 축약 발음', en: 'the intonation of an order and the reduction of would' },
+      output: { ko: '알레르기를 밝히고 대안을 요청하는 한 문장', en: 'Name an allergy and ask for an alternative in one sentence' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1811,6 +2072,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '표를 사고, 갈아타고, 길을 묻는 최소한의 문장을 익힙니다.',
       en: 'The minimum you need to buy a ticket, change lines and ask for directions.'
+    },
+    plan: {
+      goals: {
+        ko: ['표를 사고 시간과 승강장을 확인합니다.', '갈아타는 곳을 묻고 안내를 따라갑니다.', '길을 묻고 들은 설명을 되짚어 확인합니다.'],
+        en: ['Buy a ticket and check the time and platform.', 'Ask where to change and follow the directions.', 'Ask the way and repeat the answer back to be sure.']
+      },
+      grammar: { ko: '전치사로 말하는 이동 (to·from·via)', en: 'prepositions of movement: to, from and via' },
+      words: { ko: '교통·방향 어휘 10개', en: 'ten words for transport and directions' },
+      pron: { ko: '지명과 정류장 이름의 강세와 연음', en: 'stress and linking in place and stop names' },
+      output: { ko: '두 번 갈아타는 길을 순서대로 설명하기', en: 'Explain a route with two changes, in order' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1823,6 +2095,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '약속을 잡고, 옮기고, 미안하다고 말하는 표현을 다룹니다.',
       en: 'Make a plan, move it, and apologise for cancelling without sounding stiff.'
+    },
+    plan: {
+      goals: {
+        ko: ['약속을 잡고 시간과 장소를 확정합니다.', '일정을 옮기자고 정중하게 제안합니다.', '취소를 알리고 사과합니다.'],
+        en: ['Make a plan and fix the time and place.', 'Suggest moving a plan politely.', 'Cancel and apologise without sounding stiff.']
+      },
+      grammar: { ko: '미래 표현 will·be going to·현재진행의 쓰임 구분', en: 'future forms: will, be going to and the present continuous' },
+      words: { ko: '약속·일정 어휘 10개', en: 'ten words for plans and schedules' },
+      pron: { ko: '시간 표현의 약화 (at seven의 at)', en: 'weak forms in time phrases' },
+      output: { ko: '약속을 하루 미루자고 제안하는 짧은 통화', en: 'A short call that moves a plan by one day' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1835,6 +2118,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '전화에서 놓친 부분을 되묻고, 요지를 남기는 표현을 익힙니다.',
       en: 'Ask people to repeat what you missed on a call and leave a clear message.'
+    },
+    plan: {
+      goals: {
+        ko: ['전화에서 놓친 부분을 정중하게 되묻습니다.', '들은 숫자와 이름을 소리 내어 확인합니다.', '용건과 연락처를 남기고 끊습니다.'],
+        en: ['Ask someone to repeat what you missed on a call.', 'Read numbers and names back to confirm them.', 'Leave the point and a number before you hang up.']
+      },
+      grammar: { ko: '의문문의 간접화법 (Could you tell me ~)', en: 'indirect questions with Could you tell me' },
+      words: { ko: '통화·메시지 어휘 10개', en: 'ten words for calls and messages' },
+      pron: { ko: '전화에서 흐려지는 자음과 축약', en: 'reductions and unclear consonants on a call' },
+      output: { ko: '30초 음성 메시지 한 통 남기기', en: 'Leave a thirty-second voice message' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1847,6 +2141,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '아픈 곳을 설명하고, 약국에서 약을 묻고, 예약을 잡습니다.',
       en: 'Describe what hurts, ask at a pharmacy and book an appointment.'
+    },
+    plan: {
+      goals: {
+        ko: ['증상을 아픈 곳과 기간으로 설명합니다.', '약국에서 약과 복용법을 묻습니다.', '진료 예약을 잡고 보험을 확인합니다.'],
+        en: ['Describe a symptom by place and duration.', 'Ask at a pharmacy about medicine and how to take it.', 'Book an appointment and check insurance.']
+      },
+      grammar: { ko: '현재완료 진행형 (I have been coughing)', en: 'the present perfect continuous' },
+      words: { ko: '증상·진료 어휘 10개', en: 'ten words for symptoms and treatment' },
+      pron: { ko: '아픈 곳을 말할 때의 강세와 끊어 읽기', en: 'stress and pausing when naming what hurts' },
+      output: { ko: '증상을 세 문장으로 설명하고 예약 잡기', en: 'Describe a symptom in three sentences and book a visit' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1859,6 +2164,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '집을 구하고, 문제를 알리고, 이웃과 가볍게 인사하는 표현을 다룹니다.',
       en: 'Find a place, report a problem and make small talk with neighbours.'
+    },
+    plan: {
+      goals: {
+        ko: ['집의 조건과 문제를 설명합니다.', '집주인이나 관리실에 수리를 요청합니다.', '이웃과 인사하고 도움을 주고받습니다.'],
+        en: ['Describe a place and the problem with it.', 'Ask a landlord or building office for a repair.', 'Greet neighbours and offer or accept help.']
+      },
+      grammar: { ko: 'there is / there are와 수량 표현', en: 'there is and there are with quantity words' },
+      words: { ko: '집·수리·이웃 어휘 10개', en: 'ten words for housing, repairs and neighbours' },
+      pron: { ko: '축약 (there is → there s)과 문장 강세', en: 'contractions and sentence stress' },
+      output: { ko: '수리를 요청하는 짧은 메시지 남기기', en: 'Leave a short message asking for a repair' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1871,6 +2187,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '취미를 소개하고, 같이 하자고 권하고, 일정을 맞추는 표현을 익힙니다.',
       en: 'Talk about hobbies, invite someone along and agree on a time.'
+    },
+    plan: {
+      goals: {
+        ko: ['취미를 소개하고 얼마나 자주 하는지 말합니다.', '상대를 같이 하자고 권합니다.', '시간과 장소를 맞춥니다.'],
+        en: ['Introduce a hobby and say how often you do it.', 'Invite someone to join you.', 'Agree on a time and a place.']
+      },
+      grammar: { ko: '빈도 부사와 enjoy + -ing', en: 'adverbs of frequency and enjoy plus -ing' },
+      words: { ko: '취미·운동 어휘 10개', en: 'ten words for hobbies and sport' },
+      pron: { ko: '권유 문장의 억양 (Do you want to ~)', en: 'the intonation of an invitation' },
+      output: { ko: '같이 하자고 권하고 일정을 맞추는 대화 한 장', en: 'One dialogue that invites someone and sets a time' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1883,6 +2210,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '1분기의 어휘·구동사·문법을 다시 풀며 약한 곳을 찾습니다.',
       en: 'Revisit the words, phrasal verbs and grammar of Q1 and find the weak spots.'
+    },
+    plan: {
+      goals: {
+        ko: ['1분기 어휘와 구동사를 다시 꺼내 씁니다.', '약한 문법 항목을 스스로 찾아냅니다.', '저장한 표현으로 짧은 자기 점검을 합니다.'],
+        en: ['Recall the words and phrasal verbs of Q1.', 'Find your weak grammar points yourself.', 'Self-check with the expressions you saved.']
+      },
+      grammar: { ko: '1분기 문법 총정리 (현재완료·미래·수량)', en: 'a recap of Q1 grammar: perfect, future and quantity' },
+      words: { ko: '1~12주 누적 어휘 복습', en: 'cumulative vocabulary from weeks one to twelve' },
+      pron: { ko: '1분기 발음 포인트 다시 듣기', en: 'revisiting the pronunciation points of Q1' },
+      output: { ko: '1분기에서 가장 약한 섹션 하나를 골라 다시 풀기', en: 'Pick your weakest section of Q1 and do it again' },
+      parts: { ko: '약 10개 섹션 — 누적 어휘 복습·문법 정리·오답 점검·받아쓰기·종합 퀴즈', en: 'about ten sections: cumulative vocabulary, a grammar recap, missed questions, dictation and a full quiz' }
     }
   },
 
@@ -1897,6 +2235,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '요청과 기한과 맺음말을 다섯 줄 안에 넣는 메일 공식을 다룹니다.',
       en: 'Fit the request, the deadline and the sign-off into five lines.'
+    },
+    plan: {
+      goals: {
+        ko: ['메일 첫 줄에 요청과 기한을 함께 넣습니다.', '정중하게 재촉하고 답장 기한을 제안합니다.', '다섯 줄 안에 맺음말까지 마칩니다.'],
+        en: ['Put the request and the deadline in the first line.', 'Chase politely and suggest a reply date.', 'Close the email inside five lines.']
+      },
+      grammar: { ko: '수동태와 격식 있는 정형 표현 (Please find attached)', en: 'the passive and formal set phrases' },
+      words: { ko: '이메일 표제·맺음말 어휘 10개', en: 'ten words for email subjects and sign-offs' },
+      pron: { ko: '읽어도 자연스러운 문장 부호와 쉼', en: 'pausing and punctuation that read well aloud' },
+      output: { ko: '요청·기한·맺음말이 든 다섯 줄 메일 한 통', en: 'A five-line email with a request, a deadline and a sign-off' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1909,6 +2258,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '회의에서 의견을 내고, 끼어들고, 요약해 마무리하는 표현을 익힙니다.',
       en: 'Put an idea forward, cut in politely and summarise before you close.'
+    },
+    plan: {
+      goals: {
+        ko: ['의견을 부드럽게 내고 근거를 붙입니다.', '남의 말에 끼어들어 동의·반대를 표시합니다.', '회의 끝에 결정과 다음 단계를 요약합니다.'],
+        en: ['Put an idea forward with a reason.', 'Cut in to agree or disagree.', 'Summarise decisions and next steps at the end.']
+      },
+      grammar: { ko: '의견 표현과 완곡한 반대 (I see your point, but)', en: 'opinion frames and soft disagreement' },
+      words: { ko: '회의 진행 어휘 10개', en: 'ten words for running a meeting' },
+      pron: { ko: '끼어들 때 쓰는 신호 억양 (Sorry, can I just ~)', en: 'the intonation that signals you want to speak' },
+      output: { ko: '3분 발표를 열고 닫는 두 문장', en: 'An opening and a closing line for a three-minute talk' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1921,6 +2281,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '조건을 제시하고, 양보하고, 대안을 요구하는 표현을 다룹니다.',
       en: 'Offer terms, give ground and ask for another option.'
+    },
+    plan: {
+      goals: {
+        ko: ['조건을 제시하고 상대 조건을 확인합니다.', '양보할 것과 지킬 것을 구분해 말합니다.', '대안을 요구하고 합의점을 문장으로 남깁니다.'],
+        en: ['Offer terms and check the conditions on the other side.', 'Separate what you can give from what you cannot.', 'Ask for an alternative and put the agreement in writing.']
+      },
+      grammar: { ko: '조건문과 가정 표현 (If you could ~, we would ~)', en: 'conditionals in negotiation' },
+      words: { ko: '협상·계약 어휘 10개', en: 'ten words for negotiation and terms' },
+      pron: { ko: '숫자와 조건에 두는 강세', en: 'stressing numbers and conditions' },
+      output: { ko: '가격과 납기를 주고받는 협상 대화 한 장', en: 'One dialogue trading price and delivery time' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1933,6 +2304,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '증가와 감소와 비율을 문장으로 옮기고 근거를 붙이는 법을 익힙니다.',
       en: 'Turn rises, falls and shares into sentences, and attach the evidence.'
+    },
+    plan: {
+      goals: {
+        ko: ['증가·감소·비율을 문장으로 옮깁니다.', '수치에 근거와 출처를 붙입니다.', '그래프를 보고 한 문단으로 요약합니다.'],
+        en: ['Turn rises, falls and shares into sentences.', 'Attach a source to every figure.', 'Summarise a chart in one paragraph.']
+      },
+      grammar: { ko: '비교급과 배수 표현 (twice as many as)', en: 'comparatives and multiples' },
+      words: { ko: '수치·추세 어휘 10개', en: 'ten words for figures and trends' },
+      pron: { ko: '큰 숫자와 퍼센트 읽기', en: 'reading large numbers and percentages' },
+      output: { ko: '그래프 한 장을 근거와 함께 세 문장으로 설명', en: 'Explain one chart in three sentences with evidence' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1945,6 +2327,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '경험을 결과 중심으로 말하고, 어려운 질문을 되받는 표현을 다룹니다.',
       en: 'Talk about experience in terms of results and handle hard questions.'
+    },
+    plan: {
+      goals: {
+        ko: ['경험을 결과 중심으로 말합니다.', '약점 질문에 사실과 배움으로 답합니다.', '어려운 질문을 되받아 시간을 법니다.'],
+        en: ['Talk about experience in terms of results.', 'Answer a weakness question with a fact and a lesson.', 'Buy time on a hard question without dodging it.']
+      },
+      grammar: { ko: '과거 경험 서술과 결과 절 (I led ~ and as a result)', en: 'narrating experience with result clauses' },
+      words: { ko: '면접 질문·평가 어휘 10개', en: 'ten words for interview questions and assessment' },
+      pron: { ko: '답변 첫 문장을 또렷하게 시작하기', en: 'starting an answer with a clear first line' },
+      output: { ko: '경험을 90초 답변으로 정리하기', en: 'Shape one experience into a ninety-second answer' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1957,6 +2350,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '이력서 요약과 30초 자기소개를 영어로 정리합니다.',
       en: 'Write your summary line and a thirty-second introduction.'
+    },
+    plan: {
+      goals: {
+        ko: ['한 문단 프로필을 씁니다.', '30초 자기소개를 말합니다.', '강점을 수치로 뒷받침합니다.'],
+        en: ['Write a one-paragraph profile.', 'Give a thirty-second introduction.', 'Back a strength with a number.']
+      },
+      grammar: { ko: '주어를 생략한 이력서 문장 (Led a team of six)', en: 'resume lines without a subject' },
+      words: { ko: '직무·성과 어휘 10개', en: 'ten words for roles and achievements' },
+      pron: { ko: '강점을 말할 때의 속도와 강세', en: 'pace and stress when naming a strength' },
+      output: { ko: '내 이력서 요약 한 문단과 30초 소개', en: 'Your own profile paragraph and a thirty-second intro' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1969,6 +2373,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '화상회의에서 순서를 잡고, 화면을 공유하고, 연결 문제를 설명합니다.',
       en: 'Take turns on a call, share a screen and explain a connection problem.'
+    },
+    plan: {
+      goals: {
+        ko: ['화상회의에서 순서를 잡고 양해를 구합니다.', '연결 문제를 설명하고 대안을 제안합니다.', '화면 공유와 파일 전달을 말로 안내합니다.'],
+        en: ['Take turns on a call and ask for the floor.', 'Explain a connection problem and offer a fix.', 'Talk someone through a screen share.']
+      },
+      grammar: { ko: '진행형과 현재완료로 말하는 실시간 상태', en: 'continuous and perfect forms for live problems' },
+      words: { ko: '화상회의·협업 도구 어휘 10개', en: 'ten words for calls and collaboration tools' },
+      pron: { ko: '화면 공유 중 자주 쓰는 짧은 지시문', en: 'short instructions during a screen share' },
+      output: { ko: '연결이 끊긴 상황을 설명하는 세 문장', en: 'Three sentences that explain a dropped connection' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1981,6 +2396,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '불만을 듣고, 사과하고, 대안을 제시하는 표현을 다룹니다.',
       en: 'Take a complaint, apologise and offer a concrete alternative.'
+    },
+    plan: {
+      goals: {
+        ko: ['불만을 끝까지 듣고 요점을 되짚습니다.', '책임을 인정하고 사과합니다.', '대안과 처리 기한을 제시합니다.'],
+        en: ['Hear a complaint out and repeat the point back.', 'Own the problem and apologise.', 'Offer an alternative with a date.']
+      },
+      grammar: { ko: '공손한 사과와 요청 (I am sorry that ~)', en: 'apologies and polite requests' },
+      words: { ko: '응대·보상 어휘 10개', en: 'ten words for service and compensation' },
+      pron: { ko: '사과 문장의 억양과 속도', en: 'the pace and intonation of an apology' },
+      output: { ko: '불만 전화에 답하는 네 문장 스크립트', en: 'A four-line script for answering a complaint' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -1993,6 +2419,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '진행 상황을 알리고, 지연을 알리고, 우선순위를 합의합니다.',
       en: 'Report progress, flag a delay and agree on what comes first.'
+    },
+    plan: {
+      goals: {
+        ko: ['진행 상황을 한 문장으로 보고합니다.', '지연과 그 이유를 사실만으로 알립니다.', '우선순위를 합의해 순서를 정합니다.'],
+        en: ['Report progress in one sentence.', 'Flag a delay with the reason, without excuses.', 'Agree on what comes first.']
+      },
+      grammar: { ko: '현재완료와 시간 전치사 (by·until·within)', en: 'the perfect with by, until and within' },
+      words: { ko: '프로젝트·일정 어휘 10개', en: 'ten words for projects and schedules' },
+      pron: { ko: '날짜와 마감을 말할 때의 강세', en: 'stress when naming dates and deadlines' },
+      output: { ko: '일주일 진행 보고 세 문장', en: 'A three-line weekly progress report' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2005,6 +2442,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '문제를 사실과 추측으로 나눠 설명하고 해결책을 제안합니다.',
       en: 'Separate facts from guesses and propose a fix.'
+    },
+    plan: {
+      goals: {
+        ko: ['사실과 추측을 나눠 설명합니다.', '원인을 하나씩 짚어 확인합니다.', '해결책과 그 부작용을 함께 제안합니다.'],
+        en: ['Separate facts from guesses.', 'Check causes one at a time.', 'Propose a fix and name its side effect.']
+      },
+      grammar: { ko: '추측의 조동사 (must have, might be, seems to)', en: 'modals of deduction' },
+      words: { ko: '문제·원인 어휘 10개', en: 'ten words for problems and causes' },
+      pron: { ko: '강조로 가르는 확신과 의심', en: 'stress that marks certainty and doubt' },
+      output: { ko: '장애 원인을 사실과 추측으로 나눠 세 문장', en: 'Three sentences that split fact from guess' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2017,6 +2465,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '상대를 공격하지 않고 지적하고, 같은 말을 받아들이는 표현을 익힙니다.',
       en: 'Point out a problem without attacking, and take the same in return.'
+    },
+    plan: {
+      goals: {
+        ko: ['상대를 공격하지 않고 문제를 짚습니다.', '구체적 예와 대안을 함께 줍니다.', '받은 피드백을 되풀이해 이해를 확인합니다.'],
+        en: ['Point out a problem without attacking.', 'Give an example and a suggestion together.', 'Repeat feedback back to check you understood.']
+      },
+      grammar: { ko: '완곡한 지적 (It might help if ~)', en: 'softening structures for criticism' },
+      words: { ko: '피드백 어휘 10개', en: 'ten words for giving and taking feedback' },
+      pron: { ko: '부드럽게 만드는 억양과 속도', en: 'intonation and pace that keep it soft' },
+      output: { ko: '동료에게 주는 세 문장 피드백', en: 'Three sentences of feedback for a colleague' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2029,6 +2488,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '짧게 매일 하는 학습 계획을 세우고 영어로 설명합니다.',
       en: 'Build a short daily routine and explain it in English.'
+    },
+    plan: {
+      goals: {
+        ko: ['하루 학습 루틴을 영어로 설명합니다.', '목표를 기간과 함께 세웁니다.', '막혔을 때 쓸 방법을 말합니다.'],
+        en: ['Explain a daily study routine in English.', 'Set a goal with a period attached.', 'Describe what you do when you get stuck.']
+      },
+      grammar: { ko: '습관 표현 (I try to ~, I have been ~ing)', en: 'habits with try to and the perfect continuous' },
+      words: { ko: '학습·습관 어휘 10개', en: 'ten words for studying and habits' },
+      pron: { ko: '자기 계획을 말할 때의 리듬', en: 'the rhythm of describing your own plan' },
+      output: { ko: '내 넉 주 학습 계획을 다섯 문장으로', en: 'Your four-week study plan in five sentences' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2041,6 +2511,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '2분기의 업무 표현을 다시 풀고 약한 곳을 보완합니다.',
       en: 'Revisit the work English of Q2 and patch the weak spots.'
+    },
+    plan: {
+      goals: {
+        ko: ['2분기 업무 표현을 다시 씁니다.', '이메일과 회의 표현을 스스로 점검합니다.', '약한 문법 항목을 골라 보완합니다.'],
+        en: ['Reuse the work expressions of Q2.', 'Check your email and meeting language yourself.', 'Pick weak grammar points and patch them.']
+      },
+      grammar: { ko: '2분기 문법 총정리 (조동사·수동태·조건문)', en: 'a recap of Q2 grammar: modals, the passive and conditionals' },
+      words: { ko: '13~25주 누적 어휘 복습', en: 'cumulative vocabulary from weeks thirteen to twenty-five' },
+      pron: { ko: '2분기 발음 포인트 다시 듣기', en: 'revisiting the pronunciation points of Q2' },
+      output: { ko: '실제 업무 메일 한 통을 다시 써 보기', en: 'Rewrite one real email from your own work' },
+      parts: { ko: '약 10개 섹션 — 누적 어휘 복습·문법 정리·오답 점검·받아쓰기·종합 퀴즈', en: 'about ten sections: cumulative vocabulary, a grammar recap, missed questions, dictation and a full quiz' }
     }
   },
 
@@ -2055,6 +2536,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '두 기사를 비교하며 사실과 논평을 구분하는 법을 익힙니다.',
       en: 'Compare two reports and tell fact from opinion.'
+    },
+    plan: {
+      goals: {
+        ko: ['두 기사를 같은 사건으로 놓고 비교해 읽습니다.', '사실 진술과 논평을 구분합니다.', '표현 차이가 만드는 인상을 설명합니다.'],
+        en: ['Read two reports on one event side by side.', 'Sort factual statements from opinion.', 'Explain the impression a word choice creates.']
+      },
+      grammar: { ko: '인용과 전달 표현 (according to, is said to)', en: 'reporting structures' },
+      words: { ko: '미디어·논평 어휘 10개', en: 'ten words for media and commentary' },
+      pron: { ko: '인용문과 직접 화법의 억양 차이', en: 'intonation in reported and direct speech' },
+      output: { ko: '기사 두 편을 비교하는 네 문장 요약', en: 'A four-line comparison of two articles' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2067,6 +2559,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '스포일러 없이 줄거리를 말하고 추천하는 표현을 다룹니다.',
       en: 'Describe a plot without spoilers and recommend it.'
+    },
+    plan: {
+      goals: {
+        ko: ['스포일러 없이 줄거리를 소개합니다.', '장르와 분위기를 형용사로 말합니다.', '추천과 비추천의 이유를 붙입니다.'],
+        en: ['Describe a plot without spoilers.', 'Name the genre and mood with adjectives.', 'Recommend or warn off, with a reason.']
+      },
+      grammar: { ko: '관계절로 설명 붙이기 (a film that ~)', en: 'relative clauses for description' },
+      words: { ko: '영화·드라마 어휘 10개', en: 'ten words for film and TV' },
+      pron: { ko: '형용사 강세와 감탄 억양', en: 'adjective stress and emphatic intonation' },
+      output: { ko: '본 작품 하나를 스포일러 없이 다섯 문장으로 소개', en: 'One title described in five spoiler-free sentences' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2079,6 +2582,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '공연을 예매하고, 감상을 형용사로 나누는 표현을 익힙니다.',
       en: 'Book a show and talk about it with the right adjectives.'
+    },
+    plan: {
+      goals: {
+        ko: ['공연을 예매하고 좌석과 시간을 확인합니다.', '감상을 형용사와 비교로 나눕니다.', '상대 취향을 묻고 추천을 주고받습니다.'],
+        en: ['Book a show and check seats and times.', 'Share a reaction with adjectives and comparisons.', 'Ask about taste and exchange recommendations.']
+      },
+      grammar: { ko: '비교와 최상급 (not as good as, the best I have seen)', en: 'comparison and superlatives' },
+      words: { ko: '음악·공연 어휘 10개', en: 'ten words for music and live shows' },
+      pron: { ko: '감상 표현의 강세와 속도', en: 'stress and pace in reactions' },
+      output: { ko: '공연 후기를 네 문장으로 말하기', en: 'A four-sentence review of a show you saw' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2091,6 +2605,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '경기 규칙과 결과를 설명하고 응원하는 표현을 다룹니다.',
       en: 'Explain a rule, report a score and cheer someone on.'
+    },
+    plan: {
+      goals: {
+        ko: ['경기 규칙과 진행을 설명합니다.', '점수와 결과를 정확히 보고합니다.', '응원과 격려를 자연스럽게 말합니다.'],
+        en: ['Explain a rule and how a game flows.', 'Report a score and a result accurately.', 'Cheer someone on naturally.']
+      },
+      grammar: { ko: '수동태로 말하는 경기 결과 (was beaten, was awarded)', en: 'the passive for match results' },
+      words: { ko: '스포츠·경기 어휘 10개', en: 'ten words for sport and matches' },
+      pron: { ko: '점수 읽기와 팀 이름 강세', en: 'reading scores and stressing team names' },
+      output: { ko: '경기 하나를 규칙·결과·소감 순서로 다섯 문장', en: 'One match in five sentences: rule, result, reaction' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2103,6 +2628,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '기술의 원리를 쉬운 문장으로 설명하는 연습을 합니다.',
       en: 'Practise explaining how a technology works in plain sentences.'
+    },
+    plan: {
+      goals: {
+        ko: ['기술의 원리를 쉬운 문장으로 설명합니다.', '전문용어를 일상어로 바꿔 말합니다.', '한계와 위험을 사실대로 밝힙니다.'],
+        en: ['Explain how a technology works in plain sentences.', 'Swap technical terms for everyday words.', 'State the limits and risks honestly.']
+      },
+      grammar: { ko: '정의와 설명의 구조 (X is a ~ that ~)', en: 'definition and explanation structures' },
+      words: { ko: '과학·기술 어휘 10개', en: 'ten words for science and technology' },
+      pron: { ko: '긴 전문용어의 강세 위치', en: 'stress placement in long technical words' },
+      output: { ko: '내 분야 기술 하나를 90초로 설명하기', en: 'Explain one technology from your field in ninety seconds' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2115,6 +2651,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '환경 지표와 책임 주체를 영어로 정확하게 말합니다.',
       en: 'Talk about environmental figures and who is responsible.'
+    },
+    plan: {
+      goals: {
+        ko: ['환경 지표를 정확한 수치로 말합니다.', '책임 주체를 분명히 밝힙니다.', '원인과 결과를 구분해 설명합니다.'],
+        en: ['Quote environmental figures accurately.', 'Name who is responsible.', 'Separate causes from consequences.']
+      },
+      grammar: { ko: '인과 표현 (leads to, results in, is driven by)', en: 'cause and effect structures' },
+      words: { ko: '환경·기후 어휘 10개', en: 'ten words for environment and climate' },
+      pron: { ko: '수치와 단위를 붙여 읽기', en: 'reading figures with their units' },
+      output: { ko: '지표 하나를 원인·결과·책임으로 세 문장', en: 'One figure in three sentences: cause, effect, responsibility' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2127,6 +2674,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '찬반 주장을 근거와 함께 정리하는 표현을 익힙니다.',
       en: 'Lay out both sides of an argument with reasons.'
+    },
+    plan: {
+      goals: {
+        ko: ['찬반 양쪽 주장을 공평하게 정리합니다.', '내 입장을 근거와 함께 말합니다.', '반대 근거를 인정하고 답합니다.'],
+        en: ['Lay out both sides fairly.', 'State your position with reasons.', 'Acknowledge the counter-argument and answer it.']
+      },
+      grammar: { ko: '양보와 반박 (While it is true that ~, ~)', en: 'concession and rebuttal' },
+      words: { ko: '사회·정책 어휘 10개', en: 'ten words for social issues and policy' },
+      pron: { ko: '주장 문장의 강세와 속도 조절', en: 'stress and pacing in an argument' },
+      output: { ko: '한 쟁점의 찬반을 각각 세 문장으로', en: 'Both sides of one issue, three sentences each' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2139,6 +2697,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '과거 사건을 시간 순서와 인과로 설명하는 표현을 다룹니다.',
       en: 'Describe past events in order and link cause to effect.'
+    },
+    plan: {
+      goals: {
+        ko: ['사건을 시간 순서로 설명합니다.', '원인과 결과를 연결합니다.', '인물의 선택과 배경을 설명합니다.'],
+        en: ['Describe events in chronological order.', 'Link causes to effects.', 'Explain a person choices and the context around them.']
+      },
+      grammar: { ko: '과거완료와 시간 연결어 (by the time, after)', en: 'the past perfect with time linkers' },
+      words: { ko: '역사·인물 어휘 10개', en: 'ten words for history and people' },
+      pron: { ko: '연도와 세기 읽기', en: 'reading years and centuries' },
+      output: { ko: '사건 하나를 시간 순서로 다섯 문장', en: 'One event in five sentences, in order' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2151,6 +2720,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '작품에서 받은 인상을 말하고 그 이유를 붙이는 연습을 합니다.',
       en: 'Say what a piece makes you feel and why.'
+    },
+    plan: {
+      goals: {
+        ko: ['작품에서 받은 인상을 말합니다.', '그 이유를 형태·색·재료로 설명합니다.', '취향과 평가를 구분해 말합니다.'],
+        en: ['Say what a piece makes you feel.', 'Explain why with shape, colour and material.', 'Separate taste from judgement.']
+      },
+      grammar: { ko: '감각 동사와 형용사 배열 (looks like, feels)', en: 'sense verbs and adjective order' },
+      words: { ko: '예술·디자인 어휘 10개', en: 'ten words for art and design' },
+      pron: { ko: '묘사 문장의 리듬과 쉼', en: 'rhythm and pausing in description' },
+      output: { ko: '작품 하나를 인상·이유·평가로 네 문장', en: 'One piece in four sentences: impression, reason, view' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2163,6 +2743,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '짧은 글과 시를 천천히 읽으며 뉘앙스를 짙어 봅니다.',
       en: 'Read a short passage or poem slowly and name the nuance.'
+    },
+    plan: {
+      goals: {
+        ko: ['짧은 글을 천천히 읽고 뉘앙스를 짚습니다.', '비유와 상징을 자기 말로 풉니다.', '문장 리듬이 만드는 효과를 말합니다.'],
+        en: ['Read a short passage slowly and name the nuance.', 'Unpack metaphor and symbol in your own words.', 'Describe what a rhythm does to a line.']
+      },
+      grammar: { ko: '도치와 생략으로 만드는 문학적 문장', en: 'inversion and ellipsis in literary prose' },
+      words: { ko: '문학·비평 어휘 10개', en: 'ten words for literature and criticism' },
+      pron: { ko: '시를 소리 내어 읽는 법 (쉼과 강세)', en: 'reading poetry aloud: pause and stress' },
+      output: { ko: '짧은 시 한 편을 읽고 세 문장 감상', en: 'Three sentences on one short poem' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2175,6 +2766,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '농담이 어디서 웃긴지 영어로 설명할 수 있게 됩니다.',
       en: 'Explain in English where a joke actually lands.'
+    },
+    plan: {
+      goals: {
+        ko: ['농담이 어디서 웃긴지 설명합니다.', '풍자와 비꼬는 말투를 알아듣습니다.', '상황에 맞는 농담을 골라 씁니다.'],
+        en: ['Explain where a joke lands.', 'Recognise satire and dry humour.', 'Pick a joke that fits the room.']
+      },
+      grammar: { ko: '과장과 축소 표현 (the worst thing ever)', en: 'hyperbole and understatement' },
+      words: { ko: '유머·풍자 어휘 10개', en: 'ten words for humour and satire' },
+      pron: { ko: '비꼬는 억양과 진짜 감탄의 차이', en: 'the intonation of sarcasm versus real surprise' },
+      output: { ko: '내가 좋아하는 농담 하나를 영어로 풀어 말하기', en: 'Explain a joke you like in English' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2187,6 +2789,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '동의하지 않는다는 것을 정중하게 말하는 표현을 익힙니다.',
       en: 'Say you disagree without damaging the relationship.'
+    },
+    plan: {
+      goals: {
+        ko: ['동의하지 않는다는 것을 정중하게 말합니다.', '상대 논리를 요약해 확인합니다.', '관계를 지키면서 입장을 유지합니다.'],
+        en: ['Say you disagree without damaging the relationship.', 'Summarise the other position back to them.', 'Hold your ground and stay friendly.']
+      },
+      grammar: { ko: '헤지 표현과 완곡한 반대 (I am not sure that follows)', en: 'hedging and polite disagreement' },
+      words: { ko: '토론·의견 어휘 10개', en: 'ten words for debate and opinion' },
+      pron: { ko: '반대할 때 낮추는 억양', en: 'the lowered intonation of disagreement' },
+      output: { ko: '동의하지 않는 두 문장과 그 이유', en: 'Two sentences of disagreement with a reason' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2199,6 +2812,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '3분기의 읽기와 토론 표현을 다시 점검합니다.',
       en: 'Revisit the reading and discussion English of Q3.'
+    },
+    plan: {
+      goals: {
+        ko: ['3분기 읽기 표현을 다시 씁니다.', '토론에서 쓴 문장을 스스로 점검합니다.', '약한 독해·문법을 보완합니다.'],
+        en: ['Reuse the reading language of Q3.', 'Check the sentences you used in discussion.', 'Patch weak reading and grammar points.']
+      },
+      grammar: { ko: '3분기 문법 총정리 (관계절·인과·양보)', en: 'a recap of Q3 grammar: relatives, cause and concession' },
+      words: { ko: '27~38주 누적 어휘 복습', en: 'cumulative vocabulary from weeks twenty-seven to thirty-eight' },
+      pron: { ko: '3분기 발음 포인트 다시 듣기', en: 'revisiting the pronunciation points of Q3' },
+      output: { ko: '3분기 독해 한 편을 기억으로 다시 요약하기', en: 'Summarise one Q3 reading again from memory' },
+      parts: { ko: '약 10개 섹션 — 누적 어휘 복습·문법 정리·오답 점검·받아쓰기·종합 퀴즈', en: 'about ten sections: cumulative vocabulary, a grammar recap, missed questions, dictation and a full quiz' }
     }
   },
 
@@ -2213,6 +2837,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '슬라이드를 문장으로 옮기고 발표를 여는 표현을 다룹니다.',
       en: 'Turn slides into lines and open a talk with confidence.'
+    },
+    plan: {
+      goals: {
+        ko: ['슬라이드를 문장이 아니라 메시지로 바꿉니다.', '발표를 여는 한 문장과 순서 안내를 만듭니다.', '질문을 받고 답을 정리해 마무리합니다.'],
+        en: ['Turn slides into messages rather than sentences.', 'Open a talk in one line and signpost the order.', 'Take questions and close with a summary.']
+      },
+      grammar: { ko: '순서를 잡는 표현 (First, then, to sum up)', en: 'signposting language' },
+      words: { ko: '발표·슬라이드 어휘 10개', en: 'ten words for presentations and slides' },
+      pron: { ko: '속도와 쉼으로 만드는 발표 리듬', en: 'pace and pausing in a talk' },
+      output: { ko: '열 장 슬라이드를 열 문장으로 줄이기', en: 'Compress ten slides into ten lines' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2225,6 +2860,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '회의를 진행하고, 결정을 정리하고, 다음 단계를 남깁니다.',
       en: 'Lead the call, record the decisions and leave clear next steps.'
+    },
+    plan: {
+      goals: {
+        ko: ['회의를 열고 안건과 시간을 안내합니다.', '결정과 담당자를 그 자리에서 정리합니다.', '다음 단계와 기한을 남기고 닫습니다.'],
+        en: ['Open a call and set the agenda and the time.', 'Record decisions and owners on the spot.', 'Close with next steps and dates.']
+      },
+      grammar: { ko: '진행을 맡는 표현 (Shall we start with ~)', en: 'facilitation structures' },
+      words: { ko: '회의 진행·결정 어휘 10개', en: 'ten words for running and closing a call' },
+      pron: { ko: '확인 질문의 억양과 되묻기', en: 'the intonation of checks and clarifications' },
+      output: { ko: '30분 회의를 열고 닫는 다섯 문장', en: 'Five lines that open and close a thirty-minute call' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2237,6 +2883,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '가격과 조건을 끝까지 조율하는 회화를 연습합니다.',
       en: 'Work through price and terms all the way to your walk-away point.'
+    },
+    plan: {
+      goals: {
+        ko: ['가격과 조건을 단계적으로 조율합니다.', '양보에는 반대급부를 분명히 요구합니다.', '합의점과 이탈 조건을 문장으로 남깁니다.'],
+        en: ['Work through price and terms step by step.', 'Ask for something in return for every concession.', 'Write down the agreement and the walk-away point.']
+      },
+      grammar: { ko: '가정과 조건의 조합 (If we ~, could you ~)', en: 'stacked conditionals' },
+      words: { ko: '협상 실전 어휘 10개', en: 'ten words for real negotiation' },
+      pron: { ko: '숫자와 마감을 또렷하게 강조하기', en: 'stressing numbers and deadlines clearly' },
+      output: { ko: '가격·납기·보증을 주고받는 협상 한 판', en: 'One negotiation over price, delivery and warranty' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2249,6 +2906,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '한 문단 에세이의 뼈대를 영어로 세우는 연습을 합니다.',
       en: 'Build the skeleton of a one-paragraph essay in English.'
+    },
+    plan: {
+      goals: {
+        ko: ['주장과 근거와 결론을 한 문단에 넣습니다.', '연결어로 문장을 잇습니다.', '반대 근거를 한 문장으로 처리합니다.'],
+        en: ['Fit claim, evidence and conclusion into one paragraph.', 'Link sentences with clear connectors.', 'Handle a counter-argument in one sentence.']
+      },
+      grammar: { ko: '문단 구조와 연결어 (However, Therefore, In short)', en: 'paragraph structure and connectors' },
+      words: { ko: '에세이·논증 어휘 10개', en: 'ten words for essays and argument' },
+      pron: { ko: '쓴 문장을 소리 내어 점검하기', en: 'reading your own sentence aloud to test it' },
+      output: { ko: '100단어 한 문단 에세이 한 편', en: 'One hundred words of a single-paragraph essay' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2261,6 +2929,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '토익 파트별 시간 배분과 자주 나오는 함정을 정리합니다.',
       en: 'Budget time by part and learn the standard traps.'
+    },
+    plan: {
+      goals: {
+        ko: ['파트별 시간 배분을 정합니다.', '자주 나오는 함정을 알아봅니다.', '오답 유형을 스스로 분류합니다.'],
+        en: ['Set a time budget for each part.', 'Recognise the standard traps.', 'Sort your wrong answers by type.']
+      },
+      grammar: { ko: '시험 빈출 문법 (수일치·시제·전치사)', en: 'high-frequency grammar for tests' },
+      words: { ko: '시험 빈출 어휘 10개', en: 'ten high-frequency test words' },
+      pron: { ko: '듣기 파트의 숫자·시간 표현 잡아내기', en: 'catching figures and times in the listening part' },
+      output: { ko: '파트별 시간표 한 장 만들기', en: 'Draw up a time budget for each part' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2273,6 +2952,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '말하기 시험에서 15초 안에 답을 구성하는 틀을 익힙니다.',
       en: 'Use a frame to build an answer within fifteen seconds.'
+    },
+    plan: {
+      goals: {
+        ko: ['15초 안에 답의 뼈대를 만듭니다.', '시간을 버는 표현으로 시작을 법니다.', '답을 두 문장으로 마무리합니다.'],
+        en: ['Build the frame of an answer in fifteen seconds.', 'Buy time at the start without stalling.', 'Close the answer in two sentences.']
+      },
+      grammar: { ko: '즉답용 문장 틀 (In my view ~ because ~)', en: 'answer frames for quick responses' },
+      words: { ko: '말하기 시험 어휘 10개', en: 'ten words for speaking tests' },
+      pron: { ko: '긴장한 목소리 다스리기 (속도·쉼)', en: 'pace and pausing under pressure' },
+      output: { ko: '여섯 문항을 15초 준비로 답하기', en: 'Answer six prompts with fifteen seconds of preparation each' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2285,6 +2975,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '지연과 분실과 환불처럼 여행 중 생기는 문제를 해결하는 표현을 다룹니다.',
       en: 'Handle delays, lost luggage and refunds on the road.'
+    },
+    plan: {
+      goals: {
+        ko: ['지연과 결항에 대응해 대안을 요구합니다.', '분실 수하물을 신고하고 추적합니다.', '환불과 보상을 근거와 함께 청구합니다.'],
+        en: ['Handle delays and cancellations and ask for an alternative.', 'Report and track lost luggage.', 'Claim a refund with the conditions at hand.']
+      },
+      grammar: { ko: '강한 요청과 항의의 완급 (I would like to ~)', en: 'firm requests and complaints' },
+      words: { ko: '여행 문제 어휘 10개', en: 'ten words for travel problems' },
+      pron: { ko: '통화에서 숫자와 예약 번호 전하기', en: 'saying numbers and booking codes on the phone' },
+      output: { ko: '지연 보상을 요구하는 네 문장 이메일', en: 'A four-line email claiming compensation for a delay' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2297,6 +2998,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '처음 만난 사람과 자연스럽게 대화를 잇는 표현을 익힙니다.',
       en: 'Keep a conversation going with someone you just met.'
+    },
+    plan: {
+      goals: {
+        ko: ['처음 만난 사람과 대화를 엽니다.', '직업과 관심사를 짧게 소개하고 질문합니다.', '연결과 후속 연락을 자연스럽게 남깁니다.'],
+        en: ['Open a conversation with a stranger.', 'Introduce your work and interests briefly, then ask.', 'Leave a connection and a follow-up.']
+      },
+      grammar: { ko: '부가의문문과 되묻기 (You are in design, right?)', en: 'tag and echo questions' },
+      words: { ko: '네트워킹 어휘 10개', en: 'ten words for networking' },
+      pron: { ko: '이름과 회사명을 또렷하게 전하기', en: 'saying names and company names clearly' },
+      output: { ko: '3분 대화 한 판과 후속 메시지 한 줄', en: 'A three-minute conversation and one follow-up line' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2309,6 +3021,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '계약 조건과 지불 조건을 정확하게 묻고 확인합니다.',
       en: 'Ask about and confirm terms and payment conditions.'
+    },
+    plan: {
+      goals: {
+        ko: ['지불 조건과 일정을 정확히 묻습니다.', '계약 조항을 확인하고 되짚습니다.', '예외와 위약 조건을 명확히 합니다.'],
+        en: ['Ask exactly about payment terms and dates.', 'Check contract clauses and repeat them back.', 'Pin down exceptions and penalties.']
+      },
+      grammar: { ko: '의무와 허용 (shall, may, is required to)', en: 'obligation and permission in contracts' },
+      words: { ko: '계약·지불 어휘 10개', en: 'ten words for contracts and payment' },
+      pron: { ko: '조항 번호와 금액 읽기', en: 'reading clause numbers and amounts' },
+      output: { ko: '계약 조건을 확인하는 다섯 문장', en: 'Five sentences that confirm the terms' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2321,6 +3044,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '사설과 논평에서 주장과 근거를 분리해 읽습니다.',
       en: 'Separate argument from evidence in an editorial.'
+    },
+    plan: {
+      goals: {
+        ko: ['사설에서 주장과 근거를 분리합니다.', '논평의 전제를 찾아냅니다.', '반대 논평과 나란히 놓고 읽습니다.'],
+        en: ['Separate argument from evidence in an editorial.', 'Find the assumptions in a comment piece.', 'Read it against an opposing column.']
+      },
+      grammar: { ko: '긴 문장에서 주어 찾기 (수식어 처리)', en: 'finding the subject in long sentences' },
+      words: { ko: '논평·사설 어휘 10개', en: 'ten words for editorials and comment' },
+      pron: { ko: '긴 문장을 끊어 읽는 법', en: 'chunking long sentences aloud' },
+      output: { ko: '사설 한 편의 주장을 세 문장으로 분해', en: 'Break one editorial into three sentences of argument' },
+      parts: { ko: '약 16~18개 섹션 — 학습목표·어휘·문법·구동사·연어·발음·이디엄·회화·받아쓰기·독해·작문·토론·문화·확인 문제·해설 노트', en: 'about sixteen to eighteen sections: goals, vocabulary, grammar, phrasal verbs, collocations, pronunciation, idioms, conversation, dictation, reading, writing, discussion, culture, quiz and notes' }
     }
   },
   {
@@ -2333,6 +3067,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '1년 동안 배운 표현을 주제별로 다시 묶어 봅니다.',
       en: 'Gather a year of expressions back into themes.'
+    },
+    plan: {
+      goals: {
+        ko: ['1년 표현을 주제별로 다시 묶습니다.', '가장 약한 분기를 골라 보완합니다.', '저장한 단어로 종합 점검합니다.'],
+        en: ['Gather a year of expressions back into themes.', 'Pick the weakest quarter and patch it.', 'Run a full check with the words you saved.']
+      },
+      grammar: { ko: '1년 문법 총정리 (분기별 핵심 항목)', en: 'a year of grammar in twelve points' },
+      words: { ko: '1~49주 누적 어휘 복습', en: 'cumulative vocabulary from weeks one to forty-nine' },
+      pron: { ko: '1년 발음 포인트 다시 듣기', en: 'revisiting a year of pronunciation points' },
+      output: { ko: '내가 자주 틀리는 표현 열 개 정리', en: 'List the ten expressions you get wrong most' },
+      parts: { ko: '약 10개 섹션 — 누적 어휘 복습·문법 정리·오답 점검·받아쓰기·종합 퀴즈', en: 'about ten sections: cumulative vocabulary, a grammar recap, missed questions, dictation and a full quiz' }
     }
   },
   {
@@ -2345,6 +3090,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '1년 중 틀렸던 문제와 저장한 단어로 최종 점검합니다.',
       en: 'Revise with the questions you missed and the words you saved.'
+    },
+    plan: {
+      goals: {
+        ko: ['틀렸던 문제만 다시 풉니다.', '저장한 단어로 최종 점검합니다.', '남은 약점을 목록으로 만듭니다.'],
+        en: ['Redo only the questions you missed.', 'Run a final check on the words you saved.', 'Turn what is left into a short list.']
+      },
+      grammar: { ko: '약점 문법만 골라 다시 정리', en: 'only the grammar points you still miss' },
+      words: { ko: '단어장에 저장한 표현 다시 보기', en: 'the expressions in your wordbook' },
+      pron: { ko: '어려웠던 문장만 다시 듣고 따라 말하기', en: 'replay the sentences that were hardest' },
+      output: { ko: '최종 약점 목록 다섯 줄', en: 'A five-line list of what still needs work' },
+      parts: { ko: '약 10개 섹션 — 누적 어휘 복습·문법 정리·오답 점검·받아쓰기·종합 퀴즈', en: 'about ten sections: cumulative vocabulary, a grammar recap, missed questions, dictation and a full quiz' }
     }
   },
   {
@@ -2357,6 +3113,17 @@ var MAGAZINE_WEEKS = [
     summary: {
       ko: '내년 학습 계획을 영어로 세우며 52주를 마무리합니다.',
       en: 'Write next year plan in English and close the fifty-two weeks.'
+    },
+    plan: {
+      goals: {
+        ko: ['내년 목표를 영어로 세웁니다.', '기간과 측정 방법을 함께 적습니다.', '52주를 마무리하며 회고합니다.'],
+        en: ['Write next year goals in English.', 'Attach a period and a way to measure each one.', 'Look back and close the fifty-two weeks.']
+      },
+      grammar: { ko: '목표 표현 (I aim to, by the end of)', en: 'expressing goals and deadlines' },
+      words: { ko: '계획·회고 어휘 10개', en: 'ten words for plans and reflection' },
+      pron: { ko: '내 계획을 소리 내어 선언하기', en: 'saying your plan out loud' },
+      output: { ko: '내년 계획 다섯 문장과 회고 세 문장', en: 'Five sentences for next year and three looking back' },
+      parts: { ko: '약 10개 섹션 — 누적 어휘 복습·문법 정리·오답 점검·받아쓰기·종합 퀴즈', en: 'about ten sections: cumulative vocabulary, a grammar recap, missed questions, dictation and a full quiz' }
     }
   }
 ];

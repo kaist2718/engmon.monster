@@ -35,6 +35,7 @@
   var WORDS_PER_MINUTE = 120;   /* 학습자 기준 조용히 읽는 속도 */
 
   var KIND_ICONS = {
+    goals: '🎯',
     vocabulary: '📚',
     phrasal: '🔗',
     collocation: '🧷',
@@ -404,6 +405,11 @@
         var text = el('span', 'plan-text');
         text.appendChild(el('span', 'plan-theme', pick(week.theme)));
         text.appendChild(el('span', 'plan-title', pick(week.title)));
+
+        /* 아직 준비 중인 주는 로드맵에서도 핵심 문법을 미리 보여 줍니다 */
+        if (state === 'planned' && week.plan && week.plan.grammar) {
+          text.appendChild(el('span', 'plan-focus', pick(week.plan.grammar)));
+        }
         text.appendChild(el('span', 'plan-meta', state === 'planned'
           ? week.level + ' · ' + t('mag.planned')
           : week.level + ' · ' + week.sections.length + t('mag.sectionSuffix')
@@ -1413,7 +1419,50 @@
     });
   }
 
-  /* 아직 발행되지 않은 주 — 플랜의 주제와 상태만 보여 주고 본문 대신 안내를 둡니다. */
+  /* 발행 전인 주의 계획 카드 — 학습목표·문법·어휘·발음·산출 과제·구성 예정 섹션.
+     데이터가 없는 줄은 그리지 않습니다. */
+  function planLines(plan) {
+    return [
+      ['mag.planGrammar', plan.grammar],
+      ['mag.planWords', plan.words],
+      ['mag.planPron', plan.pron],
+      ['mag.planOutput', plan.output],
+      ['mag.planParts', plan.parts]
+    ];
+  }
+
+  function buildPlanCard(plan) {
+    var card = el('div', 'm-plan-card');
+    card.appendChild(el('p', 'm-plan-card-title', t('mag.planCardTitle')));
+
+    if (plan.goals) {
+      var goals = isArray(plan.goals) ? plan.goals : (plan.goals[lang()] || plan.goals.ko || []);
+
+      if (goals.length) {
+        var goalBlock = el('div', 'm-plan-block');
+        goalBlock.appendChild(el('p', 'm-plan-label', t('mag.planGoals')));
+
+        var list = el('ul', 'm-plan-goals');
+        goals.forEach(function (goal) { list.appendChild(el('li', null, goal)); });
+
+        goalBlock.appendChild(list);
+        card.appendChild(goalBlock);
+      }
+    }
+
+    planLines(plan).forEach(function (line) {
+      if (!line[1]) return;
+
+      var block = el('div', 'm-plan-block');
+      block.appendChild(el('p', 'm-plan-label', t(line[0])));
+      block.appendChild(el('p', 'm-plan-value', pick(line[1])));
+      card.appendChild(block);
+    });
+
+    return card;
+  }
+
+  /* 아직 발행되지 않은 주 — 본문 대신 그 주의 계획과 상태를 보여 줍니다. */
   function buildPlannedNotice() {
     var box = el('section', 'section m-section m-planned');
     box.id = 'planned';
@@ -1435,6 +1484,8 @@
     head.appendChild(headMain);
 
     inner.appendChild(el('p', 'm-intro', pick(WEEK.summary)));
+
+    if (WEEK.plan) inner.appendChild(buildPlanCard(WEEK.plan));
 
     var note = el('div', 'm-planned-note');
     note.appendChild(el('p', 'm-planned-title', t('mag.plannedTitle')));
