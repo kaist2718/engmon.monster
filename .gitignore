@@ -7,6 +7,9 @@ _site/
 # 판매용 워크북 PDF·HTML (tools/make-workbook.mjs 산출물 — 재생성 가능)
 _workbook/
 
+# 판매용 듣기 팩 MP3 (tools/make-audio.mjs 산출물 — 재생성 가능 · 바이너리라 git 이 무거워집니다)
+_audio/
+
 # 폰트 서브셋 원본(6.7MB) — tools/make-font-subset.py 가 필요할 때 받아 두는 캐시
 .cache/
 

@@ -13,6 +13,8 @@
     "check:browser": "node browser-test.js",
     "shots": "node browser-test.js --shots",
     "workbook": "node tools/make-workbook.mjs",
+    "audio": "node tools/make-audio.mjs",
+    "audio:plan": "node tools/make-audio.mjs --dry-run",
     "stage": "node tools/stage-site.mjs",
     "check:staged": "npm run stage && node browser-test.js --site-root _site",
     "check:live": "node browser-test.js --live",

@@ -24,7 +24,7 @@ robots.txt        # 검색엔진 크롤링 허용 + 사이트맵 위치
 sitemap.xml       # 사이트맵 (한 페이지, 주 단위 갱신)
 smoke-test.js     # 검증 스크립트 (의존성 없이 Node 로 페이지 스크립트 실행)
 browser-test.js   # 헤드리스 Chrome 검증 (레이아웃·기능·PWA·네트워크)
-tools/            # serve · stage-site · font-charset · make-font-subset · make-icons · make-workbook
+tools/            # serve · stage-site · font-charset · make-font-subset · make-icons · make-workbook · make-audio
 package.json      # npm 스크립트 (serve · test · stage · check) — 런타임 의존성 0
 .github/workflows # CI(ci.yml) · GitHub Pages 배포(deploy.yml)
 docs/RESEARCH.md  # 영어 학습 서비스 조사·분석 (기획 근거 · 배포 대상 아님)
@@ -32,6 +32,7 @@ docs/MONETIZATION.md # 수익화 플랜 — 단건 판매(주·분기 묶음) ·
 docs/PRODUCT-COPY.md # 상품 이름·소개문·가격·환불 문구 원본 (배포 대상 아님)
 docs/PRICING.md  # 가격 정책 정본 — 정가·할인·환불·인상 조건 (배포 대상 아님)
 _workbook/        # 판매용 워크북 HTML·PDF (npm run workbook 산출물 — 재생성 가능 · 배포 대상 아님)
+_audio/           # 판매용 듣기 팩 MP3 (npm run audio 산출물 — 재생성 가능 · gitignore · 배포 대상 아님)
 CNAME             # GitHub Pages 커스텀 도메인 (engmon.monster)
 ```
 
@@ -141,10 +142,16 @@ CNAME             # GitHub Pages 커스텀 도메인 (engmon.monster)
 - **집필 규칙**: 문자열은 작은따옴표로 감싸므로 값 안에 `'`를 쓰지 마세요(축약형은 풀어서).
   값 안에 `':` 조합도 피하세요 — 사전 검사 스크립트가 오인합니다.
   `**굵게**`만 지원합니다.
-- **오디오**: `issues.js`의 영어 필드(`body.en`, `reading`, `items[].en`, `dialogue[].en`,
+- **오디오(웹)**: `issues.js`의 영어 필드(`body.en`, `reading`, `items[].en`, `dialogue[].en`,
   `questions[].en`, `dictation[].en`)를 문장 단위로 잘라 `speechSynthesis`로 읽습니다.
-  화자 이름(Front desk, You)은 **읽지 않고**, 목소리와 음높이로만 구분합니다.
+  화자 이름(Front desk, You)은 **읽지 않고**, 목소리·음높이·**악센트**로 구분합니다 —
+  직원은 영국식(en-GB), 손님은 미국식(en-US) 음성을 먼저 찾고, 그 악센트가 없으면
+  음높이 차이로 내려갑니다. 기기에 두 악센트가 다 있으면 대비가 그대로 생깁니다.
   오디오 파일이 필요 없고 비용도 0입니다. "섹션 전체 듣기"에는 받아쓰기 문장도 포함됩니다.
+- **오디오(판매)**: 듣기 팩 MP3는 `npm run audio` (`tools/make-audio.mjs`)로 구긴 뒤
+  **상품 파일로만** 씁니다. 받아쓰기·회화·예문을 굽고, 화자 악센트 규칙은 화면과 같습니다.
+  파일은 `_audio/`(gitignore) 에 생기고 저장소에는 올리지 않습니다 — 바이너리는 히스토리를 무겁게 만듭니다.
+  사람이 낭독한 음성이 아니라 **합성 음성**이며, 상품 설명·약관에 그렇게 적습니다.
 
 ## 다른 영어 학습 서비스에서 가져온 것
 
@@ -168,7 +175,8 @@ CNAME             # GitHub Pages 커스텀 도메인 (engmon.monster)
 ## 수익화 (단건 판매)
 
 본문은 **계속 전부 무료·공개**합니다. 페이월을 만들지 않습니다.
-수익은 **인쇄·필기용 워크북(PDF)** 과 거기에만 담기는 정답·해설집·모범 답안·누적 어휘 색인으로 냅니다.
+수익은 **인쇄·필기용 워크북(PDF)** 과 거기에만 담기는 정답·해설집·모범 답안·누적 어휘 색인,
+그리고 **듣기 팩(합성 음성 MP3)** 으로 냅니다. 웹의 소리(speechSynthesis)는 그대로 무료입니다.
 자세한 결정·결제 수단 비교·90일 계획은 [`docs/MONETIZATION.md`](docs/MONETIZATION.md)에,
 가격·할인·환불·인상 조건의 정본은 [`docs/PRICING.md`](docs/PRICING.md)에 있습니다.
 
@@ -179,6 +187,7 @@ CNAME             # GitHub Pages 커스텀 도메인 (engmon.monster)
 - 구매 링크는 `index.html` 의 `#buy` 안 `data-shop-url` **한 곳**에서 정합니다.
   비어 있으면 표지 버튼과 구매 화면이 함께 숨겨져, 팔 상품이 없을 때 죽은 링크가 남지 않습니다.
 - 워크북 파일은 `npm run workbook` 으로 만듭니다(학습편 + 정답·해설편 + 누적 어휘 색인).
+  듣기 팩은 `npm run audio` 로 만듭니다 — 음성은 **합성 음성**이고 그대로 표기합니다.
   상품 문구 원본은 [`docs/PRODUCT-COPY.md`](docs/PRODUCT-COPY.md)입니다.
 
 ## 로컬에서 보기
@@ -230,6 +239,8 @@ npm test              # smoke-test.js — 페이지 스크립트를 Node 로 실
 npm run check:browser # browser-test.js — 헤드리스 Chrome 검증
 npm run workbook      # tools/make-workbook.mjs — 판매용 워크북(학습편·정답편) HTML + PDF
 npm run workbook -- --no-pdf   # PDF 없이 HTML만 (Chrome 없이도 동작)
+npm run audio:plan    # tools/make-audio.mjs --dry-run — 듣기 팩 분량·비용만 계산(API 키 불필요)
+npm run audio         # 듣기 팩 MP3 합성 (GOOGLE_TTS_KEY 필요 · _audio/ 에 생성)
 npm run stage         # tools/stage-site.mjs — 공개 파일만 _site 로 추려 검증
 npm run check:staged  # stage + _site 를 http 로 서빙해 브라우저 검증(레이아웃·기능·PWA)
 npm run check:live    # 배포된 engmon.monster 를 브라우저로 점검
@@ -252,7 +263,7 @@ node smoke-test.js
 브라우저 없이 페이지 스크립트를 **실제로 실행**해 보는 테스트입니다(의존성 없음, Node만 있으면 됩니다).
 `index.html`의 인라인 스크립트 → `issues.js` → `script.js` → `magazine.js`를 최소 DOM 위에서 돌리고
 언어 전환·테마·강조색·매거진 렌더링·주 전환·52주 플랜·번역 토글·받아쓰기 채점·퀴즈 점수·복습 카드·단어장 검색까지
-클릭을 흉내 내 확인합니다. 현재 **64개 항목**을 검사합니다.
+클릭을 흉내 내 확인합니다. 현재 **66개 항목**을 검사합니다.
 
 특히 다음을 지켜줍니다.
 
@@ -278,6 +289,10 @@ node smoke-test.js
   그 안의 **계획 카드**(학습목표·핵심 문법·구성 예정 섹션)가 함께 그려지는지도 확인합니다.
 - **문의 유형**: 유형을 고르면 안내가 (필수)로 바뀌고 빈 내용은 막히는지,
   `type` 과 제목(`_subject`)이 함께 전송되는지, 관련 주 목록이 발행된 주 수만큼 채워지는지 검사합니다.
+- **화자 악센트**: 기기에 en-US·en-GB 음성이 있을 때 직원은 영국식, 손님은 미국식으로
+  읽히는지 검사합니다 — 판매용 듣기 팩(`make-audio.mjs`)과 **같은 규칙**이어야 합니다.
+- **듣기 팩 일관성**: 합성 음성이라는 안내가 약관에 있고, 상품 문구·가격 정책에 듣기 팩이
+  적혀 있고, 생성 도구에 악센트 규칙이 있는지 검사합니다.
 - **사전 검사**: `data-i18n` 키가 ko/en 양쪽에 모두 있는지, 한쪽에만 있는 키가 없는지 확인합니다.
 - **데이터 검사**: 52주 플랜이 온전한지(중복 week 없음·분기 누락 없음), 모든 발행 주의 섹션 항목에 ko/en이 있는지,
   퀴즈 정답 범위·표 구조·받아쓰기 짝이 맞는지 확인합니다.

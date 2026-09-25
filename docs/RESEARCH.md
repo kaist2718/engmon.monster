@@ -262,7 +262,7 @@ CEFR 원문을 옮긴 것이 아니라, **이 매거진의 글 길이·문장 �
 이 문서와 `README.md`의 주장은 사람의 기억이 아니라 **스크립트**로 확인합니다.
 
 ```bash
-npm test                 # smoke-test.js — 페이지 스크립트를 Node 로 실행 (현재 64개 항목)
+npm test                 # smoke-test.js — 페이지 스크립트를 Node 로 실행 (현재 66개 항목)
 npm run check:browser    # browser-test.js — 헤드리스 Chrome 으로 실제 렌더링 확인
 npm run check:staged     # 공개 목록만 _site 로 추려 http 로 검증 (+PWA)
 ```
@@ -308,3 +308,4 @@ npm run check:staged     # 공개 목록만 _site 로 추려 http 로 검증 (+P
 | 2026-09 (3차·W01~W04) | 수익화 준비 — 본문 유료 수준 심화 | §3.4의 기준 상향(항목 351개 · 확인 문제 48문항 · 받아쓰기 32문장), 모범 답안·모범 표현 신설, 표준 골격 분량 기준 상향 |
 | 2026-09 (3차) | 단건 판매 수익화 플랜 | [`MONETIZATION.md`](MONETIZATION.md) 신설 — 웹은 무료 유지, 워크북 PDF 판매, 결제 수단 비교(Gumroad·크몽) |
 | 2026-09 (4차) | 가격 정책 확정 | [`PRICING.md`](PRICING.md) 신설 — 정본 원화(분기 ₩39,000/US$29) · 할인 상한 30% · 실수령 최저선 ₩19,000 · 업그레이드 차액 · 인상 조건 |
+| 2026-09 (5차) | 낭독 음성 검토 · 듣기 팩 결정 | 합성 음성 MP3(미국식 여성·영국식 남성, 받아쓰기·회화·예문) 제작 도구 신설, 화면(speechSynthesis)도 화자별 en-US/en-GB 고정. 사람 낭독은 사지 않기로 함 |

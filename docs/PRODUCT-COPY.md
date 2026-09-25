@@ -17,6 +17,8 @@
 | 2 | 1분기 묶음 (W01~W13) | 크몽 | **₩39,000** | 위 상품이 팔린 뒤 |
 | 3 | 1년 패스 (W01~W52) | Gumroad | US$99 | 2분기 발행 뒤 |
 
+- **상품 하나의 구성**: 워크북 PDF + 정답·해설 PDF + 누적 어휘 색인 + **듣기 팩(합성 음성 MP3)**.
+  듣기 팩은 별도 상품이 아니라 위 상품의 파일 세 번째입니다(`PRICING.md` §2.1·§3.3).
 - 처음에는 **1번 하나만** 올립니다. 상품이 늘면 어느 것이 팔렸는지 알 수 없습니다.
 - 주 단권(₩4,900)은 국내 채널 전용이고, 1년 패스는 2분기가 팔린 뒤에 꺼냅니다.
   언제 무엇을 꺼내는지는 `PRICING.md` 7장 「가격 캘린더」가 정합니다.
@@ -57,6 +59,12 @@
 · 1년 누적 어휘 색인 (주차·뜻·예문)
 · 인쇄해서 필기할 수 있는 레이아웃, 오프라인에서도 사용
 
+■ 듣기 팩 (MP3)
+· 받아쓰기 문장 · 회화 대사 · 어휘와 표현의 예문을 소리 파일로 함께 보냅니다.
+· 회화는 미국식 발음과 영국식 발음을 오가면서 들을 수 있습니다.
+· 기기나 브라우저에 따라 음성이 달라지는 문제가 없고, 오프라인에서도 재생됩니다.
+· 이 음성은 합성 음성입니다. 실제 사람이 낭독한 음성이 아닙니다.
+
 ■ 1분기 13주까지 함께 받습니다
 지금은 4주가 들어 있습니다. 1분기 13주가 완성되는 대로 같은 파일로 다시 받으실 수 있습니다.
 (추가 결제 없음)
@@ -86,6 +94,12 @@ WHAT THE WORKBOOK ADDS
 · A running vocabulary index for the year (week, meaning, example).
 · Laid out for printing and handwriting, and usable offline.
 
+THE LISTENING PACK (MP3)
+· Every dictation sentence, every conversation line and every example sentence as audio.
+· Conversations move between an American and a British accent, so your ear gets both.
+· The same files on every device, and they play offline.
+· These voices are synthesised, not recorded by a person.
+
 YOU GET THE WHOLE QUARTER
 Four weeks are ready today. As the rest of quarter one is finished, the same file is updated
 and you can download it again at no extra cost.
@@ -107,7 +121,9 @@ Ask within seven days of downloading and you get your money back.
 | 가격 (Gumroad) | `29` USD |
 | 가격 (크몽) | `39000` 원 |
 | 커버 이미지 | 저장소의 `og.png` (1200×630) — 그대로 올립니다 |
-| 파일 | 워크북 PDF + 정답·해설 PDF 두 개 (`npm run workbook` 로 생성) |
+| 파일 (PDF) | 워크북 PDF + 정답·해설 PDF 두 개 (`npm run workbook` 로 생성) |
+| 파일 (듣기 팩) | 받아쓰기·회화·예문 MP3 — `npm run audio` 로 `_audio/` 에 만들고 **zip 으로 묶어** 올립니다 |
+| 음성 안내 문구 | `듣기 팩은 합성 음성입니다. 실제 사람이 낭독한 음성이 아니라, 발음 학습을 위해 만든 음성입니다.` |
 | URL 슬러그 | `engmon-q1` |
 | 구매 후 안내 문구 | `감사합니다. 파일 2부(워크북·정답편)를 내려받으세요. 새 주가 추가되면 같은 링크로 다시 받으실 수 있습니다.` |
 | 환불 안내 | `파일을 받은 날부터 7일 안에 요청하면 환불합니다.` |
@@ -137,6 +153,7 @@ Ask within seven days of downloading and you get your money back.
 | 확인 문제 수 | 〃 (현재 48) | 〃 |
 | 받아쓰기 수 | 〃 (현재 32) | 〃 |
 | 표·독해·회화 수 | 〃 (표 4 · 독해 4 · 회화 12) | 이 문서 §2.3·§2.4 |
+| 듣기 팩 분량·용량 | `npm run audio:plan` (현재 4주 708개 · 약 22분 · 13주 약 16MB) | 이 문서 §2.3·§2.4 · `PRICING.md` §3.3 |
 | 가격 | `PRICING.md` §0·§2.1 (정본) | 이 문서 §1·§2, `index.html` 의 `mag.buyPrice` (ko·en), `script.js` 의 같은 키, `MONETIZATION.md` §4, `README.md` 「수익화」 절 |
 | 할인·환불 기간 | `PRICING.md` §4·§6 | 이 문서 §2.3·§2.4·§3, `terms.html` 제3조, `privacy.html` 4항 |
 

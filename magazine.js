@@ -520,19 +520,41 @@
     { pitch: 1.08, rate: 0.96 }
   ];
 
+  /* 화자별 **악센트** — 0 직원(영국식) · 1 손님(미국식) · 2 동료(미국식) · 3 그 외(영국식).
+     기기에 두 악센트 음성이 다 있으면 화면과 파일에서 같은 구분이 생기고,
+     하나뿐이면 아래 폴백(음높이 + 아무 영어 음성)으로 자연스럽게 내려갑니다.
+     tools/make-audio.mjs 의 SPEAKER_ACCENT 와 같은 규칙입니다 — 한쪽만 고치지 마세요. */
+  var SPEAKER_ACCENT = ['en-GB', 'en-US', 'en-US', 'en-GB'];
+
+  function accentKey(lang) {
+    return String(lang || '').replace('_', '-').toLowerCase();
+  }
+
+  /* 해당 악센트(en-US / en-GB)의 음성만 골라 돌려줍니다. */
+  function voicesForAccent(accent) {
+    var wanted = accentKey(accent);
+    return englishVoices().filter(function (v) {
+      return accentKey(v.lang).indexOf(wanted) === 0;
+    });
+  }
+
   function applySpeaker(utterance, who) {
     var index = speakerKey(who);
     var style = SPEAKER_STYLE[index % SPEAKER_STYLE.length];
     var voices = englishVoices();
+    var accent = SPEAKER_ACCENT[index % SPEAKER_ACCENT.length];
 
     utterance.pitch = style.pitch;
     utterance.rate = speechRate * style.rate;
+    utterance.lang = accent;
 
-    /* 목소리가 여러 개면 화자마다 다른 목소리를 붙여 구분을 더 쉽게 합니다 */
-    if (voices.length > 1) {
-      var voice = voices[index % Math.min(voices.length, 4)];
-      if (voice) { utterance.voice = voice; utterance.lang = voice.lang || 'en-US'; }
-    }
+    /* 1순위: 화자 악센트에 맞는 음성. 2순위: 여러 음성이 있으면 화자마다 다른 음성. */
+    var matched = voicesForAccent(accent);
+    var voice = matched.length
+      ? matched[index % matched.length]
+      : (voices.length > 1 ? voices[index % Math.min(voices.length, 4)] : null);
+
+    if (voice) { utterance.voice = voice; utterance.lang = voice.lang || accent; }
   }
 
   /* 긴 문장을 한 번에 읽으면 브라우저가 중간에 끊습니다. 문장 단위로 자릅니다. */

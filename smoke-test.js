@@ -416,7 +416,27 @@ function makeSandbox(dom, opts) {
     (windowListeners[type] = windowListeners[type] || []).push(fn);
   };
   sandbox.removeEventListener = () => {};
-  sandbox.speechSynthesis = { cancel() {}, speak() {} };
+  /* 음성합성 최소 구현 — 화자별 악센트 검사에 씁니다.
+     실제 브라우저처럼 en-US 와 en-GB 음성을 둘 다 돌려줍니다(없는 기기 상황은
+     빈 배열을 주면 되고, 그때는 음높이 폴백으로 내려갑니다). */
+  sandbox.__spoken = [];
+  sandbox.speechSynthesis = {
+    cancel() { sandbox.__spoken.length = 0; },
+    speak(u) {
+      sandbox.__spoken.push({
+        text: u.text,
+        lang: u.lang,
+        voice: u.voice ? u.voice.name : '',
+        pitch: u.pitch,
+      });
+    },
+    getVoices() {
+      return [
+        { name: 'Test US Female', lang: 'en-US' },
+        { name: 'Test GB Male', lang: 'en-GB' },
+      ];
+    },
+  };
 
   /* FormData 최소 구현 — 폼 입력값을 읽고, set() 으로 덧붙인 값(토큰·제목 등)을 담습니다. */
   sandbox.FormData = class FormData {
@@ -1752,6 +1772,67 @@ check('유료 상품의 결제·환불 조건이 약관과 방침에 있다', ()
     '방침에 결제 정보 미보관 안내가 없습니다');
 
   return '약관 제3조(결제·환불 7일·재배포 금지) · 방침 4항(결제 대행·카드 미보관)';
+});
+
+check('화면 오디오가 화자마다 악센트를 고정한다', () => {
+  const page = runPage('index.html');
+  const rows = collect(page.dom.byId.get('issueContent'), 'm-line');
+  assert(rows.length >= 2, '회화 줄이 ' + rows.length + '개뿐입니다');
+
+  const spoken = page.sandbox.__spoken;
+  const played = [];
+
+  /* 화자마다 한 줄씩 눌러 실제로 넘어간 utterance 의 lang 을 봅니다.
+     기기에 두 악센트가 다 있으면 직원은 영국식, 손님은 미국식이어야 합니다. */
+  [{ match: /front desk|officer|staff|clerk/i, locale: 'en-GB', label: '직원' },
+    { match: /you|customer|guest/i, locale: 'en-US', label: '손님' }].forEach((t) => {
+    const row = rows.filter((r) => {
+      const who = collect(r, 'm-who')[0];
+      return who && t.match.test(String(who.textContent || ''));
+    })[0];
+    assert(row, t.label + ' 화자 줄을 찾지 못했습니다');
+
+    const btn = collect(row, 'm-bubble-play')[0];
+    assert(btn, t.label + ' 줄에 재생 버튼이 없습니다');
+
+    spoken.length = 0;
+    btn.dispatch('click');
+
+    const last = spoken[spoken.length - 1];
+    assert(last, t.label + ' 줄을 눌렀는데 재생이 시작되지 않았습니다');
+    assert(last.lang === t.locale, t.label + ' 낭독 lang = ' + last.lang + ' (' + t.locale + ' 여야 합니다)');
+    assert(last.voice, t.label + ' 줄에 음성이 붙지 않았습니다 (악센트 음성 선택 실패)');
+    played.push(t.label + '=' + last.lang);
+  });
+
+  return played.join(' · ') + ' (make-audio.mjs 와 같은 규칙)';
+});
+
+check('듣기 팩이 상품 문구·정책·도구에 일관되게 적혀 있다', () => {
+  const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8');
+  const terms = read('terms.html');
+  const copy = read('docs/PRODUCT-COPY.md');
+  const pricing = read('docs/PRICING.md');
+
+  /* 합성 음성이라는 사실은 약관에 있어야 합니다 — 사람 낭독으로 오해되면 안 됩니다. */
+  assert(terms.indexOf('합성') !== -1, '약관에 합성 음성 안내가 없습니다');
+  assert(terms.indexOf('MP3') !== -1, '약관에 듣기 팩(MP3) 조항이 없습니다');
+
+  assert(copy.indexOf('듣기 팩') !== -1, '상품 문구에 듣기 팩이 없습니다');
+  assert(pricing.indexOf('듣기 팩') !== -1, '가격 정책에 듣기 팩이 없습니다');
+
+  /* 판매 파일을 만들 도구가 저장소에 있어야 합니다 */
+  const tool = path.join(ROOT, 'tools', 'make-audio.mjs');
+  assert(fs.existsSync(tool), 'tools/make-audio.mjs 가 없습니다');
+
+  /* 굽는 규칙(화자 악센트)은 화면과 도구가 같아야 합니다 */
+  const audio = fs.readFileSync(tool, 'utf8');
+  assert(audio.indexOf('en-GB') !== -1 && audio.indexOf('en-US') !== -1,
+    'make-audio.mjs 에 악센트 규칙이 없습니다');
+  assert(read('magazine.js').indexOf('SPEAKER_ACCENT') !== -1,
+    'magazine.js 에 화자 악센트 규칙이 없습니다');
+
+  return '약관 제3조(합성 음성·MP3) · 상품 문구·가격 정책 · 도구 악센트 규칙';
 });
 
 check('52주 플랜 데이터가 온전하다', () => {
