@@ -1533,6 +1533,37 @@ check('공유 에셋(styles.css / script.js) 버전 표기가 일관된다', () 
 
 });
 
+check('폰트 서브셋이 사이트 글자를 모두 담는다', () => {
+  const { execFileSync } = require('child_process');
+  const os = require('os');
+
+  /* 글자 집합의 정본은 tools/font-charset.mjs 한 곳입니다. 그 도구를 그대로 실행해
+     목록을 받고, 폰트가 담은 글자(assets/fonts/charset.json)와 비교합니다.
+     새로 발행한 주에 새 글자가 있는데 서브셋을 다시 만들지 않으면 그 글자만
+     다른 글꼴로 보입니다 — 그래서 코드로 잠급니다. */
+  const tmp = path.join(os.tmpdir(), 'engmon-charset-' + process.pid + '.txt');
+  execFileSync(process.execPath, [path.join(ROOT, 'tools', 'font-charset.mjs'), '--out', tmp], { stdio: 'ignore' });
+  const codepoints = fs.readFileSync(tmp, 'utf8').trim().split(',').map((h) => parseInt(h, 16));
+  try { fs.unlinkSync(tmp); } catch (e) { /* 무시 */ }
+
+  const meta = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets', 'fonts', 'charset.json'), 'utf8'));
+  const covered = new Set();
+  (meta.covered || []).concat(meta.ignored || []).forEach((range) => {
+    const parts = String(range).split('-');
+    const from = parseInt(parts[0], 16);
+    const to = parseInt(parts[1] || parts[0], 16);
+    for (let c = from; c <= to; c++) covered.add(c);
+  });
+
+  const missing = codepoints.filter((c) => !covered.has(c));
+  assert(missing.length === 0,
+    '폰트 서브셋에 없는 글자 ' + missing.length + '개: ' +
+    missing.slice(0, 12).map((c) => String.fromCodePoint(c) + '(U+' + c.toString(16).toUpperCase() + ')').join(' ') +
+    ' — python tools/make-font-subset.py 를 다시 실행하세요');
+
+  return '사이트 글자 ' + codepoints.length + '자 모두 담김 (서브셋 ' + meta.bytes + ' bytes)';
+});
+
 /* ── 7. 데이터 구조 ───────────────────────────────────────────────────── */
 check('CSS에 없는 클래스를 화면에 쓰지 않는다', () => {
   const css = fs.readFileSync(path.join(ROOT, 'styles.css'), 'utf8');

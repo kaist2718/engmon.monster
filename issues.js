@@ -86,8 +86,8 @@ var MAGAZINE_WEEKS = [
       en: 'Reading English news from the first paragraph'
     },
     summary: {
-      ko: '뉴스 문장은 짧고 정보가 빽빽합니다. 뉴스 어휘 12개, 구동사 8개, 연어 8개, 수치 표현 8개, 수동태와 헤드라인 문법, 발음 8개, 이디엄 8개, 인터뷰 표현, 회화 1장, 받아쓰기 8문장, 기사 독해와 모범 답안이 있는 요약 쓰기, 토론 질문 8개, 확인 문제 12개.',
-      en: 'News sentences are short and dense. Twelve news words, eight phrasal verbs, eight collocations, eight ways to read a chart, the passive and headline grammar, eight pronunciation points, eight idioms, interview language, one conversation, eight dictation lines, a full article with a model summary and a twelve-question test.'
+      ko: '뉴스 문장은 짧고 정보가 빽빽합니다. 뉴스 어휘 16개, 구동사 10개, 연어 10개, 수치 표현 10개, 수동태와 헤드라인 문법, 발음 10개, 이디엄 10개, 인터뷰 표현, 회화 1장, 받아쓰기 10문장, 기사 독해와 모범 답안이 있는 요약 쓰기, 토론 질문 10개, 확인 문제 16개.',
+      en: 'News sentences are short and dense. Sixteen news words, ten phrasal verbs, ten collocations, ten ways to read a chart, the passive and headline grammar, ten pronunciation points, ten idioms, interview language, one conversation, ten dictation lines, a full article with a model summary and a sixteen-question test.'
     },
 
     sections: [
@@ -103,7 +103,7 @@ var MAGAZINE_WEEKS = [
         },
         bullets: [
           { en: 'Turn a clipped headline back into a full sentence and say who did what.', ko: '줄어든 헤드라인을 온전한 문장으로 되돌려 누가 무엇을 했는지 말합니다.' },
-          { en: 'Use the twelve news words and eight collocations without stopping to translate.', ko: '뉴스 어휘 12개와 연어 8개를 번역 없이 씁니다.' },
+          { en: 'Use the sixteen news words and ten collocations without stopping to translate.', ko: '뉴스 어휘 16개와 연어 10개를 번역 없이 씁니다.' },
           { en: 'Find the conclusion in the first paragraph and separate fact from objection.', ko: '첫 문단에서 결론을 찾고 사실과 반대 의견을 구분합니다.' },
           { en: 'Summarise one article in three English sentences, with a figure in the middle.', ko: '숫자 하나를 넣어 기사 한 편을 영어 세 문장으로 요약합니다.' }
         ],
@@ -118,7 +118,7 @@ var MAGAZINE_WEEKS = [
         id: 'news-words',
         kind: 'vocabulary',
         level: 'B2',
-        title: { ko: '뉴스 어휘 — 기사에서 매일 나오는 12단어', en: 'News words — twelve that appear daily' },
+        title: { ko: '뉴스 어휘 — 기사에서 매일 나오는 16단어', en: 'News words — sixteen that appear daily' },
         intro: {
           ko: '일상 회화에서는 잘 안 쓰지만, 뉴스에서는 하루에도 여러 번 나오는 단어들입니다.',
           en: 'You rarely say these in conversation, yet news stories use them several times a day.'
@@ -135,7 +135,11 @@ var MAGAZINE_WEEKS = [
           { en: 'eyewitness', ko: '목격자', meaning: 'someone who saw the event', example: 'An eyewitness described the scene.', note: '법정 증인은 witness, 현장 목격자는 eyewitness입니다' },
           { en: 'retract', ko: '철회하다', meaning: 'to take a published claim back', example: 'The paper retracted the claim.', note: '짧은 정정은 correction, 완전 철회는 retraction입니다' },
           { en: 'leak', ko: '유출하다, 유출', meaning: 'to give secret material to a reporter', example: 'The draft was leaked to a blog.', note: '명사로도 쓰여 a leak입니다' },
-          { en: 'brief', ko: '간단히 설명하다', meaning: 'to give someone the key points', example: 'Officials briefed reporters at noon.', note: '명사 a briefing은 설명회, in brief는 요약하면입니다' }
+          { en: 'brief', ko: '간단히 설명하다', meaning: 'to give someone the key points', example: 'Officials briefed reporters at noon.', note: '명사 a briefing은 설명회, in brief는 요약하면입니다' },
+          { en: 'outlet', ko: '언론사', meaning: 'a news organisation', example: 'Several outlets ran the same story.', note: 'media outlet이 전체를 가리킵니다' },
+          { en: 'poll', ko: '여론조사', meaning: 'a survey of opinions', example: 'The poll put support at forty percent.', note: '조사 결과는 poll results라고 합니다' },
+          { en: 'statement', ko: '성명, 발표문', meaning: 'an official comment', example: 'The office released a short statement.', note: 'issue a statement와 짝을 이룹니다' },
+          { en: 'update', ko: '최신 소식', meaning: 'the latest news on a developing story', example: 'Here is an update on the fire.', note: '속보 이후 이어지는 소식에 씁니다' }
         ]
       },
 
@@ -144,7 +148,7 @@ var MAGAZINE_WEEKS = [
         id: 'news-phrasal',
         kind: 'phrasal',
         level: 'B2',
-        title: { ko: '구동사 — 보도 문장을 짧게 만드는 8개', en: 'Phrasal verbs — eight that tighten a report' },
+        title: { ko: '구동사 — 보도 문장을 짧게 만드는 10개', en: 'Phrasal verbs — ten that tighten a report' },
         items: [
           { en: 'put out', ko: '발표하다, 내놓다', meaning: 'to publish or release something', example: 'The office put out a short statement.', note: '발표문에는 put out a statement를 씁니다' },
           { en: 'break down', ko: '하나씩 풀어 설명하다', meaning: 'to explain something in parts', example: 'Let us break down the numbers.', note: '고장 나다는 뜻도 있으니 문맥을 보세요' },
@@ -153,7 +157,9 @@ var MAGAZINE_WEEKS = [
           { en: 'back up', ko: '근거로 뒷받침하다', meaning: 'to support with evidence', example: 'The claim was not backed up by data.', note: '수동태로도 자주 씁니다' },
           { en: 'call out', ko: '공개적으로 지적하다', meaning: 'to criticise openly', example: 'Several papers called out the decision.', note: '직접 인용보다 논평 기사에 많습니다' },
           { en: 'walk back', ko: '앞서 한 말을 물리다', meaning: 'to soften or withdraw a claim', example: 'The minister walked back the remark.', note: '사과까지는 아니고 표현의 세기를 낮추는 것입니다' },
-          { en: 'push back on', ko: '~에 반발하다', meaning: 'to resist or oppose something', example: 'The union pushed back on the plan.', note: 'push back against도 같은 뜻입니다' }
+          { en: 'push back on', ko: '~에 반발하다', meaning: 'to resist or oppose something', example: 'The union pushed back on the plan.', note: 'push back against도 같은 뜻입니다' },
+          { en: 'lay out', ko: '조목조목 설명하다', meaning: 'to present the parts of a plan', example: 'The minister laid out the timetable.', note: 'lay out a plan은 계획을 차례로 보여 준다는 뜻입니다' },
+          { en: 'set out', ko: '근거를 들어 설명하다', meaning: 'to explain the reasons for something', example: 'The report sets out the case for change.', note: 'set out to do는 ~하려고 결심하다는 별개 뜻입니다' }
         ]
       },
 
@@ -162,7 +168,7 @@ var MAGAZINE_WEEKS = [
         id: 'news-collocation',
         kind: 'collocation',
         level: 'B2',
-        title: { ko: '연어 — 기사에서 통째로 굳은 8쌍', en: 'Collocations — eight fixed pairs in news writing' },
+        title: { ko: '연어 — 기사에서 통째로 굳은 10쌍', en: 'Collocations — ten fixed pairs in news writing' },
         items: [
           { en: 'run a story', ko: '기사를 싣다', meaning: 'to publish an article', example: 'Three outlets ran the same story.', note: 'publish보다 가볍게 씁니다' },
           { en: 'break the news', ko: '소식을 처음 전하다', meaning: 'to tell someone news for the first time', example: 'The family was told before the news broke.', note: '나쁜 소식에도, 좋은 소식에도 씁니다' },
@@ -171,7 +177,9 @@ var MAGAZINE_WEEKS = [
           { en: 'stay on top of', ko: '계속 파악하고 있다', meaning: 'to keep following a situation', example: 'We are staying on top of the story.', note: '취재 상황을 설명할 때 씁니다' },
           { en: 'fact-check', ko: '사실 여부를 검증하다', meaning: 'to check the facts of a claim', example: 'The claim was fact-checked within an hour.', note: '동사와 명사로 모두 씁니다' },
           { en: 'issue a statement', ko: '성명을 발표하다', meaning: 'to release an official comment', example: 'The office issued a short statement.', note: 'put out a statement와 같은 뜻입니다' },
-          { en: 'draw criticism', ko: '비판을 받다', meaning: 'to attract criticism', example: 'The plan drew criticism from drivers.', note: 'criticise보다 담백한 기사체입니다' }
+          { en: 'draw criticism', ko: '비판을 받다', meaning: 'to attract criticism', example: 'The plan drew criticism from drivers.', note: 'criticise보다 담백한 기사체입니다' },
+          { en: 'spark a debate', ko: '논쟁을 촉발하다', meaning: 'to start a debate', example: 'The ruling sparked a debate online.', note: 'trigger a debate도 같은 뜻입니다' },
+          { en: 'pick up steam', ko: '힘이 실리다', meaning: 'to gain strength or support', example: 'The campaign picked up steam this week.', note: '사건·운동이 확산될 때 씁니다' }
         ]
       },
 
@@ -239,11 +247,14 @@ var MAGAZINE_WEEKS = [
           { en: 'The minister says the plan will work.', ko: '장관은 계획이 통할 것이라고 말합니다.', note: 'says는 "세즈"가 아니라 "səz"로 약해집니다.' },
           { en: 'The talks will resume next week.', ko: '회담은 다음 주에 재개됩니다.', note: 'will은 거의 들리지 않고 "위르"처럼 앞 단어에 붙습니다.' },
           { en: 'Two thousand and twenty-six', ko: '2026년', note: '연도는 and를 빼고 "two thousand twenty-six"으로 읽는 쪽이 흔합니다.' },
-          { en: 'A quarter of the total', ko: '전체의 4분의 1', note: 'of the는 "어브더"로 뭉쳐 한 단어처럼 지나갑니다.' }
+          { en: 'A quarter of the total', ko: '전체의 4분의 1', note: 'of the는 "어브더"로 뭉쳐 한 단어처럼 지나갑니다.' },
+          { en: 'The findings were published in a weekly report.', ko: '연구 결과는 주간 보고서에 실렸습니다.', note: 'published의 -ed는 아주 약하게 끝나서 거의 들리지 않습니다.' },
+          { en: 'The figure stood at twelve percent.', ko: '수치는 12퍼센트에 머물렀습니다.', note: 'stood at는 평평하고 빠르게 지나가고 percent에만 강세가 갑니다.' }
         ],
         bullets: [
           { en: 'Numbers and names carry the stress; everything between them is reduced.', ko: '숫자와 이름에 강세가 실리고 그 사이는 모두 약해집니다.' },
-          { en: 'Reported speech keeps a flat, steady rhythm on purpose.', ko: '인용 문장은 일부러 평평하고 일정한 리듬으로 읽습니다.' }
+          { en: 'Reported speech keeps a flat, steady rhythm on purpose.', ko: '인용 문장은 일부러 평평하고 일정한 리듬으로 읽습니다.' },
+          { en: 'Function words are almost silent; keep your ear on the numbers and names.', ko: '기능어는 거의 들리지 않습니다. 귀를 숫자와 이름에 두세요.' }
         ]
       },
 
@@ -252,7 +263,7 @@ var MAGAZINE_WEEKS = [
         id: 'news-idioms',
         kind: 'idioms',
         level: 'B2',
-        title: { ko: '이디엄 — 뉴스룸에서 쓰는 8개', en: 'Idioms — eight from the newsroom' },
+        title: { ko: '이디엄 — 뉴스룸에서 쓰는 10개', en: 'Idioms — ten from the newsroom' },
         items: [
           { en: 'break a story', ko: '단독으로 처음 보도하다', meaning: 'to publish news before anyone else', example: 'The local paper broke the story.', note: 'break the news와 뜻이 다릅니다' },
           { en: 'hot off the press', ko: '갓 나온', meaning: 'very recently published', example: 'Here is the report, hot off the press.', note: '신문에서 시작한 표현입니다' },
@@ -261,7 +272,9 @@ var MAGAZINE_WEEKS = [
           { en: 'on the record', ko: '공개 발언으로', meaning: 'allowed to be published', example: 'Nothing was said on the record.', note: '인터뷰에서 반드시 확인해야 할 구분입니다' },
           { en: 'spin a story', ko: '유리하게 포장하다', meaning: 'to present events in a favourable way', example: 'Both sides spun the story their way.', note: 'spin은 명사로도 씁니다' },
           { en: 'bury the lede', ko: '핵심을 뒤로 미루다', meaning: 'to hide the main point low in a story', example: 'The report buried the lede in paragraph nine.', note: 'lede는 기사의 첫 문단을 뜻하는 기자 은어입니다' },
-          { en: 'on background', ko: '배경 설명으로', meaning: 'usable but not attributed by name', example: 'The official spoke on background.', note: 'off the record와 달리 인용은 가능합니다' }
+          { en: 'on background', ko: '배경 설명으로', meaning: 'usable but not attributed by name', example: 'The official spoke on background.', note: 'off the record와 달리 인용은 가능합니다' },
+          { en: 'make headlines', ko: '헤드라인에 오르다', meaning: 'to get a lot of attention', example: 'The scandal made headlines for a week.', note: 'hit the headlines도 같은 뜻입니다' },
+          { en: 'throw light on', ko: '사정을 밝히다', meaning: 'to make something clearer', example: 'The report throws light on the cause.', note: 'shed light on과 같은 뜻입니다' }
         ],
         quote: {
           ko: '뉴스 이디엄은 대부분 취재 과정에서 생겼습니다. 읽을 때 그 장면을 떠올리면 기억에 남습니다.',
@@ -333,7 +346,7 @@ var MAGAZINE_WEEKS = [
         id: 'news-listening',
         kind: 'listening',
         level: 'B2',
-        title: { ko: '듣기·받아쓰기 — 보도 문장 8개', en: 'Listening and dictation — eight report sentences' },
+        title: { ko: '듣기·받아쓰기 — 보도 문장 10개', en: 'Listening and dictation — ten report sentences' },
         intro: {
           ko: '숫자와 날짜가 들어간 문장입니다. 숫자를 놓치지 않는 것이 목표입니다.',
           en: 'These carry numbers and dates. The goal is not to lose the figures.'
@@ -346,7 +359,9 @@ var MAGAZINE_WEEKS = [
           { en: 'The company has not responded to our questions.', ko: '회사는 우리 질문에 답하지 않았습니다.' },
           { en: 'The trial will run for six months from March.', ko: '시험 운행은 3월부터 6개월간 이어집니다.' },
           { en: 'Officials declined to give a figure for the total cost.', ko: '당국은 총비용 수치를 밝히지 않았습니다.' },
-          { en: 'A decision on the longer term is expected by December.', ko: '장기 계획에 대한 결정은 12월에 나올 예정입니다.' }
+          { en: 'A decision on the longer term is expected by December.', ko: '장기 계획에 대한 결정은 12월에 나올 예정입니다.' },
+          { en: 'The new rules take effect at the start of April.', ko: '새 규정은 4월 초부터 효력이 생깁니다.' },
+          { en: 'Support for the plan has fallen to thirty percent.', ko: '계획에 대한 지지는 30퍼센트로 떨어졌습니다.' }
         ],
         items: [
           { en: 'be up by four percent', ko: '4퍼센트 올랐다', meaning: 'to have risen by that amount', example: 'Sales are up by two percent.', note: 'up by는 증가폭, up to는 상한입니다' },
@@ -387,7 +402,8 @@ var MAGAZINE_WEEKS = [
           { ko: '반대하는 쪽의 주장은 무엇이고, 매체는 어떻게 다루었나요?', en: 'What is the objection, and how does the article handle it?' },
           { ko: '시험 운행 기간을 6개월로 잡은 근거는 무엇인가요?', en: 'What supports the choice of a six-month trial?' },
           { ko: '글쓴이가 직접 판단한 문장과 출처를 밝힌 문장을 구분해 보세요.', en: 'Separate the sentences that report facts from the ones that name a source.' },
-          { ko: '이 기사에 영어 제목을 여섯 단어 이내로 붙인다면?', en: 'What English headline of six words or fewer would you give this article?' }
+          { ko: '이 기사에 영어 제목을 여섯 단어 이내로 붙인다면?', en: 'What English headline of six words or fewer would you give this article?' },
+          { ko: '이 기사에서 확인되지 않은 채 남은 사실은 무엇인가요?', en: 'What does the article leave unconfirmed?' }
         ]
       },
 
@@ -431,7 +447,7 @@ var MAGAZINE_WEEKS = [
         id: 'news-discussion',
         kind: 'discussion',
         level: 'B2',
-        title: { ko: '토론 — 뉴스와 미디어에 대한 8가지 질문', en: 'Discussion — eight questions on news and media' },
+        title: { ko: '토론 — 뉴스와 미디어에 대한 10가지 질문', en: 'Discussion — ten questions on news and media' },
         questions: [
           { ko: '영어 뉴스를 읽을 때 가장 먼저 막히는 부분은 어디인가요?', en: 'Where do you get stuck first when you read English news?' },
           { ko: '헤드라인만 보고 내용을 짐작한 적이 있나요?', en: 'Have you ever judged a story from the headline alone?' },
@@ -440,7 +456,9 @@ var MAGAZINE_WEEKS = [
           { ko: '뉴스를 영어로 요약하는 습관을 들이려면 어떻게 해야 할까요?', en: 'How could you build a habit of summarising news in English?' },
           { ko: '짧은 영상 뉴스와 기사 중 어느 쪽이 학습에 더 도움이 되나요?', en: 'Which helps you learn more, short video news or written articles?' },
           { ko: '같은 기사를 두 번 읽는 것과 다른 기사를 두 편 읽는 것 중 어느 쪽이 낫나요?', en: 'Is it better to read one article twice or two different articles once?' },
-          { ko: '영어 뉴스에 하루 몇 분까지 쓸 수 있나요? 현실적인 시간을 정해 보세요.', en: 'How many minutes a day can you realistically give to English news?' }
+          { ko: '영어 뉴스에 하루 몇 분까지 쓸 수 있나요? 현실적인 시간을 정해 보세요.', en: 'How many minutes a day can you realistically give to English news?' },
+          { ko: '같은 사건을 두 매체가 다르게 다룬 사례를 알고 있나요?', en: 'Do you know a case where two outlets covered one event differently?' },
+          { ko: '영어 뉴스에서 배운 표현을 실제로 써 본 적이 있나요?', en: 'Have you ever used a phrase you picked up from English news?' }
         ],
         bullets: [
           { en: 'To hedge — It seems to me that... / I would say that...', ko: '단정을 피할 때 — It seems to me that... / I would say that...' },
@@ -454,7 +472,7 @@ var MAGAZINE_WEEKS = [
         id: 'news-figures',
         kind: 'vocabulary',
         level: 'B2',
-        title: { ko: '수치 표현 — 그래프를 문장으로 옮기는 6개', en: 'Figures — six ways to put a chart into words' },
+        title: { ko: '수치 표현 — 그래프를 문장으로 옮기는 10개', en: 'Figures — ten ways to put a chart into words' },
         intro: {
           ko: '뉴스의 절반은 숫자입니다. 방향과 폭을 구분해서 말할 수 있어야 합니다.',
           en: 'Half of the news is numbers. You need to separate direction from size.'
@@ -467,7 +485,9 @@ var MAGAZINE_WEEKS = [
           { en: 'account for', ko: '(비율을) 차지하다', meaning: 'to make up a share of a total', example: 'Housing accounts for a third of it.', note: '전체에서 차지하는 몫을 말합니다' },
           { en: 'on par with', ko: '~와 비슷한 수준인', meaning: 'at the same level as', example: 'Output is now on par with last year.', note: 'compare with는 비교한다는 뜻입니다' },
           { en: 'hit a record high', ko: '사상 최고치를 기록하다', meaning: 'to reach the highest level ever', example: 'Exports hit a record high in May.', note: 'hit은 기록에 도달했다는 뜻입니다' },
-          { en: 'narrow the gap', ko: '격차를 좁히다', meaning: 'to reduce the difference', example: 'The gap narrowed to two points.', note: 'widen the gap은 반대 상황입니다' }
+          { en: 'narrow the gap', ko: '격차를 좁히다', meaning: 'to reduce the difference', example: 'The gap narrowed to two points.', note: 'widen the gap은 반대 상황입니다' },
+          { en: 'edge up', ko: '소폭 오르다', meaning: 'to rise a little', example: 'Prices edged up in March.', note: '큰 변동이 아니라 아주 작은 증가에 씁니다' },
+          { en: 'level off', ko: '오르내림이 멈추다', meaning: 'to stop rising or falling', example: 'Inflation levelled off in the summer.', note: 'plateau와 비슷한 뜻입니다' }
         ]
       },
 
@@ -476,7 +496,7 @@ var MAGAZINE_WEEKS = [
         id: 'news-quiz',
         kind: 'quiz',
         level: 'B2',
-        title: { ko: '확인 문제 — 12문항', en: 'Quiz — twelve questions' },
+        title: { ko: '확인 문제 — 16문항', en: 'Quiz — sixteen questions' },
         quiz: [
           {
             q: { ko: '다음 헤드라인이 나타내는 원래 문장은? "Two hurt in tunnel fire"', en: 'Which full sentence is behind this headline? "Two hurt in tunnel fire"' },
@@ -585,6 +605,42 @@ var MAGAZINE_WEEKS = [
               ko: '헤드라인의 to부정사는 앞으로의 계획을 나타냅니다.',
               en: 'A to infinitive in a headline points to a plan or a future event.'
             }
+          },
+          {
+            q: { ko: '"소폭 오르다"에 알맞은 표현은?', en: 'Which phrase means to rise just a little?' },
+            options: ['edge up', 'hit a record high', 'remain flat', 'narrow the gap'],
+            answer: 0,
+            explain: {
+              ko: 'edge up이 아주 작은 증가입니다. remain flat은 변동이 없다는 뜻입니다.',
+              en: 'Edge up is a small rise. Remain flat means no change at all.'
+            }
+          },
+          {
+            q: { ko: '"논쟁을 촉발하다"에 맞는 연어는?', en: 'Which collocation means to start a debate?' },
+            options: ['spark a debate', 'draw a debate', 'run a debate', 'make a debate'],
+            answer: 0,
+            explain: {
+              ko: 'spark a debate가 표준입니다. trigger a debate도 같은 뜻입니다.',
+              en: 'You spark a debate. Trigger a debate means the same.'
+            }
+          },
+          {
+            q: { ko: '"여론조사"를 뜻하는 단어는?', en: 'Which word means a survey of opinions?' },
+            options: ['poll', 'leak', 'brief', 'coverage'],
+            answer: 0,
+            explain: {
+              ko: 'poll이 여론조사입니다. coverage는 보도를 뜻합니다.',
+              en: 'A poll surveys opinions. Coverage is the reporting of an event.'
+            }
+          },
+          {
+            q: { ko: '주목을 받아 헤드라인에 오르다는 뜻은?', en: 'Which idiom means getting a lot of attention?' },
+            options: ['make headlines', 'bury the lede', 'break down', 'tone down'],
+            answer: 0,
+            explain: {
+              ko: 'make headlines가 주목을 받는다는 뜻입니다. bury the lede는 핵심을 뒤로 미루는 것입니다.',
+              en: 'Make headlines means attracting attention. Bury the lede hides the main point.'
+            }
           }
         ]
       },
@@ -603,7 +659,11 @@ var MAGAZINE_WEEKS = [
           { en: '**Read the last line too** — the strongest detail or the response often sits at the end.', ko: '**마지막 줄까지 읽으세요** — 반응이나 핵심 수치가 마지막에 오는 경우가 많습니다.' },
           { en: '**Do not translate every word** — skim with the numbers and names first.', ko: '**모든 단어를 옮기지 마세요** — 숫자와 이름만 먼저 훑고 내용을 잡으세요.' },
           { en: '**Note the verb, not the noun** — read the headline aloud and you will hear what is missing.', ko: '**명사보다 동사를 보세요** — 헤드라인을 소리 내어 읽으면 빠진 것이 들립니다.' },
-          { en: '**Keep a source column** — write who said it next to every claim you copy into your notes.', ko: '**출처를 함께 적으세요** — 노트에 옮긴 문장마다 누가 말했는지 붙여 두세요.' }
+          { en: '**Keep a source column** — write who said it next to every claim you copy into your notes.', ko: '**출처를 함께 적으세요** — 노트에 옮긴 문장마다 누가 말했는지 붙여 두세요.' },
+          { en: '**A poll is not a fact** — it reports what people said on one day.', ko: '**여론조사는 사실이 아닙니다** — 특정 날에 사람들이 한 대답일 뿐입니다.' },
+          { en: '**Hedging words protect the claim** — reportedly and allegedly tell you the evidence is thin.', ko: '**완곡어는 주장의 보호막입니다** — reportedly, allegedly는 근거가 얇다는 신호입니다.' },
+          { en: '**Spark a debate, not make one** — news writing has its own verbs for starting things.', ko: '**논쟁은 spark a debate** — 사건의 시작에는 기사 특유의 동사를 씁니다.' },
+          { en: '**Edge up, level off** — small movements have their own words.', ko: '**edge up · level off** — 작은 움직임에는 별도의 표현이 붙습니다.' }
         ]
       },
       /* 16. 문화 */
@@ -675,8 +735,8 @@ var MAGAZINE_WEEKS = [
       en: 'Speak like you actually do every day'
     },
     summary: {
-      ko: '교과서 영어와 진짜 회화의 간격을 좁힙니다. 일상 어휘 12개, 구동사 8개, 연어 8개, 축약 발음 8개, 슬랭 8개, 이디엄 8개, 대화 3장, 받아쓰기 8문장, 독해 1편과 모범 표현, 모범 답안이 있는 작문 템플릿, 토론 질문 8개, 확인 문제 12개.',
-      en: 'Closing the gap between textbook English and real conversation: twelve everyday words, eight phrasal verbs, eight collocations, eight reductions, eight slang items, eight idioms, three dialogues, eight dictation lines, one reading passage with model expressions, a writing template with a model answer, eight discussion questions and twelve quiz items.'
+      ko: '교과서 영어와 진짜 회화의 간격을 좁힙니다. 일상 어휘 16개, 구동사 10개, 연어 10개, 축약 발음 10개, 슬랭 10개, 이디엄 10개, 대화 3장, 받아쓰기 10문장, 독해 1편과 모범 표현, 모범 답안이 있는 작문 템플릿, 토론 질문 10개, 확인 문제 16개.',
+      en: 'Closing the gap between textbook English and real conversation: sixteen everyday words, ten phrasal verbs, ten collocations, ten reductions, ten slang items, ten idioms, three dialogues, ten dictation lines, one reading passage with model expressions, a writing template with a model answer, ten discussion questions and sixteen quiz items.'
     },
 
     sections: [
@@ -707,7 +767,7 @@ var MAGAZINE_WEEKS = [
         id: 'daily-words',
         kind: 'vocabulary',
         level: 'A2',
-        title: { ko: '일상 어휘 — 하루에 한 번은 쓰는 12단어', en: 'Everyday words — twelve you use daily' },
+        title: { ko: '일상 어휘 — 하루에 한 번은 쓰는 16단어', en: 'Everyday words — sixteen you use daily' },
         intro: {
           ko: '뜻은 알아도 입에 안 붙는 단어들입니다. 소리 내어 세 번씩 읽어 보세요.',
           en: 'You know these, but they do not come out of your mouth yet. Say each one aloud three times.'
@@ -724,7 +784,11 @@ var MAGAZINE_WEEKS = [
           { en: 'pop in', ko: '잠깐 들르다', meaning: 'to visit briefly without planning', example: 'I will pop in on my way home.', note: '예고 없이 짧게 들르는 느낌입니다' },
           { en: 'sort out', ko: '정리하다, 해결하다', meaning: 'to organise or fix something', example: 'I need to sort out my train tickets.', note: '문제와 서류 모두에 씁니다' },
           { en: 'pick up', ko: '가져오다, 데리러 가다', meaning: 'to collect someone or something', example: 'Could you pick up some milk?', note: '사 오다·데리러 가다 두 뜻 모두 자주 씁니다' },
-          { en: 'take your time', ko: '천천히 하세요', meaning: 'there is no need to hurry', example: 'Take your time, the train is late anyway.', note: '재촉하지 않는다는 배려의 표현입니다' }
+          { en: 'take your time', ko: '천천히 하세요', meaning: 'there is no need to hurry', example: 'Take your time, the train is late anyway.', note: '재촉하지 않는다는 배려의 표현입니다' },
+          { en: 'sleep in', ko: '늦잠 자다', meaning: 'to sleep longer than usual', example: 'I slept in on Sunday morning.', note: 'sleep late보다 sleep in이 훨씬 흔합니다' },
+          { en: 'keep me posted', ko: '계속 알려 줘', meaning: 'keep telling me the latest news', example: 'Keep me posted about the results.', note: '진행 상황을 계속 알려 달라는 표현입니다' },
+          { en: 'out of town', ko: '여행 중, 출장 중', meaning: 'away from the city', example: 'She is out of town until Monday.', note: '타지에 나가 있는 상태입니다' },
+          { en: 'on my way', ko: '가는 중', meaning: 'travelling there now', example: 'I am on my way, five minutes left.', note: '전화로 자주 쓰는 짧은 문장입니다' }
         ]
       },
 
@@ -733,7 +797,7 @@ var MAGAZINE_WEEKS = [
         id: 'daily-phrasal',
         kind: 'phrasal',
         level: 'B1',
-        title: { ko: '구동사 — 뜻이 통째로 달라지는 8개', en: 'Phrasal verbs — eight that change meaning completely' },
+        title: { ko: '구동사 — 뜻이 통째로 달라지는 10개', en: 'Phrasal verbs — ten that change meaning completely' },
         intro: {
           ko: '동사만 알면 문장이 안 됩니다. 구동사는 덩어리로 외워야 합니다.',
           en: 'Knowing the verb alone is not enough. Learn these as single units.'
@@ -746,7 +810,9 @@ var MAGAZINE_WEEKS = [
           { en: 'figure out', ko: '알아내다, 이해하다', meaning: 'to understand or solve something', example: 'I finally figured out the app.', note: 'think out과 헷갈리지 마세요' },
           { en: 'come up with', ko: '생각해 내다', meaning: 'to think of an idea or plan', example: 'She came up with a great name.', note: '아이디어·해결책에 씁니다' },
           { en: 'get along with', ko: '~와 잘 지내다', meaning: 'to have a good relationship with someone', example: 'I get along with my new team.', note: '사람 사이에만 씁니다. 사물에는 쓸 수 없습니다' },
-          { en: 'look after', ko: '돌보다', meaning: 'to take care of someone or something', example: 'Could you look after my cat?', note: 'take care of보다 회화적입니다' }
+          { en: 'look after', ko: '돌보다', meaning: 'to take care of someone or something', example: 'Could you look after my cat?', note: 'take care of보다 회화적입니다' },
+          { en: 'come over', ko: '놀러 오다', meaning: 'to visit someone home', example: 'Come over after work if you like.', note: '집으로 놀러 올 때 씁니다' },
+          { en: 'get by', ko: '그럭저럭 지내다', meaning: 'to manage with difficulty', example: 'My English gets by in most situations.', note: '아슬아슬하지만 버틴다는 느낌입니다' }
         ]
       },
 
@@ -755,7 +821,7 @@ var MAGAZINE_WEEKS = [
         id: 'daily-collocation',
         kind: 'collocation',
         level: 'B1',
-        title: { ko: '연어 — 같이 다니는 단어 짝 8개', en: 'Collocations — eight word partnerships' },
+        title: { ko: '연어 — 같이 다니는 단어 짝 10개', en: 'Collocations — ten word partnerships' },
         intro: {
           ko: '단어는 맞는데 조합이 어색하면 원어민이 바로 알아챕니다.',
           en: 'Right words, wrong partners, and a native speaker notices instantly.'
@@ -768,7 +834,9 @@ var MAGAZINE_WEEKS = [
           { en: 'pay attention', ko: '주의를 기울이다', meaning: 'to focus on something', example: 'Pay attention to the last part.', note: 'to를 붙여 대상을 밝힙니다' },
           { en: 'make sense', ko: '말이 되다', meaning: 'to be logical or clear', example: 'That makes sense now.', note: 'Does that make sense? 는 설명 뒤 확인 표현입니다' },
           { en: 'have a chat', ko: '이야기를 나누다', meaning: 'to talk in a friendly way', example: 'Let us have a chat about it tomorrow.', note: 'talk보다 가볍고 짧은 대화입니다' },
-          { en: 'run late', ko: '예정보다 늦어지다', meaning: 'to be behind schedule', example: 'Sorry, I am running late.', note: 'I am late는 내가 늦었다, run late는 진행이 밀린다는 느낌입니다' }
+          { en: 'run late', ko: '예정보다 늦어지다', meaning: 'to be behind schedule', example: 'Sorry, I am running late.', note: 'I am late는 내가 늦었다, run late는 진행이 밀린다는 느낌입니다' },
+          { en: 'take a nap', ko: '낮잠을 자다', meaning: 'to sleep for a short time', example: 'I took a nap after lunch.', note: '낮잠은 nap, 밤잠은 sleep입니다' },
+          { en: 'make plans', ko: '계획을 세우다', meaning: 'to arrange what to do', example: 'We made plans for the weekend.', note: '복수 plans로 자주 씁니다' }
         ]
       },
 
@@ -827,8 +895,8 @@ var MAGAZINE_WEEKS = [
         level: 'B1',
         title: { ko: '발음 — 빠르게 말할 때 줄어드는 소리', en: 'Pronunciation — what disappears in fast speech' },
         intro: {
-          ko: '들은 대로 적으면 틀리고, 적힌 대로 들으면 안 들립니다. 줄어드는 규칙 다섯 가지만 익히세요.',
-          en: 'Write what you hear and you are wrong. Expect what is written and you hear nothing. Learn five reductions.'
+          ko: '들은 대로 적으면 틀리고, 적힌 대로 들으면 안 들립니다. 줄어드는 규칙 열 가지를 익히세요.',
+          en: 'Write what you hear and you are wrong. Expect what is written and you hear nothing. Learn ten reductions.'
         },
         items: [
           { en: 'What do you want?', ko: '뭐 원해요?', note: '실제로는 "와러유 원트"처럼 들립니다. do you가 붙어 /dʒə/가 됩니다.' },
@@ -838,11 +906,14 @@ var MAGAZINE_WEEKS = [
           { en: 'Do you know him?', ko: '그 사람 알아요?', note: 'Do you는 "듀" 또는 "주"로 줄어듭니다.' },
           { en: 'Let us grab lunch.', ko: '점심 먹으러 가자.', note: 'Let us는 "레츠", grab lunch는 "그랩런치"로 붙습니다.' },
           { en: 'I have to go.', ko: '가 봐야 해.', note: 'have to는 "해프터"처럼 f 소리로 이어집니다.' },
-          { en: 'See you later.', ko: '나중에 봐.', note: 'See you는 "시유"로 붙고 later는 가볍게 지나갑니다.' }
+          { en: 'See you later.', ko: '나중에 봐.', note: 'See you는 "시유"로 붙고 later는 가볍게 지나갑니다.' },
+          { en: 'What are you up to?', ko: '뭐 해?', note: 'are you가 "아유"로 줄어들어 Whatarya up to처럼 들립니다.' },
+          { en: 'I want to go.', ko: '가고 싶어.', note: 'want to는 "원터"로 짧아집니다. going to의 "고나"와 같은 축약입니다.' }
         ],
         bullets: [
           { en: 'Function words shrink. Content words stay clear.', ko: '기능어(do, you, to, me)는 줄고, 내용어(want, call, second)는 또렷하게 남습니다.' },
-          { en: 'Stress the last content word in the sentence.', ko: '문장에서 마지막 내용어에 강세를 두면 훨씬 자연스럽게 들립니다.' }
+          { en: 'Stress the last content word in the sentence.', ko: '문장에서 마지막 내용어에 강세를 두면 훨씬 자연스럽게 들립니다.' },
+          { en: 'If it all sounds like noise, catch just the stressed word first.', ko: '전부 소음처럼 들리면 강세가 실린 단어 하나만 먼저 잡아 보세요.' }
         ]
       },
 
@@ -851,7 +922,7 @@ var MAGAZINE_WEEKS = [
         id: 'daily-slang',
         kind: 'slang',
         level: 'B1',
-        title: { ko: '슬랭 — 알아두면 편한 8가지', en: 'Slang — eight you should recognise' },
+        title: { ko: '슬랭 — 알아두면 편한 10가지', en: 'Slang — ten you should recognise' },
         intro: {
           ko: '먼저 알아듣는 것이 목표입니다. 격식 있는 자리에서는 쓰지 않는 편이 안전합니다.',
           en: 'Recognition comes first. In formal settings it is safer not to use these yourself.'
@@ -864,7 +935,9 @@ var MAGAZINE_WEEKS = [
           { en: 'I am down.', ko: '나도 할래.', meaning: 'I want to join', example: 'A movie tonight? I am down.', note: '제안에 동의하는 캐주얼한 표현입니다' },
           { en: 'No big deal.', ko: '별거 아니에요.', meaning: 'it is not important', example: 'No big deal, we can redo it.', note: '감사의 말에 대한 답으로도 씁니다' },
           { en: 'Sounds good.', ko: '좋아요.', meaning: 'I agree with that plan', example: 'Seven works for me. Sounds good.', note: '제안을 짧게 수락하는 표현입니다' },
-          { en: 'You bet.', ko: '그럼요.', meaning: 'certainly, of course', example: 'Can you help me move? You bet.', note: '친근한 확답입니다. 격식 있는 자리에는 피하세요' }
+          { en: 'You bet.', ko: '그럼요.', meaning: 'certainly, of course', example: 'Can you help me move? You bet.', note: '친근한 확답입니다. 격식 있는 자리에는 피하세요' },
+          { en: 'Kind of.', ko: '어느 정도는.', meaning: 'sort of, not exactly', example: 'Do you like it? Kind of.', note: 'kinda로 줄여 발음합니다. 격식 있는 자리에는 피합니다' },
+          { en: 'Same here.', ko: '나도 그래.', meaning: 'I feel the same way', example: 'I am exhausted. Same here.', note: '동의를 짧게 전하는 표현입니다' }
         ]
       },
 
@@ -873,7 +946,7 @@ var MAGAZINE_WEEKS = [
         id: 'daily-idioms',
         kind: 'idioms',
         level: 'B1',
-        title: { ko: '이디엄 — 일상에서 자주 나오는 8개', en: 'Idioms — eight that come up all the time' },
+        title: { ko: '이디엄 — 일상에서 자주 나오는 10개', en: 'Idioms — ten that come up all the time' },
         intro: {
           ko: '직역하면 이상하지만, 들리는 빈도는 아주 높습니다.',
           en: 'They make no sense word for word, and you hear them constantly.'
@@ -886,7 +959,9 @@ var MAGAZINE_WEEKS = [
           { en: 'in the same boat', ko: '같은 처지인', meaning: 'in the same difficult situation', example: 'We are all in the same boat here.', note: '공감하거나 위로할 때 좋습니다' },
           { en: 'out of the blue', ko: '갑자기, 난데없이', meaning: 'unexpectedly', example: 'She called me out of the blue.', note: '예상 못 한 일에 씁니다' },
           { en: 'hang in there', ko: '버텨 봐', meaning: 'keep going through a hard time', example: 'Hang in there, the term ends soon.', note: '위로할 때 쓰는 격려입니다' },
-          { en: 'the last straw', ko: '더는 못 버티게 만든 결정적 계기', meaning: 'the final problem that ends your patience', example: 'The cancelled train was the last straw.', note: '원래는 낙타 등에 지는 마지막 짚이라는 뜻입니다' }
+          { en: 'the last straw', ko: '더는 못 버티게 만든 결정적 계기', meaning: 'the final problem that ends your patience', example: 'The cancelled train was the last straw.', note: '원래는 낙타 등에 지는 마지막 짚이라는 뜻입니다' },
+          { en: 'bite the bullet', ko: '마음먹고 참다', meaning: 'to accept something hard and do it', example: 'I bit the bullet and went to the dentist.', note: '힘든 일을 미루지 않고 감수한다는 뜻입니다' },
+          { en: 'on the ball', ko: '기민한, 정신이 맑은', meaning: 'alert and quick to notice', example: 'The new assistant is really on the ball.', note: '꼼꼼한 사람을 칭찬할 때 씁니다' }
         ]
       },
 
@@ -996,7 +1071,9 @@ var MAGAZINE_WEEKS = [
           { en: 'Sorry, I am running a bit behind today.', ko: '미안, 오늘 조금 늦어지고 있어.' },
           { en: 'Do you want to grab a coffee after this?', ko: '이거 끝나고 커피 마시러 갈래?' },
           { en: 'I will let you know as soon as I hear back.', ko: '답을 듣는 대로 알려 줄게.' },
-          { en: 'It was good to see you, let us do this again.', ko: '만나서 반가웠어, 다음에 또 하자.' }
+          { en: 'It was good to see you, let us do this again.', ko: '만나서 반가웠어, 다음에 또 하자.' },
+          { en: 'Can we reschedule for some time next week?', ko: '다음 주로 다시 잡을 수 있을까요?' },
+          { en: 'It slipped my mind, sorry about that.', ko: '깜빡했습니다, 미안해요.' }
         ],
         items: [
           { en: 'start without me', ko: '나 없이 시작해', meaning: 'begin and do not wait for me', example: 'Go ahead and start without me.', note: '늦을 때 쓰는 가장 짧은 문장입니다' },
@@ -1035,7 +1112,8 @@ var MAGAZINE_WEEKS = [
           { ko: '저자는 왜 시간의 양보다 행동이 중요하다고 하나요?', en: 'Why does the writer value the action over the amount of time?' },
           { ko: '매일 하는 일 중에 영어를 붙일 수 있는 습관 하나를 골라 보세요.', en: 'Which daily habit of yours could carry ten minutes of English?' },
           { ko: '열 분이라는 시간이 부족하다고 느껴지는 이유는 무엇인가요?', en: 'Why does ten minutes a day still feel like too little?' },
-          { ko: '이번 주에 실제로 실행할 한 가지를 문장으로 써 보세요.', en: 'Write one sentence about what you will actually do this week.' }
+          { ko: '이번 주에 실제로 실행할 한 가지를 문장으로 써 보세요.', en: 'Write one sentence about what you will actually do this week.' },
+          { ko: '이 글의 조언 중 이미 실천하고 있는 것이 있나요?', en: 'Which piece of advice from the passage are you already following?' }
         ]
       },
 
@@ -1111,7 +1189,7 @@ var MAGAZINE_WEEKS = [
         id: 'daily-discussion',
         kind: 'discussion',
         level: 'B1',
-        title: { ko: '토론 — 8가지 질문', en: 'Discussion — eight questions' },
+        title: { ko: '토론 — 10가지 질문', en: 'Discussion — ten questions' },
         intro: {
           ko: '소리 내어 30초씩 답해 보세요. 녹음해서 들어 보면 더 좋습니다.',
           en: 'Answer aloud for thirty seconds each. Recording yourself helps more than you expect.'
@@ -1124,7 +1202,9 @@ var MAGAZINE_WEEKS = [
           { ko: '발음에서 가장 고치고 싶은 부분은 어디인가요?', en: 'Which part of your pronunciation do you want to fix first?' },
           { ko: '영어로 말할 때 자신감을 높이는 방법은 무엇일까요?', en: 'What actually raises your confidence when you speak?' },
           { ko: '되묻는 질문을 일부러 하나씩 붙여 본다면, 어떤 문장을 써 보겠어요?', en: 'If you added one follow-up question to every answer, which line would you use most?' },
-          { ko: '한국어로 하는 습관 중 영어로 바꿔 볼 수 있는 것은 무엇인가요?', en: 'Which habit you already do in Korean could you switch to English?' }
+          { ko: '한국어로 하는 습관 중 영어로 바꿔 볼 수 있는 것은 무엇인가요?', en: 'Which habit you already do in Korean could you switch to English?' },
+          { ko: '스몰토크를 두세 번으로 끝내는 것에 대해 어떻게 생각하나요?', en: 'How do you feel about finishing small talk after just two or three turns?' },
+          { ko: '되묻기 습관을 들이면 대화가 어떻게 달라질까요?', en: 'How would a habit of asking back change your conversations?' }
         ],
         bullets: [
           { en: 'To keep going — Go on... / Really? What happened next?', ko: '말을 이어 달라고 할 때 — Go on... / Really? What happened next?' },
@@ -1139,7 +1219,7 @@ var MAGAZINE_WEEKS = [
         id: 'daily-quiz',
         kind: 'quiz',
         level: 'B1',
-        title: { ko: '확인 문제 — 12문항', en: 'Quiz — twelve questions' },
+        title: { ko: '확인 문제 — 16문항', en: 'Quiz — sixteen questions' },
         intro: {
           ko: '보기를 고르면 바로 채점되고, 다 풀면 점수가 나옵니다. 틀려도 다시 풀 수 있습니다.',
           en: 'Pick an option and it is marked instantly. Your score appears when you finish, and you can start over.'
@@ -1252,6 +1332,42 @@ var MAGAZINE_WEEKS = [
               ko: 'That works for me는 일정이 맞는다는 뜻입니다.',
               en: 'That works for me says the arrangement is fine on your side.'
             }
+          },
+          {
+            q: { ko: '"그럴 만하네요"에 해당하는 슬랭은?', en: 'Which slang means that something is reasonable?' },
+            options: ['Fair enough.', 'My bad.', 'You bet.', 'Got it.'],
+            answer: 0,
+            explain: {
+              ko: 'Fair enough가 그럴 만하다는 인정입니다. My bad는 내 잘못이라는 뜻입니다.',
+              en: 'Fair enough accepts the point. My bad admits a small mistake.'
+            }
+          },
+          {
+            q: { ko: '"그럭저럭 버티다"에 해당하는 구동사는?', en: 'Which phrasal verb means to manage with difficulty?' },
+            options: ['get by', 'come over', 'hang out', 'pop in'],
+            answer: 0,
+            explain: {
+              ko: 'get by가 그럭저럭 지내다입니다. come over는 놀러 오다입니다.',
+              en: 'Get by means managing. Come over means visiting someone home.'
+            }
+          },
+          {
+            q: { ko: '"낮잠을 자다"에 맞는 연어는?', en: 'Which collocation means a short daytime sleep?' },
+            options: ['take a nap', 'do a nap', 'make a nap', 'sleep a nap'],
+            answer: 0,
+            explain: {
+              ko: '낮잠은 take a nap으로만 씁니다.',
+              en: 'A nap is always taken. The other verbs are never used with it.'
+            }
+          },
+          {
+            q: { ko: '빠른 말에서 going to는 어떻게 줄어드나요?', en: 'What does going to become in fast speech?' },
+            options: ['gonna', 'gotta', 'wanna', 'goin to'],
+            answer: 0,
+            explain: {
+              ko: 'going to는 gonna로 줄어듭니다. gotta는 have got to의 축약입니다.',
+              en: 'Going to becomes gonna. Gotta stands for have got to.'
+            }
           }
         ]
       },
@@ -1274,7 +1390,11 @@ var MAGAZINE_WEEKS = [
           { en: '**Slang is for listening first** — understand it, then decide whether to use it.', ko: '**슬랭은 듣기가 먼저입니다** — 알아듣고 나서 쓸지 결정하세요.' },
           { en: '**Answer, then ask** — the follow-up question is the polite half of small talk.', ko: '**답한 뒤 되물으세요** — 되묻는 질문이 스몰토크의 나머지 절반입니다.' },
           { en: '**get along with people, look after things** — the two verbs are not interchangeable.', ko: '**사람에게는 get along with, 사물에는 look after** — 서로 바꿔 쓸 수 없습니다.' },
-          { en: '**Say it out loud** — a line you have never spoken will not come out in a real conversation.', ko: '**소리 내어 말하세요** — 한 번도 입으로 뱉지 않은 문장은 실전에서 나오지 않습니다.' }
+          { en: '**Say it out loud** — a line you have never spoken will not come out in a real conversation.', ko: '**소리 내어 말하세요** — 한 번도 입으로 뱉지 않은 문장은 실전에서 나오지 않습니다.' },
+          { en: '**going to, want to, got to** — gonna, wanna, gotta in fast speech, but never in writing.', ko: '**going to · want to · got to** — 빠른 말에서는 gonna, wanna, gotta가 되지만 글로는 쓰지 않습니다.' },
+          { en: '**Sleep in, not sleep late** — the phrasal verb is the one people say.', ko: '**늦잠은 sleep in** — sleep late보다 sleep in이 훨씬 흔합니다.' },
+          { en: '**Keep me posted** — the standard way to ask for updates without asking again.', ko: '**Keep me posted** — 다시 묻지 않고도 진행 상황을 부탁하는 표준 표현입니다.' },
+          { en: '**Naps are taken, plans are made** — here too the verbs are fixed.', ko: '**낮잠은 take, 계획은 make** — 여기서도 동사가 고정입니다.' }
         ]
       }
     ]
@@ -1293,8 +1413,8 @@ var MAGAZINE_WEEKS = [
       en: 'Sentences that work in meetings and email'
     },
     summary: {
-      ko: '돌려 말하지 않고도 정중하게 말하는 법. 업무 어휘 12개, 구동사 10개, 연어 8개, 정중 표현 문법, 발음 8개, 비즈니스 이디엄 9개, 회의 대화 2장, 모범 이메일이 있는 작문, 받아쓰기 8문장, 독해 1편과 모범 표현, 회사 문화, 토론 질문 8개, 확인 문제 12개.',
-      en: 'Being polite without being vague: twelve work words, ten phrasal verbs, eight collocations, a grammar point on polite forms, eight pronunciation points, nine business idioms, two meetings, a model email, eight dictation lines, one reading passage with model expressions, a culture note, eight discussion questions and twelve quiz items.'
+      ko: '돌려 말하지 않고도 정중하게 말하는 법. 업무 어휘 16개, 구동사 12개, 연어 10개, 정중 표현 문법, 발음 10개, 비즈니스 이디엄 10개, 회의 대화 2장, 자연스러운 표현과 유머, 모범 이메일이 있는 작문, 받아쓰기 10문장, 독해 1편과 모범 표현, 회사 문화, 토론 질문 10개, 확인 문제 16개.',
+      en: 'Being polite without being vague: sixteen work words, twelve phrasal verbs, ten collocations, a grammar point on polite forms, ten pronunciation points, ten business idioms, two meetings, natural expressions and humour, a model email, ten dictation lines, one reading passage with model expressions, a culture note, ten discussion questions and sixteen quiz items.'
     },
 
     sections: [
@@ -1325,7 +1445,7 @@ var MAGAZINE_WEEKS = [
         id: 'work-words',
         kind: 'vocabulary',
         level: 'B1',
-        title: { ko: '업무 어휘 — 회의에서 매일 나오는 12단어', en: 'Work words — twelve that come up daily' },
+        title: { ko: '업무 어휘 — 회의에서 매일 나오는 16단어', en: 'Work words — sixteen that come up daily' },
         intro: {
           ko: '한국어로는 다르게 들려도, 영어 회의에서는 이 단어들이 반복됩니다.',
           en: 'They sound different in Korean, but in English meetings these come back constantly.'
@@ -1342,7 +1462,11 @@ var MAGAZINE_WEEKS = [
           { en: 'takeaway', ko: '핵심 요점', meaning: 'the main point to remember', example: 'What is the main takeaway from today?', note: '식당 포장 음식이라는 뜻도 있습니다' },
           { en: 'action item', ko: '할 일 항목', meaning: 'a task that someone must do', example: 'Let us list the action items here.', note: '회의록에서 담당자와 함께 적습니다' },
           { en: 'heads-up', ko: '미리 알림', meaning: 'an early warning about something', example: 'Thanks for the heads-up about the delay.', note: '명사 앞에 a를 붙여 a heads-up으로 씁니다' },
-          { en: 'handover', ko: '업무 인계', meaning: 'the act of passing work to someone', example: 'We need a clean handover before she leaves.', note: '동사로는 hand over입니다' }
+          { en: 'handover', ko: '업무 인계', meaning: 'the act of passing work to someone', example: 'We need a clean handover before she leaves.', note: '동사로는 hand over입니다' },
+          { en: 'agenda', ko: '회의 안건', meaning: 'the list of things to discuss', example: 'The first item on the agenda is budget.', note: '안건은 agenda 순서대로 다룹니다' },
+          { en: 'attendee', ko: '참석자', meaning: 'a person who attends a meeting', example: 'Attendees should join five minutes early.', note: '참가자·참석자를 모두 attendee로 씁니다' },
+          { en: 'availability', ko: '일정 가능 여부', meaning: 'the times when someone is free', example: 'Please check your availability for Thursday.', note: '가능한 시간대는 available slot입니다' },
+          { en: 'rework', ko: '재작업', meaning: 'work that has to be done again', example: 'The rework cost us two days.', note: '다시 만드는 작업 전체를 뜻합니다' }
         ]
       },
 
@@ -1351,7 +1475,7 @@ var MAGAZINE_WEEKS = [
         id: 'work-phrasal',
         kind: 'phrasal',
         level: 'B1',
-        title: { ko: '구동사 — 이메일을 짧게 만드는 10개', en: 'Phrasal verbs — ten that shorten your email' },
+        title: { ko: '구동사 — 이메일을 짧게 만드는 12개', en: 'Phrasal verbs — twelve that shorten your email' },
         intro: {
           ko: '긴 문장을 한 단어로 줄여 줍니다. 다만 격식이 필요한 문서에서는 풀어 쓰는 편이 안전합니다.',
           en: 'They shrink long sentences into one unit. In very formal documents, the full form is safer.'
@@ -1366,7 +1490,9 @@ var MAGAZINE_WEEKS = [
           { en: 'roll out', ko: '단계적으로 출시하다', meaning: 'to release something gradually', example: 'We roll out the update on Monday.', note: '명사형은 a rollout입니다' },
           { en: 'sign off on', ko: '최종 승인하다', meaning: 'to give final approval', example: 'The director has to sign off on the budget.', note: 'sign off는 퇴근하다는 뜻도 있습니다' },
           { en: 'flag up', ko: '문제로 알리다', meaning: 'to point something out for attention', example: 'Please flag up any risk early.', note: 'raise a concern보다 짧은 동료 간 표현입니다' },
-          { en: 'push back', ko: '일정을 미루다, 반대하다', meaning: 'to delay or to resist', example: 'Can we push back the launch by a week?', note: '일정과 의견 모두에 씁니다' }
+          { en: 'push back', ko: '일정을 미루다, 반대하다', meaning: 'to delay or to resist', example: 'Can we push back the launch by a week?', note: '일정과 의견 모두에 씁니다' },
+          { en: 'carry over', ko: '다음으로 넘기다', meaning: 'to move something to the next period', example: 'Let us carry the rest over to next week.', note: '남은 항목·일정을 다음으로 미룰 때 씁니다' },
+          { en: 'close out', ko: '마무리하다, 종결하다', meaning: 'to finish something formally', example: 'We closed out the ticket yesterday.', note: '이슈·티켓을 끝낼 때 자주 씁니다' }
         ]
       },
 
@@ -1375,7 +1501,7 @@ var MAGAZINE_WEEKS = [
         id: 'work-collocation',
         kind: 'collocation',
         level: 'B1',
-        title: { ko: '연어 — 문서에서 틀리기 쉬운 8쌍', en: 'Collocations — eight pairs that go wrong in writing' },
+        title: { ko: '연어 — 문서에서 틀리기 쉬운 10쌍', en: 'Collocations — ten pairs that go wrong in writing' },
         items: [
           { en: 'meet a deadline', ko: '마감을 지키다', meaning: 'to finish on time', example: 'We met the deadline by two hours.', note: 'keep a deadline보다 meet을 씁니다' },
           { en: 'raise a concern', ko: '우려를 제기하다', meaning: 'to mention a worry', example: 'I would like to raise a concern about cost.', note: 'say a concern은 어색합니다' },
@@ -1384,7 +1510,9 @@ var MAGAZINE_WEEKS = [
           { en: 'give an update', ko: '현황을 알리다', meaning: 'to report the current state', example: 'Let me give a quick update.', note: 'update on + 대상 형태로도 씁니다' },
           { en: 'meet expectations', ko: '기대에 부응하다', meaning: 'to be as good as expected', example: 'The result met our expectations.', note: 'live up to expectations도 같은 뜻입니다' },
           { en: 'run a meeting', ko: '회의를 진행하다', meaning: 'to lead a meeting', example: 'She runs the Monday meeting.', note: 'do a meeting은 쓰지 않습니다' },
-          { en: 'put together a plan', ko: '계획을 짜다', meaning: 'to prepare something from parts', example: 'I will put together a short plan.', note: 'write a plan보다 준비의 느낌이 강합니다' }
+          { en: 'put together a plan', ko: '계획을 짜다', meaning: 'to prepare something from parts', example: 'I will put together a short plan.', note: 'write a plan보다 준비의 느낌이 강합니다' },
+          { en: 'send a reminder', ko: '알림을 보내다', meaning: 'to remind someone about something', example: 'I will send a reminder on Monday morning.', note: '일정 알림은 reminder about로 붙입니다' },
+          { en: 'hit a target', ko: '목표를 달성하다', meaning: 'to reach a goal', example: 'We hit the sales target in March.', note: '달성하다는 hit 또는 reach로 고정입니다' }
         ]
       },
 
@@ -1426,7 +1554,7 @@ var MAGAZINE_WEEKS = [
           { en: 'Would you mind taking a look?', ko: '한번 봐 주시겠어요?', note: 'mind 뒤에는 -ing가 옵니다' },
           { en: 'I was wondering if you could join us.', ko: '함께해 주실 수 있을지 궁금했습니다.', note: '가장 부드러운 부탁 — 이메일에 어울립니다' },
           { en: 'Let me know if that works for you.', ko: '괜찮으신지 알려 주세요.', note: '부탁을 닫는 문장으로 좋습니다' },
-          { en: 'Would you mind checking this?', ko: '이것 좌 확인해 주시겠어요?', note: 'mind 뒤에는 -ing가 옵니다. 가장 자주 틀리는 자리입니다', meaning: 'a polite request with an -ing form' },
+          { en: 'Would you mind checking this?', ko: '이것 좀 확인해 주시겠어요?', note: 'mind 뒤에는 -ing가 옵니다. 가장 자주 틀리는 자리입니다', meaning: 'a polite request with an -ing form' },
           { en: 'I appreciate you looking into it.', ko: '살펴봐 주셔서 감사합니다.', note: '업무 메일에서 Thank you보다 격식 있는 감사 표현입니다', meaning: 'a more formal thank you' }
         ],
         quote: {
@@ -1453,11 +1581,14 @@ var MAGAZINE_WEEKS = [
           { en: 'I did not catch the last part.', ko: '마지막 부분을 못 들었습니다.', note: 'catch에 강세를 둡니다. did not은 약하게 지나갑니다.' },
           { en: 'Let me repeat that back to you.', ko: '다시 한번 정리해서 말씀드리겠습니다.', note: 'repeat that back은 한 덩어리로 이어 읽습니다.' },
           { en: 'Just to confirm, we are on for Thursday.', ko: '확인차 말씀드리면 목요일로 확정입니다.', note: 'Just to는 붙여 읽고 confirm에 강세를 둡니다.' },
-          { en: 'The numbers are in the shared folder.', ko: '수치는 공유 폴더에 있습니다.', note: 'shared folder는 한 단어처럼 붙여 말합니다.' }
+          { en: 'The numbers are in the shared folder.', ko: '수치는 공유 폴더에 있습니다.', note: 'shared folder는 한 단어처럼 붙여 말합니다.' },
+          { en: 'Let me walk you through the numbers.', ko: '수치를 하나씩 설명드리겠습니다.', note: 'walk you through는 차근차근 설명한다는 표현입니다.' },
+          { en: 'I will circle back to you before five.', ko: '다섯 시 전에 다시 연락드리겠습니다.', note: 'circle back은 한 덩어리로 빠르게 읽습니다.' }
         ],
         bullets: [
           { en: 'Stress the noun that matters, then pause. Flat, fast sentences are the ones people ask you to repeat.', ko: '중요한 명사에 강세를 두고 짧게 쉽니다. 평평하고 빠른 문장이 되물음을 부릅니다.' },
-          { en: 'Numbers and dates need a clear pause before and after.', ko: '숫자와 날짜는 앞뒤에 또렷한 쉼을 둡니다.' }
+          { en: 'Numbers and dates need a clear pause before and after.', ko: '숫자와 날짜는 앞뒤에 또렷한 쉼을 둡니다.' },
+          { en: 'End each point with a falling tone, so people know you are done.', ko: '각 문장 끝을 내림조로 마쳐야 말이 끝났다는 신호가 됩니다.' }
         ]
       },
 
@@ -1466,7 +1597,7 @@ var MAGAZINE_WEEKS = [
         id: 'work-idioms',
         kind: 'idioms',
         level: 'B2',
-        title: { ko: '비즈니스 이디엄 — 회의에서 들리는 9개', en: 'Business idioms — nine you hear in meetings' },
+        title: { ko: '비즈니스 이디엄 — 회의에서 들리는 10개', en: 'Business idioms — ten you hear in meetings' },
         items: [
           { en: 'touch base', ko: '짧게 상황을 공유하다', meaning: 'to make brief contact', example: 'Let us touch base on Friday.', note: '길게 논의하지 않고 확인만 하는 느낌입니다' },
           { en: 'ballpark figure', ko: '대략적인 수치', meaning: 'a rough estimate', example: 'Can you give me a ballpark figure?', note: '정확한 값이 아니어도 된다는 신호입니다' },
@@ -1476,7 +1607,36 @@ var MAGAZINE_WEEKS = [
           { en: 'low-hanging fruit', ko: '당장 성과를 내기 쉬운 일', meaning: 'the easiest wins', example: 'Let us start with the low-hanging fruit.', note: '쉬운 것부터 하자는 뜻입니다' },
           { en: 'cut corners', ko: '대충 넘어가다', meaning: 'to skip steps to save time', example: 'We cannot cut corners on testing.', note: '거의 항상 부정문으로 씁니다' },
           { en: 'circle back', ko: '나중에 다시 논의하다', meaning: 'to return to a topic later', example: 'Let us circle back after the release.', note: '구동사로도, 동사로도 익혀 두세요' },
-          { en: 'on my radar', ko: '신경 쓰고 있는', meaning: 'something I am tracking', example: 'That risk is on my radar.', note: '괜찮다기보다 보고 있다는 뜻입니다' }
+          { en: 'on my radar', ko: '신경 쓰고 있는', meaning: 'something I am tracking', example: 'That risk is on my radar.', note: '괜찮다기보다 보고 있다는 뜻입니다' },
+          { en: 'back to the drawing board', ko: '처음부터 다시', meaning: 'to start again after a failure', example: 'The test failed, so it is back to the drawing board.', note: '설계 도면으로 돌아간다는 이미지에서 온 표현입니다' }
+        ]
+      },
+
+      /* 6-2. 자연스러운 표현 */
+      {
+        id: 'work-natural',
+        kind: 'natural',
+        level: 'B1',
+        title: { ko: '자연스러운 표현 — 요청을 부드럽게', en: 'Natural English — softening a request' },
+        intro: {
+          ko: '같은 부탁도 이렇게 주고받으면 부담이 줄어듭니다. 짧은 확신과 확인 질문의 조합입니다.',
+          en: 'The same request lands lighter in this shape — short reassurance plus a checking question.'
+        },
+        dialogue: [
+          { who: 'Manager', en: 'Could you take a look at this before the meeting?', ko: '회의 전에 이것 좀 봐 주시겠어요?' },
+          { who: 'You', en: 'Sure. Would you like it back today or tomorrow morning?', ko: '그럼요. 오늘 드릴까요, 내일 오전에 드릴까요?' },
+          { who: 'Manager', en: 'Tomorrow morning is fine. There is no rush.', ko: '내일 오전이면 됩니다. 급하지 않습니다.' },
+          { who: 'You', en: 'Understood. I will send it over before ten.', ko: '알겠습니다. 열 시 전에 보내 드리겠습니다.' },
+          { who: 'Manager', en: 'And could you copy the sales team when you do?', ko: '그때 영업 팀도 참조로 넣어 주시겠어요?' },
+          { who: 'You', en: 'Of course. I will add them to the reply.', ko: '물론이죠. 답장에 추가하겠습니다.' }
+        ],
+        items: [
+          { en: 'Would you like it back today?', ko: '오늘 드릴까요?', meaning: 'when do you need it returned', example: 'Would you like it back today or tomorrow?', note: '기한을 먼저 정하면 오해가 줄어듭니다' },
+          { en: 'There is no rush.', ko: '급하지 않습니다.', meaning: 'it is not urgent', example: 'No rush, tomorrow is fine.', note: '상대의 부담을 덜어 줄 때 씁니다' },
+          { en: 'I will send it over before ten.', ko: '열 시 전에 보내 드리겠습니다.', meaning: 'I will email it before ten', example: 'I will send the file over tonight.', note: 'send over는 메일로 보내다는 회사 표현입니다' },
+          { en: 'Understood.', ko: '알겠습니다.', meaning: 'I understand and will do it', example: 'Understood, I will fix it today.', note: 'OK보다 업무에 어울리는 간결한 답입니다' },
+          { en: 'Could you copy the sales team?', ko: '영업 팀도 참조로 넣어 주시겠어요?', meaning: 'please add them to the email', example: 'Could you copy me on the reply?', note: '참조로 넣다는 말로 copy를 씁니다' },
+          { en: 'That works for me.', ko: '저는 괜찮습니다.', meaning: 'that timing suits me', example: 'Two o clock works for me.', note: '일정 조율에서 자주 쓰는 동의 표현입니다' }
         ]
       },
 
@@ -1579,7 +1739,7 @@ var MAGAZINE_WEEKS = [
         id: 'work-listening',
         kind: 'listening',
         level: 'B1',
-        title: { ko: '듣기·받아쓰기 — 업무 문장 8개', en: 'Listening and dictation — eight work sentences' },
+        title: { ko: '듣기·받아쓰기 — 업무 문장 10개', en: 'Listening and dictation — ten work sentences' },
         intro: {
           ko: '실제 회의에서 그대로 나오는 문장입니다. 들리는 대로 적어 보세요.',
           en: 'These come up word for word in real meetings. Write what you hear.'
@@ -1592,7 +1752,9 @@ var MAGAZINE_WEEKS = [
           { en: 'Both files are in the shared folder now.', ko: '두 파일 모두 지금 공유 폴더에 있습니다.' },
           { en: 'I have pushed the deadline to Friday afternoon.', ko: '마감을 금요일 오후로 미뤄 두었습니다.' },
           { en: 'Could you flag anything that looks risky?', ko: '위험해 보이는 부분이 있으면 알려 주시겠어요?' },
-          { en: 'Thanks for the heads-up, I will update the plan.', ko: '미리 알려 주셔서 감사합니다, 계획을 수정하겠습니다.' }
+          { en: 'Thanks for the heads-up, I will update the plan.', ko: '미리 알려 주셔서 감사합니다, 계획을 수정하겠습니다.' },
+          { en: 'Let me pull up the numbers on my screen.', ko: '제 화면에서 수치를 띄워 보겠습니다.' },
+          { en: 'We are running five minutes behind schedule.', ko: '일정보다 오 분 늦어지고 있습니다.' }
         ],
         items: [
           { en: 'Just to confirm, ...', ko: '확인차 말씀드리면', note: '통화·메일 모두에서 재확인할 때 씁니다' },
@@ -1634,7 +1796,8 @@ var MAGAZINE_WEEKS = [
           { ko: '보내는 사람이 시간을 준 이유는 무엇인가요?', en: 'Why does the sender leave time before anything goes out?' },
           { ko: '도입부를 그대로 둬도 된다고 밝힌 이유는 무엇일까요?', en: 'Why does the sender say the opening does not need reworking?' },
           { ko: '이 메일을 두 줄로 줄인다면 무엇을 남기겠어요?', en: 'If you cut this email to two lines, what would you keep?' },
-          { ko: '답장에 반드시 들어가야 할 정보 두 가지는 무엇인가요?', en: 'Which two pieces of information must your reply contain?' }
+          { ko: '답장에 반드시 들어가야 할 정보 두 가지는 무엇인가요?', en: 'Which two pieces of information must your reply contain?' },
+          { ko: '이 메일에서 고객에게 공유된 것과 공유되지 않은 것을 구분해 보세요.', en: 'Work out what has and has not been shared with the client.' }
         ]
       },
 
@@ -1643,7 +1806,7 @@ var MAGAZINE_WEEKS = [
         id: 'work-discussion',
         kind: 'discussion',
         level: 'B1',
-        title: { ko: '토론 — 일과 영어에 대한 8가지 질문', en: 'Discussion — eight questions about work and English' },
+        title: { ko: '토론 — 일과 영어에 대한 10가지 질문', en: 'Discussion — ten questions about work and English' },
         questions: [
           { ko: '영어 회의에서 가장 말하기 어려운 순간은 언제인가요?', en: 'When is speaking up hardest for you in an English meeting?' },
           { ko: '정중함과 솔직함 중 어느 쪽이 더 어렵나요?', en: 'Which is harder for you, being polite or being direct?' },
@@ -1652,7 +1815,9 @@ var MAGAZINE_WEEKS = [
           { ko: '업무 영어를 늘리는 현실적인 방법은 무엇일까요?', en: 'What is a realistic way to grow your work English?' },
           { ko: '영어 메일을 쓰고 나서 다시 읽고 고치는 편인가요?', en: 'Do you reread and edit your English emails before sending?' },
           { ko: '회의에서 한 번도 말하지 못하고 끝난 적이 있다면, 무엇이 막았나요?', en: 'If you have left a meeting without speaking, what stopped you?' },
-          { ko: '내일 바로 써 볼 문장 하나를 이번 주에서 고른다면 무엇인가요?', en: 'Which single line from this week would you use tomorrow?' }
+          { ko: '내일 바로 써 볼 문장 하나를 이번 주에서 고른다면 무엇인가요?', en: 'Which single line from this week would you use tomorrow?' },
+          { ko: '동료에게 영어로 부탁할 때 어느 표현을 가장 자주 쓰나요?', en: 'Which request pattern do you use most with colleagues in English?' },
+          { ko: '영어 메일을 쓰는 시간을 절반으로 줄인다면 무엇을 바꾸겠어요?', en: 'What would you change to write English emails in half the time?' }
         ],
         bullets: [
           { en: 'To open a meeting — Shall we start with the first item?', ko: '회의를 열 때 — Shall we start with the first item?' },
@@ -1703,7 +1868,7 @@ var MAGAZINE_WEEKS = [
         id: 'work-quiz',
         kind: 'quiz',
         level: 'B1',
-        title: { ko: '확인 문제 — 12문항', en: 'Quiz — twelve questions' },
+        title: { ko: '확인 문제 — 16문항', en: 'Quiz — sixteen questions' },
         quiz: [
           {
             q: { ko: '가장 정중한 부탁은 어느 것인가요?', en: 'Which request is the softest?' },
@@ -1817,8 +1982,76 @@ var MAGAZINE_WEEKS = [
               ko: 'run a meeting이 표준이고, set up a meeting은 회의를 잡는 것입니다.',
               en: 'You run a meeting. You set up a meeting when you arrange it.'
             }
+          },
+          {
+            q: { ko: '"회의 안건"을 영어로 하면?', en: 'What do you call the list of things to discuss?' },
+            options: ['agenda', 'attendee', 'minutes', 'bandwidth'],
+            answer: 0,
+            explain: {
+              ko: 'agenda가 안건 목록입니다. minutes는 회의록입니다.',
+              en: 'The agenda is the list. Minutes are the written record afterwards.'
+            }
+          },
+          {
+            q: { ko: '"남은 항목을 다음 주로 넘기자"는 어느 것인가요?', en: 'Which means moving the rest to next week?' },
+            options: ['carry it over', 'carry it out', 'carry it on', 'carry it up'],
+            answer: 0,
+            explain: {
+              ko: 'carry over는 다음 기간으로 넘기다이고, carry out은 실행하다입니다.',
+              en: 'Carry over means moving to the next period. Carry out means doing it.'
+            }
+          },
+          {
+            q: { ko: '"목표를 달성하다"에 맞는 연어는?', en: 'Which collocation means reaching a goal?' },
+            options: ['hit a target', 'beat a target', 'make a target', 'do a target'],
+            answer: 0,
+            explain: {
+              ko: 'hit a target 또는 reach a target만 씁니다.',
+              en: 'You hit or reach a target. The others are not used.'
+            }
+          },
+          {
+            q: { ko: '처음 만나는 고객에게 안전한 인사는?', en: 'Which greeting is safest for a client you have never met?' },
+            options: ['Hi Chris,', 'Dear Ms Park,', 'Hey there,', 'Yo,'],
+            answer: 1,
+            explain: {
+              ko: '한 번도 만난 적 없는 상대는 Dear + 직함이 안전합니다.',
+              en: 'Dear plus a title is safe for first contact.'
+            }
           }
         ]
+      },
+
+      /* 13-2. 유머 */
+      {
+        id: 'work-humor',
+        kind: 'humor',
+        level: 'B1',
+        title: { ko: '유머 — 회의에 관한 농담', en: 'Humour — a joke about meetings' },
+        intro: {
+          ko: '직장 유머는 대개 회의와 이메일에서 나옵니다. 조동사와 시제가 웃음을 만듭니다.',
+          en: 'Workplace humour is mostly about meetings and email, and it turns on modals and tenses.'
+        },
+        body: {
+          en: [
+            '**A:** "This meeting could have been an email."  **B:** "And this email could have been a chat message."',
+            'The joke works because could have been quietly claims that everyone already knew the answer. The grammar is half the joke, so say the full form, not coulda.'
+          ],
+          ko: [
+            '**A:** "이 회의는 이메일이면 됐을 텐데."  **B:** "그 이메일도 채팅 한 줄이면 됐을 텐데."',
+            'could have been이라는 형태가 "모두가 답을 알고 있었다"는 뉘앙스를 슬쩍 넣기 때문에 웃음이 납니다. 문법이 농담의 절반이므로 coulda로 줄이지 말고 풀어서 말하세요.'
+          ]
+        },
+        items: [
+          { en: 'This meeting could have been an email.', ko: '이 회의는 이메일이면 됐을 텐데.', meaning: 'the meeting was unnecessary', example: 'Another meeting that could have been an email.', note: 'could have been은 ~이면 됐을 텐데입니다' },
+          { en: 'Let us take this offline.', ko: '이건 따로 이야기하죠.', meaning: 'to stop discussing it in the meeting', example: 'Good point, let us take this offline.', note: '회의에서 논의를 끊는 정중한 표현입니다' },
+          { en: 'Per my last email.', ko: '앞서 보낸 메일에 적었듯이.', meaning: 'as I already wrote', example: 'Per my last email, the deadline is Friday.', note: '무뚝뚝한 회신에서 자주 보이는 표현입니다' },
+          { en: 'Just circling back.', ko: '다시 한번 여쭙니다.', meaning: 'a gentle reminder', example: 'Just circling back on my question below.', note: '재촉 메일의 부드러운 첫 줄입니다' }
+        ],
+        quote: {
+          ko: '직장 유머의 핵심은 과장이 아니라, 모두가 아는 사실을 정확한 문법으로 말하는 것입니다.',
+          en: 'Work humour is not exaggeration. It is saying what everyone knows in exact grammar.'
+        }
       },
 
       /* 14. 해설 노트 */
@@ -1835,7 +2068,11 @@ var MAGAZINE_WEEKS = [
           { en: '**Ask again politely** — Could you repeat the last part? is always acceptable.', ko: '**다시 묻는 것은 실례가 아닙니다** — 마지막 부분을 다시 말해 달라고 해도 됩니다.' },
           { en: '**Would you mind takes -ing** — this is the single most common request error.', ko: '**Would you mind 뒤에는 -ing** — 부탁 문장에서 가장 흔한 오류입니다.' },
           { en: '**Start formal, move down** — Hi is safe after one exchange, Dear is safe before it.', ko: '**처음에는 격식으로, 그다음 이름으로** — 한 번 주고받기 전에는 Dear가 안전합니다.' },
-          { en: '**Say the number out loud** — deadlines that are only written are the ones that get missed.', ko: '**날짜는 소리 내어 읽으세요** — 눈으로만 본 기한은 놓치기 쉬운 기한입니다.' }
+          { en: '**Say the number out loud** — deadlines that are only written are the ones that get missed.', ko: '**날짜는 소리 내어 읽으세요** — 눈으로만 본 기한은 놓치기 쉬운 기한입니다.' },
+          { en: '**Agenda is the list, minutes are the record** — the two are never swapped.', ko: '**agenda는 안건, minutes는 회의록** — 바꿔 쓰지 않습니다.' },
+          { en: '**Hit a target, meet a deadline** — the verbs are fixed, so learn them as pairs.', ko: '**목표는 hit, 마감은 meet** — 동사가 고정이므로 짝으로 외웁니다.' },
+          { en: '**Carry over means next period** — the politest way to say something was delayed.', ko: '**carry over는 다음 기간으로** — 미뤄졌다는 뜻을 가장 정중하게 전하는 표현입니다.' },
+          { en: '**End with a falling tone** — a rising tone makes people wait for the rest of the sentence.', ko: '**문장 끝은 내림조로** — 오르막조로 끝나면 상대는 아직 말이 남은 줄 압니다.' }
         ]
       }
     ]
@@ -1854,8 +2091,8 @@ var MAGAZINE_WEEKS = [
       en: 'From airport to hotel — one issue of travel English'
     },
     summary: {
-      ko: '여행에서 실제로 쓰는 표현만 모았습니다. 학습목표, 테마 어휘 12개, 문법 1가지, 구동사 10개, 연어 8개, 발음 8개, 이디엄 8개, 대화 3장, 받아쓰기 8문장, 독해 1편과 모범 표현, 모범 답안이 있는 예약 메일 쓰기, 토론 질문 8개, 확인 문제 12개.',
-      en: 'Only the expressions you actually use on a trip: learning goals, twelve theme words, one grammar point, ten phrasal verbs, eight collocations, eight pronunciation points, eight idioms, three dialogues, eight dictation lines, one reading passage with model expressions, a booking email task with a model answer, eight discussion questions and twelve quiz items.'
+      ko: '여행에서 실제로 쓰는 표현만 모았습니다. 학습목표, 테마 어휘 16개, 문법 1가지, 구동사 12개, 연어 10개, 발음 10개, 이디엄 10개, 대화 3장, 받아쓰기 10문장, 독해 1편과 모범 표현, 모범 답안이 있는 예약 메일 쓰기, 토론 질문 10개, 확인 문제 16개.',
+      en: 'Only the expressions you actually use on a trip: learning goals, sixteen theme words, one grammar point, twelve phrasal verbs, ten collocations, ten pronunciation points, ten idioms, three dialogues, ten dictation lines, one reading passage with model expressions, a booking email task with a model answer, ten discussion questions and sixteen quiz items.'
     },
 
     sections: [
@@ -1870,7 +2107,7 @@ var MAGAZINE_WEEKS = [
           en: 'By the end of this week you should be able to do the four things below. Check them once before you read and once after.'
         },
         bullets: [
-          { en: 'Get twelve airport and hotel words and ten phrasal verbs into your mouth.', ko: '공항·호텔에서 쓰는 12단어와 구동사 10개를 입에 붙입니다.' },
+          { en: 'Get sixteen airport and hotel words and twelve phrasal verbs into your mouth.', ko: '공항·호텔에서 쓰는 16단어와 구동사 12개를 입에 붙입니다.' },
           { en: 'Choose between the present perfect and the past simple while you are speaking.', ko: '말하는 도중에 현재완료와 과거시제를 골라 씁니다.' },
           { en: 'Catch the numbers, gates and times in an announcement, and pull the key details out of a booking email.', ko: '안내 방송의 숫자·게이트·시간을 놓치지 않고, 예약 메일에서 핵심 정보를 골라냅니다.' },
           { en: 'Keep a check-in or taxi exchange going for three sentences or more.', ko: '체크인이나 택시에서 세 문장 이상 주고받습니다.' }
@@ -1886,10 +2123,10 @@ var MAGAZINE_WEEKS = [
         id: 'theme-words',
         kind: 'vocabulary',
         level: 'A2',
-        title: { ko: '테마 어휘 — 여행 필수 12단어', en: 'Theme words — twelve you need for travel' },
+        title: { ko: '테마 어휘 — 여행 필수 16단어', en: 'Theme words — sixteen you need for travel' },
         intro: {
-          ko: '이 여덟 개만 손에 익히면 여행 중 대부분의 상황을 문장으로 만들 수 있습니다.',
-          en: 'Get these eight into your hands and you can build most travel sentences.'
+          ko: '이 열여섯 개만 손에 익히면 여행 중 대부분의 상황을 문장으로 만들 수 있습니다. 뉴스와 달리 여행 어휘는 빈도가 아니라 상황에 묶여 있어서, 상황별로 덩어리째 외우는 편이 빠릅니다.',
+          en: 'Get these sixteen into your hands and you can build most travel sentences. Travel words are tied to situations rather than frequency, so learn them situation by situation.'
         },
         items: [
           { en: 'itinerary', ko: '여행 일정표', meaning: 'a plan of a journey', example: 'Do you have the itinerary?', note: '복수형은 itineraries입니다' },
@@ -1903,7 +2140,11 @@ var MAGAZINE_WEEKS = [
           { en: 'stopover', ko: '경유 체류', meaning: 'a longer stay between flights', example: 'We had a stopover of two days in Istanbul.', note: 'layover보다 길게 머무를 때 씁니다' },
           { en: 'baggage claim', ko: '수하물 찾는 곳', meaning: 'the area where bags arrive', example: 'Let us meet at baggage claim.', note: 'baggage는 셀 수 없는 명사입니다' },
           { en: 'window seat', ko: '창가 좌석', meaning: 'a seat beside the window', example: 'I would prefer a window seat.', note: '복도는 aisle, 가운데는 middle seat입니다' },
-          { en: 'jet lag', ko: '시차 피로', meaning: 'tiredness after crossing time zones', example: 'Jet lag hit me on the second day.', note: 'I am jet-lagged처럼 형용사로도 씁니다' }
+          { en: 'jet lag', ko: '시차 피로', meaning: 'tiredness after crossing time zones', example: 'Jet lag hit me on the second day.', note: 'I am jet-lagged처럼 형용사로도 씁니다' },
+          { en: 'immigration', ko: '입국 심사', meaning: 'the border check for people', example: 'We waited at immigration for an hour.', note: '사람 검사는 immigration, 물건 검사는 customs입니다' },
+          { en: 'connecting flight', ko: '환승편', meaning: 'the flight you take after the first one', example: 'Our connecting flight leaves at nine.', note: '환승 대기 시간은 layover입니다' },
+          { en: 'travel insurance', ko: '여행자 보험', meaning: 'cover for problems on a trip', example: 'Travel insurance covered the delay.', note: '보험 증서는 travel insurance policy입니다' },
+          { en: 'souvenir', ko: '기념품', meaning: 'something you bring back from a trip', example: 'I bought souvenirs for the family.', note: '발음은 수브니어에 가깝습니다' }
         ]
       },
 
@@ -1959,7 +2200,7 @@ var MAGAZINE_WEEKS = [
         id: 'travel-phrasal',
         kind: 'phrasal',
         level: 'B1',
-        title: { ko: '구동사 — 공항과 호텔에서 10개', en: 'Phrasal verbs — ten for airports and hotels' },
+        title: { ko: '구동사 — 공항과 호텔에서 12개', en: 'Phrasal verbs — twelve for airports and hotels' },
         intro: {
           ko: '안내 방송과 직원이 실제로 쓰는 동사들입니다.',
           en: 'These are the verbs in announcements and at the front desk.'
@@ -1974,7 +2215,9 @@ var MAGAZINE_WEEKS = [
           { en: 'check out', ko: '체크아웃하다', meaning: 'to leave a hotel and settle the bill', example: 'We check out at eleven.', note: '살펴보다라는 뜻도 있으니 문맥을 보세요' },
           { en: 'stop by', ko: '잠깐 들르다', meaning: 'to visit briefly on the way', example: 'Could we stop by the ticket office?', note: 'pop in보다 목적지에 가는 길에 들른다는 느낌입니다' },
           { en: 'end up', ko: '결국 ~하게 되다', meaning: 'to arrive somewhere or do something in the end', example: 'We ended up walking to the hotel.', note: '계획과 달라진 결과를 말할 때 씁니다' },
-          { en: 'take off', ko: '이륙하다', meaning: 'to leave the ground', example: 'The plane took off an hour late.', note: '벗다라는 뜻도 있습니다. 문맥으로 구분하세요' }
+          { en: 'take off', ko: '이륙하다', meaning: 'to leave the ground', example: 'The plane took off an hour late.', note: '벗다라는 뜻도 있습니다. 문맥으로 구분하세요' },
+          { en: 'see off', ko: '배웅하다', meaning: 'to go and say goodbye to someone leaving', example: 'We went to the station to see him off.', note: '떠나는 사람보다 배웅하는 사람이 씁니다' },
+          { en: 'get in', ko: '도착하다', meaning: 'to arrive, for trains and planes', example: 'Our train gets in at seven.', note: '기차·비행기 도착에 씁니다. get off는 내리는 것입니다' }
         ]
       },
 
@@ -1983,7 +2226,7 @@ var MAGAZINE_WEEKS = [
         id: 'travel-collocation',
         kind: 'collocation',
         level: 'B1',
-        title: { ko: '연어 — 여행에서 틀리기 쉬운 8쌍', en: 'Collocations — eight pairs travellers get wrong' },
+        title: { ko: '연어 — 여행에서 틀리기 쉬운 10쌍', en: 'Collocations — ten pairs travellers get wrong' },
         items: [
           { en: 'catch a flight', ko: '비행기를 타다', meaning: 'to be in time for a flight', example: 'I have to catch a flight at six.', note: 'take a flight도 쓰지만 catch가 시간 맞춰 탄다는 뉘앙스입니다' },
           { en: 'book a room', ko: '방을 예약하다', meaning: 'to reserve a room', example: 'I booked a room for three nights.', note: 'reserve a room도 맞습니다' },
@@ -1992,7 +2235,9 @@ var MAGAZINE_WEEKS = [
           { en: 'pay in cash', ko: '현금으로 내다', meaning: 'to pay with notes and coins', example: 'Do you take cards, or should I pay in cash?', note: 'by card, in cash로 전치사가 다릅니다' },
           { en: 'make a reservation', ko: '예약하다', meaning: 'to arrange in advance', example: 'I made a reservation under Kim.', note: '식당에서는 reservation, 숙소에서는 booking도 씁니다' },
           { en: 'check the luggage', ko: '짐을 부치다', meaning: 'to hand your bags to the airline', example: 'We checked the luggage at the counter.', note: 'have your bags checked도 같은 뜻입니다' },
-          { en: 'take a taxi', ko: '택시를 타다', meaning: 'to travel by taxi', example: 'Let us take a taxi from the station.', note: 'ride a taxi는 쓰지 않습니다. take 또는 get을 씁니다' }
+          { en: 'take a taxi', ko: '택시를 타다', meaning: 'to travel by taxi', example: 'Let us take a taxi from the station.', note: 'ride a taxi는 쓰지 않습니다. take 또는 get을 씁니다' },
+          { en: 'board a plane', ko: '비행기에 탑승하다', meaning: 'to get on a plane', example: 'We boarded the plane an hour early.', note: '비행기·기차는 board, 택시는 take를 씁니다' },
+          { en: 'go through customs', ko: '세관을 통과하다', meaning: 'to pass the border check for goods', example: 'We went through customs in ten minutes.', note: '통과하다는 go through로 고정입니다' }
         ]
       },
 
@@ -2014,11 +2259,14 @@ var MAGAZINE_WEEKS = [
           { en: 'The flight has been delayed by an hour.', ko: '항공편이 한 시간 지연되었습니다.', note: 'has been delayed는 수동태 현재완료입니다.' },
           { en: 'Passengers for Seoul, please proceed to gate twelve.', ko: '서울행 승객은 12번 게이트로 가 주세요.', note: 'proceed to는 방송에서 가장 자주 나오는 지시 동사입니다.' },
           { en: 'Boarding will begin in about ten minutes.', ko: '약 십 분 뒤 탑승을 시작합니다.', note: 'will begin은 약하게, ten minutes에 강세가 갑니다.' },
-          { en: 'Please keep your seatbelt fastened.', ko: '좌석벨트를 계속 매 주세요.', note: 'keep + 목적어 + 과거분사 형태입니다.' }
+          { en: 'Please keep your seatbelt fastened.', ko: '좌석벨트를 계속 매 주세요.', note: 'keep + 목적어 + 과거분사 형태입니다.' },
+          { en: 'Your baggage is now available at carousel six.', ko: '수하물은 이제 6번 회전대에서 찾을 수 있습니다.', note: 'carousel은 수하물 회전대입니다. available은 "에블"로 짧게 들립니다.' },
+          { en: 'We apologise for the delay and expect to board shortly.', ko: '지연되어 사과드리며 곧 탑승을 시작할 예정입니다.', note: 'apologise는 영국식 철자이고, shortly는 곧이라는 뜻입니다.' }
         ],
         bullets: [
           { en: 'Numbers, gates and times are stressed. Everything else is fast.', ko: '숫자·게이트·시간만 또렷합니다. 나머지는 빠르게 지나갑니다.' },
-          { en: 'Listen for the verb first: boarding, delayed, cancelled.', ko: '동사부터 들으세요. boarding, delayed, cancelled 중 무엇인지가 핵심입니다.' }
+          { en: 'Listen for the verb first: boarding, delayed, cancelled.', ko: '동사부터 들으세요. boarding, delayed, cancelled 중 무엇인지가 핵심입니다.' },
+          { en: 'Stress hits the key word: FINAL call, BOARDING pass, GATE twelve.', ko: '핵심 단어에 강세가 갑니다. FINAL call, BOARDING pass, GATE twelve.' }
         ]
       },
 
@@ -2027,7 +2275,7 @@ var MAGAZINE_WEEKS = [
         id: 'idioms',
         kind: 'idioms',
         level: 'B1',
-        title: { ko: '이디엄 — 이동과 여행의 8가지', en: 'Idioms — eight for travel and moving around' },
+        title: { ko: '이디엄 — 이동과 여행의 10가지', en: 'Idioms — ten for travel and moving around' },
         intro: {
           ko: '직역하면 뜻이 통하지 않습니다. 통째로 외우는 편이 빠릅니다.',
           en: 'Word-for-word translation will not help. Learn these as single chunks.'
@@ -2040,7 +2288,9 @@ var MAGAZINE_WEEKS = [
           { en: 'in the middle of nowhere', ko: '외딴 곳에', meaning: 'far from any town', example: 'The hotel was in the middle of nowhere.', note: '불평과 감탄 두 가지로 모두 씁니다' },
           { en: 'live out of a suitcase', ko: '여행 다니며 지내다', meaning: 'to travel constantly', example: 'I have been living out of a suitcase all month.', note: '출장이 잦은 사람에게 씁니다' },
           { en: 'a stones throw', ko: '아주 가까운 거리', meaning: 'very close by', example: 'The station is a stones throw from the hotel.', note: '원래는 돌을 던져 닿을 거리라는 뜻입니다' },
-          { en: 'call it a night', ko: '오늘은 이만 자다', meaning: 'to stop for the night', example: 'It is past midnight, let us call it a night.', note: '여행 첫날 밤에 자주 쓰는 표현입니다' }
+          { en: 'call it a night', ko: '오늘은 이만 자다', meaning: 'to stop for the night', example: 'It is past midnight, let us call it a night.', note: '여행 첫날 밤에 자주 쓰는 표현입니다' },
+          { en: 'touch down', ko: '착륙하다', meaning: 'to land', example: 'We touched down twenty minutes early.', note: '비행기 착륙에만 씁니다' },
+          { en: 'on the go', ko: '쉴 틈 없이 이동하다', meaning: 'busy moving from place to place', example: 'I have been on the go since five this morning.', note: '여행 중 쉴 틈 없는 나날을 말할 때 씁니다' }
         ],
         quote: {
           ko: '이디엄은 단어가 아니라 덩어리로 외웁니다. 직역은 도움이 안 됩니다.',
@@ -2136,7 +2386,7 @@ var MAGAZINE_WEEKS = [
         id: 'travel-listening',
         kind: 'listening',
         level: 'B1',
-        title: { ko: '듣기·받아쓰기 — 여행 문장 8개', en: 'Listening and dictation — eight travel sentences' },
+        title: { ko: '듣기·받아쓰기 — 여행 문장 10개', en: 'Listening and dictation — ten travel sentences' },
         intro: {
           ko: '공항과 호텔에서 그대로 나오는 문장입니다. 들리는 대로 적어 보세요.',
           en: 'You will hear these word for word. Type what you hear.'
@@ -2149,7 +2399,9 @@ var MAGAZINE_WEEKS = [
           { en: 'The gate has changed to twelve B, near the food court.', ko: '게이트가 푸드코트 옆 12B로 변경되었습니다.' },
           { en: 'Check-in closes forty minutes before departure.', ko: '체크인은 출발 40분 전에 마감됩니다.' },
           { en: 'We will make up the room while you are out.', ko: '외출하신 동안 방을 정리해 드리겠습니다.' },
-          { en: 'Could you leave the key at the front desk?', ko: '키를 프런트에 놓고 가 주시겠어요?' }
+          { en: 'Could you leave the key at the front desk?', ko: '키를 프런트에 놓고 가 주시겠어요?' },
+          { en: 'The meeting point is just inside the main entrance.', ko: '만남 장소는 정문 안쪽입니다.' },
+          { en: 'Please place your bag in the overhead bin above your seat.', ko: '짐을 머리 위 선반에 넣어 주세요.' }
         ],
         items: [
           { en: 'delayed by about forty minutes', ko: '약 40분 지연', meaning: 'late by roughly forty minutes', example: 'The flight was delayed by two hours.', note: 'delay 뒤에는 by가 옵니다' },
@@ -2190,7 +2442,8 @@ var MAGAZINE_WEEKS = [
           { ko: '주말에 도착한다면 아침 식사는 어떻게 해결해야 하나요?', en: 'If you arrive at the weekend, what should you do about breakfast?' },
           { ko: '늦은 밤에 도착하는 사람에게 중요한 문장은 어느 것인가요?', en: 'Which sentence matters most to a guest arriving late at night?' },
           { ko: '취소 조건을 한 문장으로 요약해 보세요.', en: 'Summarise the cancellation rule in one sentence.' },
-          { ko: '이 메일을 읽고 다시 물어봐야 할 것이 있다면 무엇인가요?', en: 'What, if anything, would you still need to ask the hotel?' }
+          { ko: '이 메일을 읽고 다시 물어봐야 할 것이 있다면 무엇인가요?', en: 'What, if anything, would you still need to ask the hotel?' },
+          { ko: '이 메일에서 확실히 정해진 것과 여전히 불확실한 것을 각각 하나씩 말해 보세요.', en: 'Name one thing the email settles and one thing it leaves unclear.' }
         ]
       },
 
@@ -2234,7 +2487,7 @@ var MAGAZINE_WEEKS = [
         id: 'group-talk',
         kind: 'discussion',
         level: 'B1',
-        title: { ko: '그룹 토크 — 여행에 대한 8가지 질문', en: 'Group talk — eight questions about travel' },
+        title: { ko: '그룹 토크 — 여행에 대한 10가지 질문', en: 'Group talk — ten questions about travel' },
         intro: {
           ko: '혼자서도 소리 내어 답해 보세요. 30초씩 말하면 충분합니다.',
           en: 'Answer out loud, even alone. Thirty seconds each is plenty.'
@@ -2247,7 +2500,9 @@ var MAGAZINE_WEEKS = [
           { ko: '여행 중에 생긴 문제를 어떻게 해결했나요?', en: 'How did you solve a problem that came up on a trip?' },
           { ko: '혼자 여행과 함께 여행 중 어느 쪽을 선호하나요?', en: 'Do you prefer travelling alone or with others?' },
           { ko: '말이 통하지 않는 곳에서 문제를 해결한 적이 있나요?', en: 'Have you ever solved a problem where nobody shared your language?' },
-          { ko: '다음 여행에서 이번 주 표현 중 어떤 것을 써 볼 건가요?', en: 'Which expression from this week will you use on your next trip?' }
+          { ko: '다음 여행에서 이번 주 표현 중 어떤 것을 써 볼 건가요?', en: 'Which expression from this week will you use on your next trip?' },
+          { ko: '여행에서 가장 잘 쓴 돈은 무엇이었나요?', en: 'What was the best money you spent on a trip?' },
+          { ko: '여행에서 익힌 습관이 일상에 남은 적이 있나요?', en: 'Has a habit from a trip ever stayed with you at home?' }
         ],
         bullets: [
           { en: 'To open a story — The first time I went there, I...', ko: '이야기를 꺼낼 때 — The first time I went there, I...' },
@@ -2293,7 +2548,7 @@ var MAGAZINE_WEEKS = [
         id: 'quiz',
         kind: 'quiz',
         level: 'B1',
-        title: { ko: '확인 문제 — 12문항', en: 'Quiz — twelve questions' },
+        title: { ko: '확인 문제 — 16문항', en: 'Quiz — sixteen questions' },
         intro: {
           ko: '보기를 고르면 바로 채점됩니다. 틀려도 괜찮습니다.',
           en: 'Pick an option and it is marked straight away.'
@@ -2399,12 +2654,48 @@ var MAGAZINE_WEEKS = [
             }
           },
           {
-            q: { ko: '필요 없는 것에 돈을 쓰다에는 알맞은 것은?', en: 'Which expression means you have been to a place at some point?' },
+            q: { ko: '여행 경험을 말하는 문장은 어느 것인가요?', en: 'Which expression means you have been to a place at some point?' },
             options: ['I went to Rome once in 2019.', 'I have been to Rome once.', 'I was going to Rome once.', 'I had been Rome once.'],
             answer: 1,
             explain: {
               ko: '시점을 말하지 않은 경험은 have been입니다. 2019를 붙이면 과거시제로 바뀝니다.',
               en: 'An experience without a date takes have been. Adding 2019 would switch the sentence to the past simple.'
+            }
+          },
+          {
+            q: { ko: '수하물 찾는 곳을 영어로 하면?', en: 'Where do you collect your bags after a flight?' },
+            options: ['baggage claim', 'lost and found', 'check-in desk', 'departure lounge'],
+            answer: 0,
+            explain: {
+              ko: 'baggage claim이 수하물 찾는 곳입니다. departure lounge는 탑승 전 대기 구역입니다.',
+              en: 'Baggage claim is where bags arrive. The departure lounge is where you wait to board.'
+            }
+          },
+          {
+            q: { ko: '빈칸에 알맞은 것은? "We ___ walking to the hotel in the end."', en: 'Which fits? "We ___ walking to the hotel in the end."' },
+            options: ['ended up', 'ended over', 'ended by', 'ended on'],
+            answer: 0,
+            explain: {
+              ko: 'end up은 결국 ~하게 되다이고, 뒤에는 -ing가 옵니다.',
+              en: 'End up means finally doing something, and it takes -ing after it.'
+            }
+          },
+          {
+            q: { ko: '올바른 연어는 어느 것인가요?', en: 'Which collocation is correct?' },
+            options: ['take a taxi', 'ride a taxi', 'move a taxi', 'go a taxi'],
+            answer: 0,
+            explain: {
+              ko: '택시는 take a taxi 또는 get a taxi로만 씁니다.',
+              en: 'You take or get a taxi. The other verbs are never used with taxi.'
+            }
+          },
+          {
+            q: { ko: '빈칸에 알맞은 것은? "I ___ never ___ alone."', en: 'Which fits? "I ___ never ___ alone."' },
+            options: ['have / flown', 'did / fly', 'was / flying', 'had / flew'],
+            answer: 0,
+            explain: {
+              ko: 'never가 들어간 경험은 현재완료이고, flown은 fly의 과거분사입니다.',
+              en: 'Never with experience takes the present perfect, and flown is the past participle of fly.'
             }
           }
         ]
@@ -2460,7 +2751,11 @@ var MAGAZINE_WEEKS = [
           { en: '**in cash, by card** — the prepositions are fixed.', ko: '**현금은 in cash, 카드는 by card** — 전치사가 고정되어 있습니다.' },
           { en: '**Aisle is silent** — the s is not pronounced at all.', ko: '**aisle의 s는 묵음** — 소리 내지 않습니다.' },
           { en: '**One question beats a gesture** — Is the tip included? is safer than guessing.', ko: '**동작보다 질문 한 마디** — 팁은 추측하지 말고 Is the tip included?로 물으세요.' },
-          { en: '**Say the numbers twice** — repeat the gate, floor and price back before you move on.', ko: '**숫자는 한 번 되풀이하세요** — 게이트·층·요금을 되받아 말하면 실수가 사라집니다.' }
+          { en: '**Say the numbers twice** — repeat the gate, floor and price back before you move on.', ko: '**숫자는 한 번 되풀이하세요** — 게이트·층·요금을 되받아 말하면 실수가 사라집니다.' },
+          { en: '**Board, take, get** — you board a plane or train, but you take a taxi and get on a bus.', ko: '**board · take · get** — 비행기·기차는 board, 택시는 take, 버스는 get on입니다.' },
+          { en: '**Immigration for people, customs for bags** — the two words are not interchangeable.', ko: '**immigration은 사람, customs는 물건** — 바꿔 쓰지 않습니다.' },
+          { en: '**get in vs get off** — the train gets in at seven, and you get off at your stop.', ko: '**get in과 get off** — 기차가 도착하면 gets in, 내가 내리면 get off입니다.' },
+          { en: '**A connecting flight is a connection** — you catch it, and you can miss it.', ko: '**환승편은 connection** — connection을 catch하기도 하고 miss하기도 합니다.' }
         ]
       }
     ]

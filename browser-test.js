@@ -301,10 +301,35 @@ const overflowProbe = `(() => {
        기준은 **목차 항목**입니다 — .issue-aside 는 index.html 에 정적으로 있어서
        그것만 보면 아직 스크립트가 돌기 전에 검사가 시작됩니다(매거진 데이터가
        커지면 렌더링이 300ms 를 넘겨 tocList 가 비어 있는 채로 잡히기도 합니다). */
-    for (let i = 0; i < 60; i++) {
-      const ready = await evalv('!!document.querySelector(".issue-aside") && !!document.querySelector("#tocList li")').catch(() => false);
-      if (ready) break;
-      await sleep(100);
+    /* 콘텐츠가 늘수록 렌더링이 느려집니다. 대기 시간을 넉넉히 두고,
+       끝내 못 기다렸으면 여기서 분명한 메시지로 실패시킵니다.
+       (그냥 진행하면 asideProbe 가 null 을 잡고 알 수 없는 에러로 죽습니다)
+       CI 처럼 여러 검사를 연달아 돌릴 때 첫 네비게이션이 간혹 멈추는 경우가 있어,
+       못 기다렸으면 한 번 다시 네비게이션한 뒤 다시 기다립니다. */
+    const rendered = async () => {
+      for (let i = 0; i < 150; i++) {
+        const ok = await evalv('!!document.querySelector(".issue-aside") && !!document.querySelector("#tocList li")').catch(() => false);
+        if (ok) return true;
+        await sleep(100);
+      }
+      return false;
+    };
+
+    let ready = await rendered();
+    if (!ready) {
+      await cdp.send('Page.navigate', { url });
+      ready = await rendered();
+    }
+    if (!ready) {
+      /* 무엇이 문제인지 알 수 있게 페이지 상태를 함께 남깁니다 */
+      const diag = await evalv(`(() => ({
+        title: document.title,
+        readyState: document.readyState,
+        data: typeof window.MAGAZINE_WEEKS,
+        tocItems: document.querySelectorAll('#tocList li').length,
+        sections: document.querySelectorAll('.m-section').length
+      }))()`).catch((e) => '진단 실패: ' + e.message);
+      throw new Error('매거진 렌더링 대기 시간 초과 — ' + w + 'x' + h + ' 에서 2회 시도했는데 목차(#tocList li)가 나오지 않았습니다 · ' + JSON.stringify(diag));
     }
     await sleep(200); /* 레이아웃 안정화 */
   };

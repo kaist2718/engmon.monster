@@ -215,7 +215,7 @@ node tools/serve.mjs --open
 ## 본문 서체 (자체 호스팅)
 
 - `assets/fonts/pretendard-variable.woff2` 는 사이트에 **실제로 나오는 글자만** 담은 Pretendard 서브셋입니다(외부 CDN 요청 없음).
-- 글자가 늘었을 때(새 주 발행 등) 다시 만듭니다:
+- 글자가 늘었을 때(새 주 발행 등) 다시 만듭니다(스모크 테스트가 서브셋 누락을 검사합니다):
 
 ```bash
 python tools/make-font-subset.py     # = node tools/font-charset.mjs + fontTools 서브셋
@@ -263,7 +263,7 @@ node smoke-test.js
 브라우저 없이 페이지 스크립트를 **실제로 실행**해 보는 테스트입니다(의존성 없음, Node만 있으면 됩니다).
 `index.html`의 인라인 스크립트 → `issues.js` → `script.js` → `magazine.js`를 최소 DOM 위에서 돌리고
 언어 전환·테마·강조색·매거진 렌더링·주 전환·52주 플랜·번역 토글·받아쓰기 채점·퀴즈 점수·복습 카드·단어장 검색까지
-클릭을 흉내 내 확인합니다. 현재 **66개 항목**을 검사합니다.
+클릭을 흉내 내 확인합니다. 현재 **67개 항목**을 검사합니다.
 
 특히 다음을 지켜줍니다.
 
@@ -300,6 +300,9 @@ node smoke-test.js
   좁은 화면(≤760px)에서 섹션 머리(`.m-head`)가 줄바꿈되는지 검사합니다.
 - **클래스 검사**: HTML과 렌더링 결과가 쓰는 클래스가 모두 `styles.css`에 있는지 검사합니다
   (새 UI를 만들고 스타일을 빠뜨리면 먼저 걸립니다).
+- **폰트 커버리지**: 사이트에 나오는 글자가 본문 서체 서브셋에 모두 들어 있는지 검사합니다.
+  새 콘텐츠로 글자가 늘면 `python tools/make-font-subset.py`를 다시 돌려야 하고,
+  빠뜨리면 그 글자만 다른 글꼴로 보이므로 이 검사가 먼저 걸립니다.
 - **문의 폼**: UTF-8 본문(`x-www-form-urlencoded`) 전송 값(`type`·`email`·`name`·`issue`·`message`·`_subject`·`source`),
   허니팟 칸이 비어 있는지, reCAPTCHA 키가 없을 때 **외부 요청이 0** 인지, 성공/실패/한도 초과(429) 문구,
   전송 후 입력값 초기화, 언어를 바꿨을 때 안내 문구가 함께 바뀌는지 확인합니다.
