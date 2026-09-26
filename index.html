@@ -55,13 +55,16 @@
 <!-- 본문 서체(Pretendard 서브셋)를 첫 페인트 전에 받아 글자 깜박임을 줄입니다.
      파일은 저장소에 함께 커밋합니다 — 만드는 도구: tools/make-font-subset.py -->
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/pretendard-variable.woff2" crossorigin />
-<link rel="stylesheet" href="styles.css?v=12" />
+<link rel="stylesheet" href="styles.css?v=13" />
 <!-- 방문 분석 (자체 호스팅) — 쿠키를 쓰지 않아 동의 배너가 필요 없습니다.
      수집 서버 주소와 도메인은 아래 태그에서만 정합니다.
      자세한 내용은 README 의 "방문 분석" 항목을 보세요. -->
 <script defer src="https://visitor-analytics-a5bp.onrender.com/analytics.js" data-domain="engmon.monster"></script>
 </head>
 <body>
+
+<!-- 키보드·화면 낭독기 사용자가 본문으로 바로 건너뛰는 링크 (Tab 을 누르면 나타남) -->
+<a class="skip-link" href="#top" data-i18n="a11y.skip">본문으로 바로가기</a>
 
 <header class="site-header" id="siteHeader">
   <div class="wrap header-inner">
@@ -105,6 +108,24 @@
     </div>
   </div>
 </header>
+
+<!-- ── 빠른 이동 (바로 가기) ──────────────────────────────────────
+     헤더 아래에 붙어 따라오는 칩 바입니다. 긴 페이지 어디에서든
+     이번 주 · 복습 · 단어장 · 플랜으로 한 번에 이동하고,
+     지금 보고 있는 화면이 어디인지 강조로 알려 줍니다(스크롤 스파이). -->
+<nav class="quick-nav" id="quickNav" aria-label="빠른 이동" data-i18n-aria-label="mag.quickNav">
+  <div class="wrap quick-nav-inner">
+    <span class="quick-nav-hint" data-i18n="mag.quickJump">바로 가기</span>
+    <div class="quick-nav-row">
+      <a class="quick-chip" href="#issue" data-i18n="mag.navIssue">이번 주</a>
+      <a class="quick-chip" href="#sections" data-i18n="mag.navSections">섹션</a>
+      <a class="quick-chip" href="#review" data-i18n="mag.navReview">복습</a>
+      <a class="quick-chip" href="#wordbook" data-i18n="mag.navWords">단어장</a>
+      <a class="quick-chip" href="#plan" data-i18n="mag.navPlan">플랜</a>
+      <a class="quick-chip" href="#next" data-i18n="mag.quickContact">알림 신청</a>
+    </div>
+  </div>
+</nav>
 
 <main id="top">
 
@@ -417,6 +438,32 @@
   </div>
 </footer>
 
+<!-- ── 모바일 하단 탭바 ──────────────────────────────────────────
+     좁은 화면(≤760px)에서만 나타나는 고정 탭바입니다. 스크롤 위치에 따라
+     지금 보고 있는 화면이 자동으로 강조되고, 누르면 그 화면으로 이동합니다. -->
+<nav class="tab-bar" id="tabBar" aria-label="하단 빠른 메뉴" data-i18n-aria-label="mag.tabNav">
+  <a class="tab-item" href="#top">
+    <span class="tab-ico" aria-hidden="true">🏠</span>
+    <span class="tab-label" data-i18n="mag.navHome">홈</span>
+  </a>
+  <a class="tab-item" href="#issue">
+    <span class="tab-ico" aria-hidden="true">📖</span>
+    <span class="tab-label" data-i18n="mag.navIssue">이번 주</span>
+  </a>
+  <a class="tab-item" href="#review">
+    <span class="tab-ico" aria-hidden="true">🔁</span>
+    <span class="tab-label" data-i18n="mag.navReview">복습</span>
+  </a>
+  <a class="tab-item" href="#wordbook">
+    <span class="tab-ico" aria-hidden="true">📔</span>
+    <span class="tab-label" data-i18n="mag.navWords">단어장</span>
+  </a>
+  <a class="tab-item" href="#plan">
+    <span class="tab-ico" aria-hidden="true">🗺️</span>
+    <span class="tab-label" data-i18n="mag.navPlan">플랜</span>
+  </a>
+</nav>
+
 <button class="to-top" id="toTop" type="button" aria-label="맨 위로" data-i18n-aria-label="top.back" hidden>
   <span aria-hidden="true">↑</span>
 </button>
@@ -424,7 +471,7 @@
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script src="issues.js?v=12"></script>
-<script src="script.js?v=14"></script>
+<script src="script.js?v=15"></script>
 <script src="magazine.js?v=11"></script>
 <!-- 서비스워커 — 오프라인 학습과 설치형 앱(PWA) 지원.
      file:// 로 열면 등록하지 않습니다(서비스워커는 http(s) 에서만 동작합니다).

@@ -44,6 +44,11 @@
       'mag.navWords': '단어장',
       'mag.navPlan': '플랜',
       'mag.navHome': '홈',
+      'mag.quickNav': '빠른 이동',
+      'mag.quickJump': '바로 가기',
+      'mag.quickContact': '알림 신청',
+      'mag.tabNav': '하단 빠른 메뉴',
+      'a11y.skip': '본문으로 바로가기',
       'mag.startReading': '읽기 시작',
       'mag.openWordbook': '단어장',
       'mag.hideKo': '번역 가리기',
@@ -257,6 +262,11 @@
       'mag.navWords': 'Wordbook',
       'mag.navPlan': 'Plan',
       'mag.navHome': 'Home',
+      'mag.quickNav': 'Quick navigation',
+      'mag.quickJump': 'Jump to',
+      'mag.quickContact': 'Get notified',
+      'mag.tabNav': 'Bottom quick menu',
+      'a11y.skip': 'Skip to content',
       'mag.startReading': 'Start reading',
       'mag.openWordbook': 'Wordbook',
       'mag.hideKo': 'Hide translation',
@@ -715,6 +725,11 @@
     on(document, 'keydown', function (e) {
       if (e.key === 'Escape') closeNav();
     });
+
+    /* 데스크톱 폭으로 돌아오면 접어 둔 메뉴가 남아 있지 않게 합니다 */
+    on(window, 'resize', function () {
+      if ((window.innerWidth || 0) > 760) closeNav();
+    });
   });
 
   /* ── 8. 문의 폼 (Formspree) ────────────────────────────────────────
@@ -1004,12 +1019,26 @@
     var toTop = $('toTop');
     var nav = $('nav');
     var navLinks = nav ? Array.prototype.slice.call(nav.querySelectorAll('a[href^="#"]')) : [];
-    var sections = navLinks
+
+    /* 빠른 이동 칩 바 · 모바일 하단 탭바도 헤더 메뉴와 같은 기준으로 강조합니다 */
+    var quickLinks = Array.prototype.slice.call(
+      document.querySelectorAll('.quick-nav a[href^="#"], .tab-bar a[href^="#"]'));
+    var allLinks = navLinks.concat(quickLinks);
+
+    var sections = allLinks
       .map(function (a) { return document.querySelector(a.getAttribute('href')); })
       .filter(Boolean)
       /* '홈'(#top)은 페이지 맨 위를 가리키므로 스크롤 위치와 무관합니다.
          강조 대상에 넣으면 항상 켜져서 다른 메뉴가 강조되지 않습니다. */
       .filter(function (section) { return section.id !== 'top'; });
+
+    /* 같은 화면을 가리키는 링크가 여럿이면(헤더·칩·탭바) 한 번만 씁니다 */
+    var seen = {};
+    sections = sections.filter(function (section) {
+      if (seen[section.id]) return false;
+      seen[section.id] = true;
+      return true;
+    });
 
     function syncActiveNav() {
       if (!sections.length) return;
@@ -1021,7 +1050,7 @@
         if (section.offsetTop <= pos) current = section.id;
       });
 
-      navLinks.forEach(function (a) {
+      allLinks.forEach(function (a) {
         a.classList.toggle('is-active', a.getAttribute('href') === '#' + current);
       });
     }

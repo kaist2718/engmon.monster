@@ -137,7 +137,9 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 84px;
+  /* 헤더(68px) + 빠른 이동 칩 바(~52px)가 위에 붙어 있으므로, 앵커 이동 시
+     그 높이만큼 띄워 읽던 자리가 가려지지 않게 합니다. */
+  scroll-padding-top: 132px;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -162,6 +164,24 @@ a  { color: inherit; text-decoration: none; }
 .accent { color: var(--accent); }
 
 .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 22px; }
+
+/* ── Skip link (본문으로 바로가기) ────────────────────────────────────
+   Tab 을 누르기 전에는 화면 위로 숨어 있고, 초점이 가면 나타납니다. */
+.skip-link {
+  position: fixed;
+  top: 10px; left: 12px;
+  z-index: 100;
+  padding: 11px 18px;
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-radius: 999px;
+  box-shadow: 0 14px 30px -14px rgb(var(--accent-rgb) / .8);
+  transform: translateY(-200%);
+  transition: transform .18s ease;
+}
+.skip-link:focus { transform: none; }
 
 /* ── Header ───────────────────────────────────────────────────────────── */
 .site-header {
@@ -280,6 +300,65 @@ a  { color: inherit; text-decoration: none; }
 .menu-btn[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
 .menu-btn[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
+/* ── 빠른 이동 (바로 가기 칩 바) ──────────────────────────────────────
+   헤더 아래에 붙어 따라옵니다. 긴 페이지 어디에서든 주요 화면으로 한 번에
+   이동하고, 스크롤 위치에 따라 지금 보고 있는 화면이 강조됩니다. */
+.quick-nav {
+  position: sticky;
+  top: 69px;              /* 헤더 높이(68px) + 테두리 1px */
+  z-index: 45;
+  /* 흐린 배경(backdrop-filter) 대신 반투명 배경 — 스크롤 중 렌더링 비용이
+     적어 긴 페이지에서도 스크롤이 부드럽습니다. */
+  background: var(--overlay-bg);
+  border-bottom: 1px solid var(--border);
+}
+.quick-nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.quick-nav-hint {
+  flex: none;
+  font-size: .72rem;
+  font-weight: 750;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+/* 칩 줄은 좁아지면 옆으로 스크롤됩니다(줄바꿈 대신) — 스크롤 막대 대신
+   오른쪽 끝을 흐려 "뒤에 더 있다"는 사실을 보여 줍니다(모바일 블록). */
+.quick-nav-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.quick-nav-row::-webkit-scrollbar { display: none; }
+.quick-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 6px 14px;
+  font-size: .82rem;
+  font-weight: 650;
+  white-space: nowrap;
+  color: var(--text-soft);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: color .18s ease, border-color .18s ease, background .18s ease;
+}
+.quick-chip:hover { color: var(--text); border-color: var(--accent); }
+.quick-chip.is-active {
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
 /* ── 표지 배경 광원 ───────────────────────────────────────────────────── */
 .hero-glow {
   position: absolute;
@@ -295,7 +374,7 @@ a  { color: inherit; text-decoration: none; }
 }
 .badge {
   display: inline-block;
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   padding: 6px 14px;
   font-size: .8rem;
   font-weight: 600;
@@ -308,7 +387,7 @@ a  { color: inherit; text-decoration: none; }
 .lead { font-size: clamp(1rem, 2.3vw, 1.12rem); color: var(--text-soft); max-width: 620px; }
 .lead strong { color: var(--text); }
 
-.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
 
 .btn {
   display: inline-flex;
@@ -416,7 +495,7 @@ a  { color: inherit; text-decoration: none; }
 /* ══ Magazine (issue page) ═══════════════════════════════════════════════ */
 
 /* ── 표지 ─────────────────────────────────────────────────────────────── */
-.cover { position: relative; padding: clamp(34px, 6vw, 68px) 0 clamp(24px, 4vw, 40px); overflow: hidden; }
+.cover { position: relative; padding: clamp(28px, 5vw, 56px) 0 clamp(16px, 3vw, 28px); overflow: hidden; }
 .cover-inner {
   position: relative;
   display: grid;
@@ -466,7 +545,7 @@ a  { color: inherit; text-decoration: none; }
 .cover-rule { display: block; width: 42px; height: 2px; background: var(--accent); border-radius: 2px; }
 .cover-date { font-size: .78rem; font-weight: 650; letter-spacing: .1em; color: var(--text-soft); }
 
-.cover-progress { max-width: 420px; margin: 26px 0 0; }
+.cover-progress { max-width: 420px; margin: 22px 0 0; }
 .cover-progress-head {
   display: flex;
   justify-content: space-between;
@@ -521,7 +600,7 @@ a  { color: inherit; text-decoration: none; }
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin: 26px 0 0;
+  margin: 22px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -555,7 +634,7 @@ a  { color: inherit; text-decoration: none; }
   grid-template-columns: minmax(0, 270px) minmax(0, 1fr);
   gap: clamp(28px, 4vw, 56px);
   align-items: start;
-  padding-top: clamp(24px, 4vw, 40px);
+  padding-top: clamp(18px, 3vw, 30px);
   padding-bottom: clamp(40px, 6vw, 72px);
 }
 /* 목차는 화면에 붙어 따라옵니다(sticky). 그런데 목차가 화면보다 길어지면
@@ -563,8 +642,8 @@ a  { color: inherit; text-decoration: none; }
    스크롤 상자로 만들어, 길어져도 끝까지 내려볼 수 있게 했습니다. */
 .issue-aside {
   position: sticky;
-  top: 92px;
-  max-height: calc(100vh - 116px);
+  top: 132px;                          /* 헤더 + 빠른 이동 칩 바 + 여백 */
+  max-height: calc(100vh - 156px);
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-right: 6px;
@@ -839,7 +918,7 @@ a  { color: inherit; text-decoration: none; }
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  margin: 18px 0 0;
+  margin: 14px 0 0;
   padding: 4px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -919,7 +998,7 @@ a  { color: inherit; text-decoration: none; }
 /* ── 주(week) 선택기 ──────────────────────────────────────────────────
    1년 52주를 작은 번호 칩으로 늘어놓습니다. 발행된 주는 채워지고,
    아직 구성 중인 주는 테두리만 보입니다(누르면 준비 중 안내가 뜹니다). */
-.issue-nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 24px 0 0; }
+.issue-nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 20px 0 0; }
 .week-chip {
   display: inline-flex;
   align-items: center;
@@ -1050,8 +1129,8 @@ a  { color: inherit; text-decoration: none; }
 /* ── 학습 가이드 (표지) ──────────────────────────────────────────────── */
 .guide {
   max-width: 700px;
-  margin: 30px 0 0;
-  padding: 18px 22px;
+  margin: 22px 0 0;
+  padding: 16px 20px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
@@ -1386,6 +1465,29 @@ a  { color: inherit; text-decoration: none; }
   border: 0;
 }
 
+/* ── 모바일 하단 탭바 ──────────────────────────────────────────────────
+   좁은 화면에서만 나타나는 고정 탭바입니다(엄지가 닿는 아래쪽).
+   iOS 홈 인디케이터 영역은 safe-area-inset-bottom 으로 비워 둡니다. */
+.tab-bar { display: none; }
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  color: var(--text-dim);
+  border-radius: 10px;
+  transition: color .18s ease, background .18s ease;
+}
+.tab-item.is-active { color: var(--accent); background: rgb(var(--accent-rgb) / .12); }
+.tab-ico { font-size: 1.15rem; line-height: 1.25; }
+.tab-label {
+  font-size: .68rem;
+  font-weight: 650;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
 /* ── Back to top & toast ──────────────────────────────────────────────── */
 .to-top {
   position: fixed;
@@ -1483,7 +1585,14 @@ html.reveal-ready .reveal.is-visible { opacity: 1; transform: none; }
     display: none;
   }
   .nav.is-open { display: flex; }
-  .nav a { padding: 12px 0; border-bottom: 1px solid var(--border); }
+  /* 메뉴 항목은 손가락으로 누르기 쉽도록 한 항목당 48px 이상 확보합니다 */
+  .nav a {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
   .nav a:last-of-type { border-bottom: 0; }
 
   /* 테마 선택은 좁은 화면에서 메뉴 안으로 들어갑니다 */
@@ -1497,7 +1606,51 @@ html.reveal-ready .reveal.is-visible { opacity: 1; transform: none; }
   }
   .nav-theme-label { font-size: .85rem; font-weight: 650; color: var(--text-soft); }
 
-  .to-top { right: 16px; bottom: 16px; }
+  /* 하단 탭바가 화면 아래를 차지하므로, 떠 있는 버튼·알림·본문 끝을 함께 올립니다.
+     safe-area-inset-bottom 은 iOS 홈 인디케이터 영역을 피하기 위한 여유입니다. */
+  body { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+  .to-top { right: 16px; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+  .toast { bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+
+  .tab-bar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 58;
+    display: flex;
+    gap: 2px;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+    background: var(--header-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+  }
+  .tab-item {
+    flex: 1 1 0;
+    min-height: 48px;
+    padding: 5px 2px 4px;
+    justify-content: center;
+  }
+
+  /* 빠른 이동 칩 — 좁아지면 줄바꿈 대신 옆으로 스크롤되고,
+     스크롤 막대가 안 보이므로 오른쪽 끝을 흐려 "뒤에 칩이 더 있다"를 보여 줍니다. */
+  .quick-nav-row {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+    scroll-snap-type: x proximity;
+  }
+  .quick-chip { scroll-snap-align: start; min-height: 40px; }
+
+  /* 손가락으로 누를 때 잘못 짚지 않도록 최소 터치 영역을 보장합니다(권장 44px). */
+  .btn-sm, .m-btn, .rate-opt, .week-chip { min-height: 44px; }
+  .theme-opt { width: 40px; height: 40px; }
+  .m-btn--icon { min-width: 44px; }
+  .m-bubble-play { min-width: 44px; min-height: 40px; }
+  .quiz-opt, .toc-link, .plan-week { min-height: 48px; }
+  .swatch { width: 30px; height: 30px; }
+
+  /* iOS 사파리는 입력 글자가 16px 미만이면 초점을 줄 때 화면을 확대합니다. */
+  .wb-search, .dict-input,
+  .nf-row input, .nf-row select, .nf-row textarea { font-size: 16px; }
 
   .quiz-options { grid-template-columns: 1fr; }
   .rate-set { width: 100%; justify-content: space-between; }
@@ -1557,6 +1710,7 @@ html.reveal-ready .reveal.is-visible { opacity: 1; transform: none; }
   body { font-size: 11pt; }
 
   .site-header, .site-footer, .read-bar, .to-top, .toast,
+  .quick-nav, .tab-bar, .skip-link,
   .issue-nav, .hero-actions, .rate-set, .guide .guide-steps,
   .m-tools, .m-next, .m-btn, .m-bubble-play, .m-dialogue-tools,
   .quiz-opt, .dict-actions, .wb-tools, .review-actions, .aside-tr,
