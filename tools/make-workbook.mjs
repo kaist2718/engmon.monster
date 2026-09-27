@@ -87,6 +87,7 @@ const en = (v) => {
 /* script.js 의 mag.kind.* 와 같은 문구입니다 — 새 kind 를 만들면 여기도 추가하세요. */
 const KIND_LABELS = {
   goals: '학습목표',
+  study: '학습 지도',
   vocabulary: '어휘',
   phrasal: '구동사',
   collocation: '연어',

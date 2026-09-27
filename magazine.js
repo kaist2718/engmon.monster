@@ -36,6 +36,7 @@
 
   var KIND_ICONS = {
     goals: '🎯',
+    study: '🧭',
     vocabulary: '📚',
     phrasal: '🔗',
     collocation: '🧷',
@@ -366,6 +367,51 @@
 
       holder.appendChild(btn);
     });
+  }
+
+  /* ── 이전 주 / 다음 주 이동 ──────────────────────────────────────────
+     본문을 다 읽고 나면 작은 칩을 찾지 않고도 다음 주로 넘어갈 수 있게 합니다.
+     양 끝(1주·52주)에서는 없는 쪽을 빈 자리로 남겨 단추가 튀지 않습니다. */
+  function weekNeighbor(offset) {
+    for (var i = 0; i < WEEKS.length; i++) {
+      if (WEEKS[i] === WEEK) return WEEKS[i + offset] || null;
+    }
+    return null;
+  }
+
+  function buildWeekNav() {
+    var nav = el('nav', 'week-nav');
+    nav.setAttribute('aria-label', t('mag.weekNav'));
+
+    [
+      { offset: -1, cls: 'week-nav-prev', label: t('mag.prevWeek'), arrow: '←' },
+      { offset: 1, cls: 'week-nav-next', label: t('mag.nextWeek'), arrow: '→' }
+    ].forEach(function (step) {
+      var week = weekNeighbor(step.offset);
+
+      if (!week) {
+        nav.appendChild(el('span', 'week-nav-link is-empty ' + step.cls));
+        return;
+      }
+
+      var btn = el('button', 'week-nav-link ' + step.cls);
+      btn.type = 'button';
+      btn.setAttribute('data-week', String(week.week));
+      btn.setAttribute('title', weekTip(week));
+
+      var text = el('span', 'week-nav-text');
+      text.appendChild(el('span', 'week-nav-dir', (step.offset < 0 ? step.arrow + ' ' : '') + step.label + (step.offset > 0 ? ' ' + step.arrow : '')));
+      text.appendChild(el('span', 'week-nav-title', 'W' + pad(week.week) + ' · ' + pick(week.title)));
+      btn.appendChild(text);
+
+      btn.addEventListener('click', function () {
+        setWeek(week, true);
+      });
+
+      nav.appendChild(btn);
+    });
+
+    return nav;
   }
 
   /* ── 1년 52주 플랜 (로드맵) ────────────────────────────────────────── */
@@ -1531,6 +1577,7 @@
     /* 아직 구성이 끝나지 않은 주 — 본문 대신 플랜 안내를 띄웁니다 */
     if (!isPublished(WEEK)) {
       holder.appendChild(buildPlannedNotice());
+      holder.appendChild(buildWeekNav());
       renderToc();
       applyReveal();
       return;
@@ -1539,6 +1586,9 @@
     WEEK.sections.forEach(function (section, i) {
       holder.appendChild(buildSection(section, i));
     });
+
+    /* 본문을 다 읽으면 이전 주 / 다음 주로 이어집니다 */
+    holder.appendChild(buildWeekNav());
 
     syncSaveButtons();
     syncDoneButtons();

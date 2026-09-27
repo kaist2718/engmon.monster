@@ -989,9 +989,14 @@ if (magazine) {
     assert(data.length, 'issues.js를 읽지 못했습니다');
 
     const expected = data[0].sections.length;
-    assert(content.children.length === expected,
-      '섹션 ' + content.children.length + '개 (데이터: ' + expected + '개)');
-    return expected + '개 섹션';
+    const sections = collect(content, 'm-section');
+    assert(sections.length === expected,
+      '섹션 ' + sections.length + '개 (데이터: ' + expected + '개)');
+
+    /* 본문 끝에는 이전/다음 주 이동 블록이 하나 더 붙습니다 */
+    const weekNav = collect(content, 'week-nav');
+    assert(weekNav.length === 1, '주 이동 블록 = ' + weekNav.length + '개 (1개여야 합니다)');
+    return expected + '개 섹션 + 주 이동';
   });
 
   check('표지·목차·진행률이 데이터와 맞는다', () => {
@@ -1417,7 +1422,11 @@ if (magazine) {
 
     assert(dom.byId.get('issueNumeral').textContent === '05',
       '표지 번호 = ' + dom.byId.get('issueNumeral').textContent);
-    assert(content.children.length === 1, '본문 영역 = ' + content.children.length + '개 (안내 1개여야 함)');
+    /* 준비 중 안내(m-planned)와 주 이동(week-nav)만 있어야 합니다 —
+       발행된 주의 본문 섹션이 섞이면 안 됩니다 */
+    const blocks = Array.prototype.map.call(content.children, (n) => String(n.className));
+    assert(content.children.length === 2 && /m-planned/.test(blocks[0] || '') && /week-nav/.test(blocks[1] || ''),
+      '본문 영역 = ' + content.children.length + '개 (' + blocks.join(' | ') + ') — 준비 중 안내 + 주 이동이어야 함');
     assert(joined.indexOf(t('mag.plannedTitle', 'ko')) > -1, '준비 중 안내가 없습니다');
     assert(dom.byId.get('issueProgressText').textContent === t('mag.planned', 'ko'),
       '진행률 = ' + dom.byId.get('issueProgressText').textContent);

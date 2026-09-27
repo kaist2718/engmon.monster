@@ -306,11 +306,13 @@ const overflowProbe = `(() => {
        (그냥 진행하면 asideProbe 가 null 을 잡고 알 수 없는 에러로 죽습니다)
        CI 처럼 여러 검사를 연달아 돌릴 때 첫 네비게이션이 간혹 멈추는 경우가 있어,
        못 기다렸으면 한 번 다시 네비게이션한 뒤 다시 기다립니다. */
+    /* 콘텐츠가 커질수록 첫 렌더링이 느려집니다. 기계가 느릴 때 첫 시도가
+       타임아웃으로 죽지 않도록 시도당 30초 이상 기다립니다. */
     const rendered = async () => {
-      for (let i = 0; i < 150; i++) {
+      for (let i = 0; i < 240; i++) {
         const ok = await evalv('!!document.querySelector(".issue-aside") && !!document.querySelector("#tocList li")').catch(() => false);
         if (ok) return true;
-        await sleep(100);
+        await sleep(150);
       }
       return false;
     };
@@ -346,8 +348,10 @@ const overflowProbe = `(() => {
       ' · overflow-y=' + v.overflowY);
   }
   await load(1400, 700, false);
-  await evalv('document.querySelector(".issue-aside").scrollTop = 0; window.scrollTo(0, 4000);');
-  await sleep(200);
+  /* 부드러운 스크롤(smooth)을 끄지 않으면 스크롤 애니메이션 도중에 좌표를
+     잡아 휠 이벤트가 다른 곳에 떨어집니다(플레이키의 원인). */
+  await evalv('document.documentElement.style.scrollBehavior = "auto"; document.querySelector(".issue-aside").scrollTop = 0; window.scrollTo(0, 4000);');
+  await sleep(400);
   const wheelBefore = await evalv('document.querySelector(".issue-aside").scrollTop');
   const rect = await evalv(`(() => { const b = document.querySelector('.issue-aside').getBoundingClientRect(); return { x: Math.round(b.left + b.width / 2), y: Math.round(b.top + b.height / 2) }; })()`);
   for (let i = 0; i < 14; i++) {
