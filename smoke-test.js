@@ -1163,6 +1163,49 @@ if (magazine) {
     return '꺼짐 제자리 · 켜짐 다음 섹션 · 버튼 2곳 동기화';
   });
 
+  check('퀴즈를 다 풀면 완료되고 자동 이동이 뒤따른다', () => {
+    /* 독립 인스턴스에서 — 다른 검사의 학습 기록에 섞이지 않게 */
+    const page = runPage('index.html');
+    const d = page.dom;
+
+    /* 자동 이동 켜기 */
+    const toggles = d.bySelector['[data-auto-toggle]'] || [];
+    if (toggles[0].getAttribute('aria-pressed') !== 'true') toggles[0].dispatch('click');
+
+    /* 퀴즈가 있는 섹션으로 이동합니다 */
+    const content = d.byId.get('issueContent');
+    const sections = collect(content, 'm-section');
+    const nav = collect(collect(content, 'step-bar')[0], 'step-nav');
+    let idx = sections.findIndex((s) => !s.hidden);
+    while (idx > -1 && idx < sections.length - 1 && !collect(sections[idx], 'quiz-item').length) {
+      nav[1].dispatch('click');
+      idx = sections.findIndex((s) => !s.hidden);
+    }
+    const items = idx > -1 ? collect(sections[idx], 'quiz-item') : [];
+    assert(items.length > 0, '퀴즈가 있는 섹션을 찾지 못했습니다');
+
+    /* 이동은 잠깐 뒤에 일어납니다 — 예약을 받아 뒀다가 직접 실행합니다 */
+    const timers = [];
+    page.sandbox.setTimeout = (fn) => { timers.push(fn); return timers.length; };
+
+    /* 모든 문항의 첫 보기로 — 점수와 무관하게 마지막 문항이면 완료로 봅니다 */
+    items.forEach((item) => {
+      const opts = collect(item, 'quiz-opt');
+      assert(opts.length > 1, '보기가 부족한 문항이 있습니다');
+      opts[0].dispatch('click');
+    });
+
+    /* 알림 닫기 같은 다른 예약도 잡히므로 1번 이상이면 됩니다 */
+    assert(timers.length >= 1, '이동 예약이 없습니다 (' + timers.length + '번)');
+    assert(sections[idx].hidden === false, '점수 요약을 보기 전에 이미 이동했습니다');
+
+    timers.forEach((fn) => fn()); /* 예약된 작업 실행 (알림 닫기 + 이동) */
+    const after = sections.findIndex((s) => !s.hidden);
+    assert(after === Math.min(idx + 1, sections.length - 1),
+      '퀴즈 완료 후 다음 섹션으로 넘어가지 않았습니다 (' + idx + ' → ' + after + ')');
+    return items.length + '문항 풀이 → 완료 → 예약 이동 → 다음 섹션';
+  });
+
   check('단어장 저장·복사·비우기 요소가 준비돼 있다', () => {
     ['wbList', 'wbEmpty', 'wbCopyBtn', 'wbClearBtn'].forEach((id) => {
       assert(dom.byId.get(id), '#' + id + '가 없습니다');
@@ -1227,9 +1270,10 @@ if (magazine) {
     const weeks = sandbox.MAGAZINE_WEEKS || [];
     const quarters = sandbox.MAGAZINE_QUARTERS || [];
     const list = dom.byId.get('planList');
+    const boxes = (list ? list.children : []).filter((c) => String(c.className).indexOf('plan-quarter') > -1);
 
-    assert(list && list.children.length === quarters.length,
-      '플랜 묶음 = ' + (list && list.children.length) + '개 (분기 ' + quarters.length + '개)');
+    assert(list && boxes.length === quarters.length,
+      '플랜 묶음 = ' + boxes.length + '개 (분기 ' + quarters.length + '개)');
 
     assert(dom.byId.get('planWeekCount').textContent === '52',
       '주 전체 = ' + dom.byId.get('planWeekCount').textContent);
@@ -1239,7 +1283,7 @@ if (magazine) {
     /* 분기마다 주가 들어 있고, 발행/예정 표시가 갈라져야 합니다 */
     let planned = 0;
     let published = 0;
-    list.children.forEach((quarter) => {
+    boxes.forEach((quarter) => {
       const grid = (quarter.children || []).filter((c) => c.className === 'plan-grid')[0];
       assert(grid && grid.children.length, '분기에 주가 없습니다');
       grid.children.forEach((item) => {
@@ -1251,6 +1295,38 @@ if (magazine) {
     assert(published === 4, '발행으로 표시된 주 = ' + published + '개 (4주여야 합니다)');
     assert(planned === 48, '발행 예정으로 표시된 주 = ' + planned + '개 (48주여야 합니다)');
     return '분기 ' + quarters.length + '개 · 발행 ' + published + '주 · 예정 ' + planned + '주';
+  });
+
+  check('플랜이 한 분기씩 보이고 전체 보기로 펼쳐진다', () => {
+    const list = dom.byId.get('planList');
+    const quarters = collect(list, 'plan-quarter');
+    const bar = collect(list, 'step-bar')[0];
+    assert(quarters.length === 4 && bar, '분기 ' + quarters.length + '개 · 이동 바 ' + (bar ? '있음' : '없음'));
+
+    let visible = quarters.filter((q) => !q.hidden);
+    assert(visible.length === 1, '처음에 보이는 분기 ' + visible.length + '개 (1개여야 합니다)');
+    const start = quarters.findIndex((q) => !q.hidden);
+
+    const nav = collect(bar, 'step-nav');
+    assert(nav.length === 2, '이전/다음 버튼 = ' + nav.length + '개 (2개여야 합니다)');
+
+    nav[1].dispatch('click'); /* 다음 분기 */
+    let now = quarters.findIndex((q) => !q.hidden);
+    assert(now === start + 1 && quarters.filter((q) => !q.hidden).length === 1,
+      '다음 분기로 넘어가지 않았습니다 (' + start + ' → ' + now + ')');
+
+    nav[0].dispatch('click'); /* 이전 분기 */
+    assert(quarters.findIndex((q) => !q.hidden) === start, '이전 분기로 돌아오지 않았습니다');
+
+    const view = collect(bar, 'step-view')[0];
+    view.dispatch('click'); /* 전체 보기 */
+    assert(quarters.every((q) => !q.hidden), '전체 보기에서도 숨은 분기가 있습니다');
+    assert(JSON.parse(sandbox.localStorage.getItem('monsterlab.planview')) === 'all',
+      '보기 방식이 저장되지 않았습니다');
+
+    view.dispatch('click'); /* 한 분기씩으로 되돌려 둡니다 */
+    assert(quarters.filter((q) => !q.hidden).length === 1, '한 분기씩으로 돌아오지 않았습니다');
+    return '한 분기씩 + 이전/다음 + 전체 보기 전환';
   });
 
   check('번역 가리기 토글이 상태·저장값·버튼 표시를 바꾼다', () => {
@@ -2051,7 +2127,10 @@ check('인쇄용 스타일이 있고 번역을 종이에서는 되살린다', ()
   assert(/:root\[data-tr="off"\] \.trl \{ display: block !important; \}/.test(css),
     '인쇄할 때 한국어 해설이 감춰집니다');
   assert(/break-inside: avoid/.test(css), '인쇄 시 섹션 중간에서 페이지가 끊깁니다');
-  return '인쇄 스타일 + 번역 강제 표시 + 페이지 나눔 확인';
+  assert(/\.m-section\[hidden\] \{ display: block !important; \}/.test(css)
+    && /\.plan-quarter\[hidden\] \{ display: block !important; \}/.test(css),
+    '한 섹션씩·한 분기씩 보던 상태로 인쇄하면 접힌 부분이 빠집니다');
+  return '인쇄 스타일 + 번역 강제 표시 + 페이지 나눔 + 접힌 섹션·분기 복원 확인';
 });
 
 check('스티키 목차가 화면보다 길어도 스크롤된다 (CSS 회귀)', () => {

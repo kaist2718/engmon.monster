@@ -617,18 +617,23 @@ const overflowProbe = `(() => {
   const print = await evalv(`(() => {
     const trl = document.querySelector('.m-trl');
     const secs = Array.from(document.querySelectorAll('.m-section'));
+    const quarters = Array.from(document.querySelectorAll('.plan-quarter'));
     return {
       header: getComputedStyle(document.getElementById('siteHeader')).display,
       tools: getComputedStyle(document.querySelector('.m-tools')).display,
       trl: trl ? getComputedStyle(trl).display : null,
       sections: secs.length,
       shown: secs.filter((s) => getComputedStyle(s).display !== 'none').length,
+      quarters: quarters.length,
+      quartersShown: quarters.filter((q) => getComputedStyle(q).display !== 'none').length,
     };
   })()`);
   report(print.header === 'none' && print.tools === 'none', '인쇄 시 헤더·조작 버튼 숨김', 'header=' + print.header + ' tools=' + print.tools);
   report(print.trl !== 'none', '인쇄물에는 한국어 해설 유지', 'trl=' + print.trl + ' · 섹션 ' + print.sections + '개');
   report(print.shown === print.sections, '인쇄에는 한 섹션씩 보기의 접힌 섹션까지 전부 나온다',
     '출력 ' + print.shown + ' / ' + print.sections + '개');
+  report(print.quartersShown === print.quarters, '인쇄에는 한 분기씩 보기의 접힌 분기까지 전부 나온다',
+    '출력 ' + print.quartersShown + ' / ' + print.quarters + '개');
   await cdp.send('Emulation.setEmulatedMedia', { media: '' });
 
   /* ── 6. 콘솔 ─────────────────────────────────────────────────────────── */

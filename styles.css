@@ -1753,8 +1753,9 @@ html.reveal-ready .reveal.is-visible { opacity: 1; transform: none; }
   .review-actions { width: 100%; }
   .review-actions .btn { width: 100%; }
   .m-next { width: 100%; justify-content: space-between; }
-  /* 이전/다음은 하단 탭바가 맡으므로 이동 바에서는 뺍니다 — 줄바꿈 없이 한 줄입니다 */
-  .step-bar .step-nav { display: none; }
+  /* 이전/다음은 하단 탭바가 맡으므로 이동 바에서는 뺍니다 — 줄바꿈 없이 한 줄입니다.
+     플랜의 분기 이동 바는 탭바가 없으므로 그대로 둡니다 */
+  .issue-body .step-nav { display: none; }
   .step-where { flex: 1 1 110px; }   /* 320px 에서도 한 줄이 되도록 */
   .step-view { margin-left: 0; }
 }
@@ -1812,9 +1813,10 @@ html.reveal-ready .reveal.is-visible { opacity: 1; transform: none; }
   .quiz-opt, .dict-actions, .wb-tools, .review-actions, .aside-tr,
   .section-buy, .count-pill { display: none !important; }
 
-  /* 한 섹션씩 보던 상태로 인쇄해도 종이에는 호 전체를 넣습니다 */
+  /* 한 섹션씩·한 분기씩 보던 상태로 인쇄해도 종이에는 호 전체를 넣습니다 */
   .m-section[hidden] { display: block !important; }
   .week-nav[hidden] { display: flex !important; }
+  .plan-quarter[hidden] { display: block !important; }
 
   .wrap { max-width: none; padding: 0; }
   .cover { padding: 0 0 12pt; }

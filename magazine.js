@@ -33,6 +33,7 @@
   var ISSUE_KEY = 'monsterlab.issue';
   var TR_KEY = 'monsterlab.translation';
   var AUTO_KEY = 'monsterlab.autonext';
+  var PLAN_VIEW_KEY = 'monsterlab.planview';
   var WORDS_PER_MINUTE = 120;   /* 학습자 기준 조용히 읽는 속도 */
 
   var KIND_ICONS = {
@@ -115,6 +116,12 @@
   var stepTabRefs = null;
   var weekNavNode = null;
   var readBarUpdate = null;
+
+  /* 플랜도 한 분기씩 — '한 분기씩'이 기본이고 전체 보기로 펼칠 수 있습니다 */
+  var planAll = false;
+  var planIndex = 0;
+  var planBarRefs = null;
+  var planQuarterNodes = [];
 
   var wbQuery = '';
   var reviewQueue = [];
@@ -296,9 +303,8 @@
 
   function isDone(id) { return doneSections.indexOf(id) > -1; }
 
-  function toggleDone(id) {
-    var finishing = !isDone(id);
-
+  /* 완료 상태만 바꿉니다(이동 없음) — 퀴즈 자동 이동도 같은 길을 씁니다 */
+  function setDone(id, finishing) {
     doneSections = finishing
       ? doneSections.concat([id])
       : doneSections.filter(function (x) { return x !== id; });
@@ -314,12 +320,33 @@
 
     /* 완료를 취소하는 것은 학습 활동이 아니므로 세지 않습니다 */
     if (finishing) markStudy();
+  }
+
+  function toggleDone(id) {
+    var finishing = !isDone(id);
+    setDone(id, finishing);
 
     /* 완료 후 자동 이동 옵션 — 지금 보고 있는 섹션을 완료하면 다음 섹션으로 */
     if (finishing && autoNext && isPublished(WEEK)
       && WEEK.sections[stepIndex] && WEEK.sections[stepIndex].id === id) {
       goStep(stepIndex + 1);
     }
+  }
+
+  /* 퀴즈를 다 풀면(마지막 문항 채점) — 자동 이동이 켜져 있으면 완료로 넘기고 다음 섹션으로.
+     점수 요약을 한눈에 볼 수 있도록 완료 표시는 바로, 이동은 잠깐 뒤에 합니다. */
+  function quizCompleted(sectionId) {
+    if (!autoNext || !isPublished(WEEK)) return;
+    if (!WEEK.sections[stepIndex] || WEEK.sections[stepIndex].id !== sectionId) return;
+
+    if (!isDone(sectionId)) setDone(sectionId, true);
+
+    var go = function () {
+      /* 그동안 다른 섹션으로 옮겼으면 건드리지 않습니다 */
+      if (WEEK.sections[stepIndex] && WEEK.sections[stepIndex].id === sectionId) goStep(stepIndex + 1);
+    };
+    if (typeof setTimeout === 'function') setTimeout(go, 900);
+    else go();
   }
 
   /* ── 주(week) 전환 ─────────────────────────────────────────────────── */
@@ -441,10 +468,14 @@
     if (!holder) return;
 
     holder.textContent = '';
+    planBarRefs = null;
+    planQuarterNodes = [];
     if (!WEEKS.length) return;
 
     var all = allProgress();
     var publishedCount = 0;
+
+    holder.appendChild(buildPlanBar());
 
     QUARTERS.forEach(function (quarter) {
       var weeks = WEEKS.filter(function (w) { return w.quarter === quarter.quarter; });
@@ -494,12 +525,95 @@
 
       box.appendChild(grid);
       holder.appendChild(box);
+      planQuarterNodes.push({ node: box, quarter: quarter });
     });
 
     var countEl = byId('planPublishedCount');
     var totalEl = byId('planWeekCount');
     if (countEl) countEl.textContent = String(publishedCount);
     if (totalEl) totalEl.textContent = String(WEEKS.length);
+
+    /* 지금 보고 있는 주의 분기부터 보여 줍니다 */
+    planIndex = quarterIndex();
+    applyPlanView();
+  }
+
+  /* ── 플랜 — 한 분기씩 보기 ────────────────────────────────────────── */
+  function quarterIndex() {
+    if (!WEEK) return 0;
+    for (var i = 0; i < planQuarterNodes.length; i++) {
+      if (planQuarterNodes[i].quarter && planQuarterNodes[i].quarter.quarter === WEEK.quarter) return i;
+    }
+    return 0;
+  }
+
+  function buildPlanBar() {
+    var bar = el('div', 'step-bar');
+    bar.setAttribute('role', 'group');
+    bar.setAttribute('aria-label', t('mag.planBarLabel'));
+
+    var prev = el('button', 'm-btn step-nav', '‹ ' + t('mag.prevQuarter'));
+    prev.type = 'button';
+    prev.addEventListener('click', function () { goQuarter(planIndex - 1); });
+    bar.appendChild(prev);
+
+    var where = el('div', 'step-where');
+    var count = el('span', 'step-count', '');
+    var title = el('span', 'step-title', '');
+    where.appendChild(count);
+    where.appendChild(title);
+    bar.appendChild(where);
+
+    var next = el('button', 'm-btn step-nav', t('mag.nextQuarter') + ' ›');
+    next.type = 'button';
+    next.addEventListener('click', function () { goQuarter(planIndex + 1); });
+    bar.appendChild(next);
+
+    var view = el('button', 'm-btn step-view', '');
+    view.type = 'button';
+    view.addEventListener('click', function () { setPlanMode(!planAll); });
+    bar.appendChild(view);
+
+    planBarRefs = { count: count, title: title, prev: prev, next: next, view: view };
+    return bar;
+  }
+
+  function applyPlanView() {
+    var total = planQuarterNodes.length;
+    if (!total) return;
+
+    planIndex = Math.max(0, Math.min(total - 1, planIndex));
+
+    Array.prototype.forEach.call(planQuarterNodes, function (entry, i) {
+      entry.node.hidden = planAll ? false : i !== planIndex;
+    });
+
+    if (planBarRefs) {
+      var quarter = planQuarterNodes[planIndex].quarter;
+      planBarRefs.count.textContent = (planIndex + 1) + ' / ' + total;
+      planBarRefs.title.textContent = quarter ? pick(quarter.title) : '';
+      planBarRefs.prev.disabled = planIndex <= 0;
+      planBarRefs.next.disabled = planIndex >= total - 1;
+      planBarRefs.view.textContent = planAll ? t('mag.viewQuarters') : t('mag.viewAll');
+      planBarRefs.view.setAttribute('aria-pressed', planAll ? 'true' : 'false');
+    }
+  }
+
+  function setPlanMode(all) {
+    planAll = !!all;
+    save(PLAN_VIEW_KEY, planAll ? 'all' : 'quarters');
+    applyPlanView();
+  }
+
+  function goQuarter(i) {
+    if (!planQuarterNodes.length) return;
+
+    planIndex = Math.max(0, Math.min(planQuarterNodes.length - 1, i));
+    applyPlanView();
+
+    /* 전체 보기에서는 그 분기로 스크롤 — 한 분기씩이면 그 분기가 곧 화면입니다 */
+    var node = planQuarterNodes[planIndex].node;
+    if (planAll && node.scrollIntoView) node.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   /* 발행된 주의 총 학습 시간 — 로드맵의 한 줄에 씁니다 */
@@ -1612,6 +1726,8 @@
         if (record) {
           slot.quiz[qi] = oi;      /* 되돌릴 때 쓰는 기억 */
           markStudy();
+          /* 마지막 문항까지 풀었으면 퀴즈 완료로 봅니다 */
+          if (answered >= list.length) quizCompleted(sectionId);
         }
       }
 
@@ -2372,6 +2488,7 @@
     loadProgress();
 
     viewMode = store(VIEW_KEY, 'steps') === 'all' ? 'all' : 'steps';
+    planAll = store(PLAN_VIEW_KEY, 'quarters') === 'all';
 
     /* 처음 열 위치 — 주소의 #섹션 → 이어서 볼 섹션 → 첫 섹션 순서입니다 */
     var hashId = '';
