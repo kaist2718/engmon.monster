@@ -1759,6 +1759,14 @@ html.reveal-ready .reveal.is-visible { opacity: 1; transform: none; }
   .step-view { margin-left: 0; }
 }
 
+/* 태블릿 — 한 단이 되면 목차가 본문 위에 길게(1,400px) 놓입니다.
+   2단으로 줄여 첫 섹션까지의 스크롤을 절반 가까이 줄입니다. */
+@media (min-width: 601px) and (max-width: 900px) {
+  /* grid 는 다단(column)이 되지 않으므로 블록으로 바꾼 뒤 나눕니다 */
+  .toc-list { display: block; columns: 2; column-gap: 18px; }
+  .toc-item { break-inside: avoid; margin-bottom: 2px; }
+}
+
 @media (max-width: 900px) {
   .cover-inner { grid-template-columns: 1fr; gap: 26px; }
   .cover-card {

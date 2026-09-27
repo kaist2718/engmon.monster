@@ -3,8 +3,8 @@
  "source": "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/packages/pretendard/dist/public/variable/PretendardVariable.ttf",
  "version": "v1.3.9",
  "file": "assets/fonts/pretendard-variable.woff2",
- "bytes": 159908,
- "glyphs": 908,
+ "bytes": 160396,
+ "glyphs": 909,
  "covered": [
   "20-7e",
   "b7",
@@ -83,6 +83,7 @@
   "af2c",
   "af3c",
   "afb8",
+  "afbc",
   "afc0",
   "afc8-afc9",
   "afd4",

@@ -587,6 +587,28 @@ const overflowProbe = `(() => {
   report(f.reviewCards >= 1, '복습 카드 생성', '카드 ' + f.reviewCards + '장');
   report(f.hasPrint === true && f.downloads >= 1, '인쇄 버튼 · 백업 JSON 생성', '다운로드 트리거 ' + f.downloads + '회');
 
+  /* 완료 후 자동 이동 옵션 — 켜면 완료한 섹션에서 다음으로 넘어갑니다 */
+  const auto = await evalv(`(() => {
+    const secs = Array.from(document.querySelectorAll('.m-section'));
+    const toggle = document.querySelector('[data-auto-toggle]');
+    const toggles = document.querySelectorAll('[data-auto-toggle]');
+    toggle.click(); /* 켜기 */
+    const before = secs.findIndex((s) => !s.hidden);
+    const doneBtn = secs[before].querySelector('[data-done-for]');
+    doneBtn.click();
+    if (secs.findIndex((s) => !s.hidden) === before) doneBtn.click(); /* 이미 완료였으면 다시 완료로 전환 */
+    const after = secs.findIndex((s) => !s.hidden);
+    return {
+      on: toggle.getAttribute('aria-pressed'),
+      synced: Array.from(toggles).every((b) => b.getAttribute('aria-pressed') === 'true'),
+      saved: localStorage.getItem('monsterlab.autonext'),
+      before: before, after: after
+    };
+  })()`);
+  report(auto.on === 'true' && auto.synced && auto.after === auto.before + 1,
+    '완료 후 자동 이동 옵션이 다음 섹션으로 넘긴다',
+    '켜짐=' + auto.on + ' · 버튼 동기화=' + auto.synced + ' · ' + auto.before + ' → ' + auto.after + ' · 저장=' + auto.saved);
+
   /* ── 5. 인쇄 미디어 ──────────────────────────────────────────────────── */
   console.log('\n[5] 인쇄 미디어');
   await cdp.send('Emulation.setEmulatedMedia', { media: 'print' });

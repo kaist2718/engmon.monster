@@ -32,6 +32,7 @@
   var DAILY_GOAL = 3;                  /* 하루 목표 활동 수 */
   var ISSUE_KEY = 'monsterlab.issue';
   var TR_KEY = 'monsterlab.translation';
+  var AUTO_KEY = 'monsterlab.autonext';
   var WORDS_PER_MINUTE = 120;   /* 학습자 기준 조용히 읽는 속도 */
 
   var KIND_ICONS = {
@@ -108,6 +109,7 @@
   /* 화면 모드 — 'steps': 한 섹션씩(기본) · 'all': 전체 스크롤. 선택은 저장됩니다 */
   var VIEW_KEY = 'monsterlab.view';
   var viewMode = 'steps';
+  var autoNext = false;
   var stepIndex = 0;
   var stepBarRefs = null;
   var stepTabRefs = null;
@@ -312,6 +314,12 @@
 
     /* 완료를 취소하는 것은 학습 활동이 아니므로 세지 않습니다 */
     if (finishing) markStudy();
+
+    /* 완료 후 자동 이동 옵션 — 지금 보고 있는 섹션을 완료하면 다음 섹션으로 */
+    if (finishing && autoNext && isPublished(WEEK)
+      && WEEK.sections[stepIndex] && WEEK.sections[stepIndex].id === id) {
+      goStep(stepIndex + 1);
+    }
   }
 
   /* ── 주(week) 전환 ─────────────────────────────────────────────────── */
@@ -2276,6 +2284,32 @@
     apply(stored === 'off' ? 'off' : 'on');
   }
 
+  /* ── 완료 후 자동 이동 (표지 + 목차, 버튼 2곳) ──────────────────────── */
+  function setupAutoNext() {
+    var buttons = document.querySelectorAll('[data-auto-toggle]');
+    if (!buttons.length) return;
+
+    function apply(on, persist) {
+      autoNext = !!on;
+
+      Array.prototype.forEach.call(buttons, function (btn) {
+        btn.setAttribute('aria-pressed', autoNext ? 'true' : 'false');
+        btn.classList.toggle('is-on', autoNext);
+      });
+
+      if (persist) save(AUTO_KEY, autoNext ? 'on' : 'off');
+    }
+
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.addEventListener('click', function () {
+        apply(!autoNext, true);
+        api.toast(t(autoNext ? 'mag.autoNextOn' : 'mag.autoNextOff'));
+      });
+    });
+
+    apply(store(AUTO_KEY, 'off') === 'on', false);
+  }
+
   /* ── 스크롤 진입 애니메이션 ─────────────────────────────────────────── */
   function applyReveal() {
     var reduce = window.matchMedia &&
@@ -2372,6 +2406,7 @@
     setupReadBar();
     setupRate();
     setupTranslation();
+    setupAutoNext();
 
     /* 언어가 바뀌면 그려진 문구도 다시 그립니다 (script.js가 보내는 이벤트) */
     document.addEventListener('langchange', function () {

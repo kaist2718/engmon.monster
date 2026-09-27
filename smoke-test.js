@@ -215,6 +215,12 @@ function makeDom(html, options) {
     return el;
   });
 
+  bySelector['[data-auto-toggle]'] = [...html.matchAll(/data-auto-toggle/g)].map(() => {
+    const el = makeElement('button');
+    el.setAttribute('data-auto-toggle', '1');
+    return el;
+  });
+
   bySelector['meta[name="theme-color"]'] = [makeMeta('theme-color', '#0a0e13')];
   bySelector['meta[name="description"]'] = [makeMeta('description', '')];
 
@@ -1121,6 +1127,40 @@ if (magazine) {
     prev.dispatch('click');
     assert(sections.findIndex((s) => !s.hidden) === before, '탭바 이전으로 돌아오지 않았습니다');
     return '탭바 이전/다음 이동 확인';
+  });
+
+  check('완료 후 자동 이동 옵션이 다음 섹션으로 넘긴다', () => {
+    /* 독립 인스턴스에서 — 다른 검사의 학습 기록·진행률에 섞이지 않게 */
+    const page = runPage('index.html');
+    const d = page.dom;
+    const toggles = d.bySelector['[data-auto-toggle]'] || [];
+    assert(toggles.length === 2, '자동 이동 버튼 = ' + toggles.length + '개 (표지·목차 2개여야 합니다)');
+
+    const sections = collect(d.byId.get('issueContent'), 'm-section');
+    const done0 = collectAttr(sections[0], 'data-done-for')[0];
+    const done1 = collectAttr(sections[1], 'data-done-for')[0];
+
+    /* 꺼진 상태 — 완료해도 제자리 */
+    done0.dispatch('click');
+    assert(sections[0].hidden === false, '꺼진 상태에서 이동했습니다');
+
+    /* 켜기 — 버튼 2곳 동기화 + 저장 */
+    toggles[0].dispatch('click');
+    assert(toggles[0].getAttribute('aria-pressed') === 'true' && toggles[1].getAttribute('aria-pressed') === 'true',
+      '버튼 2곳이 동기화되지 않았습니다');
+    assert(page.sandbox.localStorage.getItem('monsterlab.autonext') === '"on"', '켜짐이 저장되지 않았습니다');
+
+    /* 완료 해제 → 다시 완료하면 다음 섹션으로 */
+    done0.dispatch('click');
+    done0.dispatch('click');
+    assert(sections[1].hidden === false && sections[0].hidden === true,
+      '완료 후 다음 섹션으로 넘어가지 않았습니다');
+
+    /* 다시 끄면 제자리 */
+    toggles[1].dispatch('click');
+    done1.dispatch('click');
+    assert(sections[1].hidden === false, '꺼진 상태에서 이동했습니다');
+    return '꺼짐 제자리 · 켜짐 다음 섹션 · 버튼 2곳 동기화';
   });
 
   check('단어장 저장·복사·비우기 요소가 준비돼 있다', () => {
