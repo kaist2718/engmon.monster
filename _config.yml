@@ -1,0 +1,25 @@
+# GitHub Pages 이중 배포 방어 — 이 파일은 사이트에 배포되지 않습니다.
+# ==========================================================================
+# 이 저장소는 사이트 파일과 운영 도구(tools/ · docs/ · 검사 스크립트)가 한 루트에
+# 섞여 있습니다. 실제 배포는 .github/workflows/deploy.yml 이 _site 로 공개 목록만
+# 골라 배포합니다.
+#
+# 그런데 저장소 Settings → Pages 의 소스가 실수로 "Deploy from a branch" 로 되면
+# GitHub 가 브랜치 루트 전체를 Jekyll 로 빌드해 공개합니다(운영 도구 포함).
+# 그 상태가 되어도 운영 자료가 인터넷에 나오지 않도록, Jekyll 빌드에서 제외해 둡니다.
+# (1차 방어: Settings → Pages → Source = "GitHub Actions")
+# ==========================================================================
+exclude:
+  - tools
+  - docs
+  - .github
+  - .cache
+  - _workbook
+  - _audio
+  - node_modules
+  - package.json
+  - smoke-test.js
+  - browser-test.js
+  - README.md
+  - Gemfile
+  - Gemfile.lock

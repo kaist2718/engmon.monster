@@ -73,10 +73,8 @@ jobs:
         with:
           node-version: "22.x"
 
-      # 배포 직후에는 CDN 이 아직 앞선 파일을 돌려줄 수 있어 잠깐 기다립니다.
-      - name: 배포 반영을 잠깐 기다립니다
-        run: sleep 20
-
+      # 배포 반영은 browser-test.js 가 라이브 HTML 의 에셋 버전을 보고 직접 기다립니다.
+      # (고정 sleep 은 CDN 이 늦으면 오탐, 빠르면 허비였습니다)
       # 러너에 Chrome 이 이미 있습니다(/usr/bin/google-chrome).
       - name: 배포된 사이트를 실제 브라우저로 점검
         run: node browser-test.js --live

@@ -276,6 +276,26 @@ const overflowProbe = `(() => {
   if (LIVE) {
     url = typeof LIVE === 'string' ? LIVE : 'https://engmon.monster/';
     console.log('\n  대상: ' + url + ' (라이브)');
+
+    /* 배포 직후에는 CDN/캐시가 이전 배포본을 돌려줄 수 있습니다. 이전 배포본에 대해
+       검사하면 데이터·기능 검사가 엉뚱한 이유로 실패하므로, 이번 커밋의 index.html 이
+       부르는 스크립트 버전(?v=) 이 라이브 HTML 에 나타날 때까지 기다립니다.
+       (deploy.yml 의 잠깐 대기(sleep) 를 대체하는 확실한 확인입니다) */
+    const localIndex = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+    const marker = (localIndex.match(/src="[^"]*script\.js\?v=\d+"/) || [])[0] || null;
+    if (marker) {
+      const deadline = Date.now() + 180000;
+      let reflected = false;
+      while (Date.now() < deadline) {
+        const liveHtml = await fetch(url).then((r) => r.text()).catch(() => '');
+        if (liveHtml.indexOf(marker) > -1) { reflected = true; break; }
+        console.log('  · 라이브가 아직 이전 배포본입니다 — 배포 반영을 기다립니다…');
+        await sleep(10000);
+      }
+      if (!reflected) {
+        throw new Error('라이브가 아직 이전 배포본을 보여 줍니다 — ' + marker + ' 를 찾지 못했습니다 (' + url + '). 배포가 반영된 뒤 다시 실행하세요.');
+      }
+    }
   } else if (SITE_ROOT) {
     const root = path.resolve(__dirname, typeof SITE_ROOT === 'string' ? SITE_ROOT : '.');
     const s = await serveDir(root);
@@ -601,9 +621,11 @@ const overflowProbe = `(() => {
   const ANALYTICS_HOST = 'visitor-analytics-a5bp.onrender.com';
   const ANALYTICS_SRC = 'https://' + ANALYTICS_HOST + '/analytics.js';
   const requested = [];
-  const static_ = LIVE ? null : await serveStatic(__dirname);
-  const local = static_ ? 'http://127.0.0.1:' + static_.port : url;
-  const indexUrl = static_ ? local + '/index.html' : url;
+  /* file:// 모드에서는 분석 스크립트가 삽니다(http 로 열어야 함) — 프로젝트 루트를 잠깐 서빙합니다.
+     --site-root / --live 에서는 이미 http(s) 이므로 **검사 대상 그대로** 셉니다.
+     (예전에는 --site-root 에서도 루트 사본을 열어 배포본이 아닌 원본을 검사했습니다) */
+  const static_ = (LIVE || SITE_ROOT) ? null : await serveStatic(__dirname);
+  const indexUrl = static_ ? 'http://127.0.0.1:' + static_.port + '/index.html' : url;
   cdp.onEvent = (msg) => {
     if (msg.method !== 'Fetch.requestPaused') return;
     const params = msg.params;
@@ -615,14 +637,33 @@ const overflowProbe = `(() => {
   };
   await cdp.send('Fetch.enable', { patterns: [{ urlPattern: '*' }] });
 
-  /* (a) 페이지를 열면 수집 스크립트를 한 번만 부르는가 */
+  /* (a) 페이지를 열면 수집 스크립트를 한 번만 부르는가
+
+     두 가지가 요청 수를 어지럽히므로 정리하고 셉니다.
+     · 이전 페이지가 떠나며 보내는 체류시간 집계(/api/collect) — 빈 페이지로 먼저
+       떠나 보내게 한 뒤 세기를 시작합니다. (라이브에서 "요청 2회" 로 오검사하던 원인)
+     · 브라우저 캐시에 남은 스크립트 — 캐시에서 나오면 가로채지지 않아 실행되어
+       집계가 추가로 전송됩니다. 캐시를 끄고 검사합니다.
+
+     수집 스크립트가 살아 있으면 /api/collect 로 집계도 같은 수집 서버로 보내므로,
+     "한 번 부른다"의 기준은 스크립트 요청(analytics.js)입니다.
+     그 밖에는 스크립트의 집계 전송(/api/collect)만 허용합니다. */
+  await cdp.send('Page.navigate', { url: 'about:blank' });
+  await sleep(500);
+  await cdp.send('Network.enable');
+  await cdp.send('Network.setCacheDisabled', { cacheDisabled: true });
   requested.length = 0;
   await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
   await cdp.send('Page.navigate', { url: indexUrl });
   await sleep(1800);
   const trackerReqs = requested.filter((u) => u.indexOf(ANALYTICS_HOST) > -1);
-  report(trackerReqs.length === 1, '수집 스크립트를 한 번만 부른다',
-    '요청 ' + trackerReqs.length + '회' + (trackerReqs.length ? ': ' + trackerReqs.join(', ') : ''));
+  const scriptReqs = trackerReqs.filter((u) => /\/analytics\.js([?#]|$)/.test(u));
+  const beaconReqs = trackerReqs.filter((u) => /\/api\/collect([?#]|$)/.test(u));
+  const strayReqs = trackerReqs.filter((u) => scriptReqs.indexOf(u) === -1 && beaconReqs.indexOf(u) === -1);
+  report(scriptReqs.length === 1 && strayReqs.length === 0, '수집 스크립트를 한 번만 부른다',
+    '스크립트 ' + scriptReqs.length + '회 · 집계 ' + beaconReqs.length + '회' +
+    (strayReqs.length ? ' · 예상 밖: ' + strayReqs.join(', ') : '') +
+    (scriptReqs.length !== 1 ? ' · 전체: ' + trackerReqs.join(', ') : ''));
 
   /* (b) 태그의 주소·도메인이 맞고, 다른 도구 흔적이 없는가 */
   const trackerTag = await evalv(`(() => {

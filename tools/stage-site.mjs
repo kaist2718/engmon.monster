@@ -65,6 +65,7 @@ const NEVER_PUBLIC = [
   "tools",
   "docs",
   ".github",
+  "_config.yml",
   "_site",
   "_workbook",
   "_audio",
