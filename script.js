@@ -232,6 +232,11 @@
       'mag.weekNav': '주 사이 이동',
       'mag.prevWeek': '이전 주',
       'mag.nextWeek': '다음 주',
+      'mag.stepBarLabel': '섹션 이동',
+      'mag.stepPrev': '이전',
+      'mag.stepNext': '다음',
+      'mag.viewAll': '전체 보기',
+      'mag.viewSteps': '한 섹션씩',
 
       'mag.pageTitle': 'EngMon — 1년 52주 영어 매거진',
       'mag.pageDesc': '1년 52주 플랜으로 한 주씩 읽는 영어 학습 매거진. 주마다 한 가지 주제를 어휘·구동사·문법·발음·회화·받아쓰기·독해·확인 문제로 끝까지 파고듭니다. 브라우저 음성으로 바로 듣습니다.',
@@ -454,6 +459,11 @@
       'mag.weekNav': 'Move between weeks',
       'mag.prevWeek': 'Previous week',
       'mag.nextWeek': 'Next week',
+      'mag.stepBarLabel': 'Section navigation',
+      'mag.stepPrev': 'Prev',
+      'mag.stepNext': 'Next',
+      'mag.viewAll': 'Show all',
+      'mag.viewSteps': 'One at a time',
 
       'mag.pageTitle': 'EngMon — a 52-week English magazine',
       'mag.pageDesc': 'A weekly English magazine built as a 52-week plan. Each week digs into one topic through vocabulary, phrasal verbs, grammar, pronunciation, conversation, dictation, reading and quizzes, read alongside browser audio.',

@@ -358,6 +358,14 @@ const overflowProbe = `(() => {
 
   /* ── 1. 목차 스크롤 ──────────────────────────────────────────────────── */
   console.log('\n[1] 목차(사이드바) 스크롤 — 데스크톱');
+  /* 사이드바 붙임(sticky)은 본문이 길 때 의미가 있습니다 — 전체 보기로 펼친 뒤
+     검사합니다. (한 섹션씩 보기에서는 짧은 본문에서 스티키가 아예 안 붙습니다) */
+  await load(1400, 1080, false);
+  await evalv(`(() => {
+    const view = document.querySelector('.step-view');
+    if (view && view.getAttribute('aria-pressed') === 'false') view.click();
+    return true;
+  })()`);
   for (const h of [1080, 1000, 900, 800, 700, 600]) {
     await load(1400, h, false);
     const v = await evalv(asideProbe);
@@ -436,19 +444,49 @@ const overflowProbe = `(() => {
   const touchY = await evalv('window.scrollY');
   report(touchY > 150, '터치 스와이프로 페이지 스크롤', 'scrollY=' + Math.round(touchY));
 
+  /* 앞선 사이드바 검사가 전체 보기로 바꿔 뒀을 수 있으니 한 섹션씩으로 맞춥니다 */
+  await evalv(`(() => {
+    const view = document.querySelector('.step-view');
+    if (view && view.getAttribute('aria-pressed') === 'true') view.click();
+    return true;
+  })()`);
+
+  /* 한 섹션씩 보기(기본)에서는 목차를 누르면 스크롤 대신 그 섹션이 열립니다 */
   const jump = await evalv(`(() => {
     const links = document.querySelectorAll('#tocList a');
     const last = links[links.length - 1];
     const target = last.getAttribute('href');
     last.click();
-    const el = document.querySelector(target);
-    return { target: target, scrollY: Math.round(window.scrollY), top: el ? Math.round(el.getBoundingClientRect().top) : null, links: links.length };
+    const secs = Array.from(document.querySelectorAll('.m-section'));
+    return {
+      target: target,
+      links: links.length,
+      open: secs.filter((s) => !s.hidden).map((s) => s.id),
+      total: secs.length
+    };
   })()`);
   await sleep(900);
   const jumpAfter = await evalv('window.scrollY');
-  report(jump.links >= 10 && jumpAfter > 400,
-    '목차 마지막 항목을 누르면 해당 섹션으로 이동',
-    jump.links + '개 링크 · ' + jump.target + ' → scrollY=' + Math.round(jumpAfter));
+  report(jump.links >= 10 && jump.open.length === 1 && jump.open[0] === jump.target.replace('#', ''),
+    '목차 마지막 항목을 누르면 그 섹션만 열린다',
+    jump.links + '개 링크 · ' + jump.target + ' → 열린 섹션 ' + jump.open.join(', ') + ' · scrollY=' + Math.round(jumpAfter));
+
+  /* 전체 보기 ↔ 한 섹션씩 · ← → 키 */
+  const views = await evalv(`(() => {
+    const secs = Array.from(document.querySelectorAll('.m-section'));
+    const view = document.querySelector('.step-view');
+    view.click(); /* 전체 보기 */
+    const allOpen = secs.filter((s) => !s.hidden).length;
+    view.click(); /* 한 섹션씩 */
+    const before = secs.findIndex((s) => !s.hidden);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    const after = secs.findIndex((s) => !s.hidden);
+    return { allOpen: allOpen, total: secs.length, before: before, after: after };
+  })()`);
+  report(views.allOpen === views.total, '전체 보기에서 모든 섹션이 펼쳐진다',
+    '펼침 ' + views.allOpen + ' / ' + views.total + '개');
+  report(views.after === views.before - 1, '← → 키로 섹션이 넘어간다',
+    views.before + ' → ' + views.after + ' (한 섹션씩)');
 
   /* ── 4. 기능 ─────────────────────────────────────────────────────────── */
   console.log('\n[4] 기능');
@@ -532,15 +570,19 @@ const overflowProbe = `(() => {
   await sleep(1500);
   const print = await evalv(`(() => {
     const trl = document.querySelector('.m-trl');
+    const secs = Array.from(document.querySelectorAll('.m-section'));
     return {
       header: getComputedStyle(document.getElementById('siteHeader')).display,
       tools: getComputedStyle(document.querySelector('.m-tools')).display,
       trl: trl ? getComputedStyle(trl).display : null,
-      sections: document.querySelectorAll('.m-section').length,
+      sections: secs.length,
+      shown: secs.filter((s) => getComputedStyle(s).display !== 'none').length,
     };
   })()`);
   report(print.header === 'none' && print.tools === 'none', '인쇄 시 헤더·조작 버튼 숨김', 'header=' + print.header + ' tools=' + print.tools);
   report(print.trl !== 'none', '인쇄물에는 한국어 해설 유지', 'trl=' + print.trl + ' · 섹션 ' + print.sections + '개');
+  report(print.shown === print.sections, '인쇄에는 한 섹션씩 보기의 접힌 섹션까지 전부 나온다',
+    '출력 ' + print.shown + ' / ' + print.sections + '개');
   await cdp.send('Emulation.setEmulatedMedia', { media: '' });
 
   /* ── 6. 콘솔 ─────────────────────────────────────────────────────────── */

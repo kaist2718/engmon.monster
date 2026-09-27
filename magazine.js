@@ -105,6 +105,14 @@
   var revealObserver = null;
   var activeSectionId = null;
 
+  /* 화면 모드 — 'steps': 한 섹션씩(기본) · 'all': 전체 스크롤. 선택은 저장됩니다 */
+  var VIEW_KEY = 'monsterlab.view';
+  var viewMode = 'steps';
+  var stepIndex = 0;
+  var stepBarRefs = null;
+  var weekNavNode = null;
+  var readBarUpdate = null;
+
   var wbQuery = '';
   var reviewQueue = [];
   var reviewIndex = 0;
@@ -317,6 +325,10 @@
 
     save(ISSUE_KEY, week.slug);
     loadProgress();
+
+    /* 주를 바꾸면 이어서 볼 섹션부터 시작합니다 */
+    var startTarget = firstUnfinished();
+    stepIndex = startTarget ? sectionIndex(startTarget.id) : 0;
 
     renderCover();
     renderContent();
@@ -849,6 +861,13 @@
       var link = el('a', 'toc-link');
       link.href = '#' + section.id;
       link.setAttribute('data-toc-for', section.id);
+
+      /* 한 섹션씩 보기에서는 스크롤 대신 그 섹션만 펼칩니다 */
+      link.addEventListener('click', function (e) {
+        if (!isSteps()) return;
+        if (e && e.preventDefault) e.preventDefault();
+        goStep(i);
+      });
       link.appendChild(el('span', 'toc-icon', KIND_ICONS[section.kind] || '•'));
 
       var body = el('span', 'toc-body');
@@ -897,19 +916,171 @@
     if (!body || !fill) return;
 
     function update() {
-      var top = body.getBoundingClientRect().top + window.scrollY;
-      var height = body.offsetHeight;
-      var viewport = window.innerHeight;
-      var passed = window.scrollY + viewport * 0.35 - top;
-      var ratio = height > 0 ? passed / height : 0;
+      var ratio;
+
+      /* 한 섹션씩 보기에서는 지금 몇 번째 섹션인지가 곧 진행률입니다 */
+      if (isSteps() && stepTotal()) {
+        ratio = (stepIndex + 1) / stepTotal();
+      } else {
+        var top = body.getBoundingClientRect().top + (window.scrollY || 0);
+        var height = body.offsetHeight;
+        var viewport = window.innerHeight;
+        var passed = (window.scrollY || 0) + viewport * 0.35 - top;
+        ratio = height > 0 ? passed / height : 0;
+      }
 
       ratio = ratio < 0 ? 0 : (ratio > 1 ? 1 : ratio);
       fill.style.width = Math.round(ratio * 100) + '%';
     }
 
+    readBarUpdate = update;
     update();
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
+  }
+
+  /* ── 섹션 단위 보기 ──────────────────────────────────────────────────
+     19개 섹션을 한 스크롤에 전부 쌓으면(데스크톱 기준 4만 px) 읽기 힘듭니다.
+     기본은 한 섹션씩 보여 주고, 이동 바·목차·← → 키로 넘깁니다.
+     '전체 보기'로 바꾸면 예전처럼 한 스크롤에 전부 펼쳐집니다(선택은 저장). */
+  function isSteps() { return viewMode === 'steps'; }
+
+  function stepTotal() { return isPublished(WEEK) ? WEEK.sections.length : 0; }
+
+  function clampIndex(i) {
+    var n = stepTotal();
+    return n ? Math.max(0, Math.min(n - 1, i)) : 0;
+  }
+
+  function sectionIndex(id) {
+    if (!isPublished(WEEK)) return -1;
+    for (var i = 0; i < WEEK.sections.length; i++) {
+      if (WEEK.sections[i].id === id) return i;
+    }
+    return -1;
+  }
+
+  /* issueContent 의 직속 자식에서 섹션만 골라냅니다 — 요소 단위
+     querySelectorAll 이 빈 배열을 돌려주는 환경(smoke-test DOM)에서도 돕니다 */
+  function sectionNodes(holder) {
+    var out = [];
+    for (var i = 0; i < holder.children.length; i++) {
+      var node = holder.children[i];
+      if ((' ' + String(node.className) + ' ').indexOf(' m-section ') > -1) out.push(node);
+    }
+    return out;
+  }
+
+  function buildStepBar() {
+    var bar = el('div', 'step-bar');
+    bar.setAttribute('role', 'group');
+    bar.setAttribute('aria-label', t('mag.stepBarLabel'));
+
+    var prev = el('button', 'm-btn step-nav', '‹ ' + t('mag.stepPrev'));
+    prev.type = 'button';
+    prev.setAttribute('data-step', 'prev');
+    prev.addEventListener('click', function () { goStep(stepIndex - 1); });
+    bar.appendChild(prev);
+
+    var where = el('div', 'step-where');
+    var count = el('span', 'step-count', '');
+    var title = el('span', 'step-title', '');
+    where.appendChild(count);
+    where.appendChild(title);
+    bar.appendChild(where);
+
+    var next = el('button', 'm-btn step-nav', t('mag.stepNext') + ' ›');
+    next.type = 'button';
+    next.setAttribute('data-step', 'next');
+    next.addEventListener('click', function () { goStep(stepIndex + 1); });
+    bar.appendChild(next);
+
+    var view = el('button', 'm-btn step-view', '');
+    view.type = 'button';
+    view.setAttribute('data-step', 'view');
+    view.addEventListener('click', function () { setViewMode(isSteps() ? 'all' : 'steps'); });
+    bar.appendChild(view);
+
+    stepBarRefs = { count: count, title: title, prev: prev, next: next, view: view };
+    return bar;
+  }
+
+  function updateStepBar() {
+    var refs = stepBarRefs;
+    if (!refs) return;
+
+    var total = stepTotal();
+    var section = isPublished(WEEK) ? WEEK.sections[stepIndex] : null;
+
+    refs.count.textContent = total ? (stepIndex + 1) + ' / ' + total : '';
+    refs.title.textContent = section ? pick(section.title) : '';
+    refs.prev.disabled = stepIndex <= 0;
+    refs.next.disabled = stepIndex >= total - 1;
+    refs.view.textContent = isSteps() ? t('mag.viewAll') : t('mag.viewSteps');
+    refs.view.setAttribute('aria-pressed', isSteps() ? 'false' : 'true');
+  }
+
+  function applyViewMode() {
+    var holder = byId('issueContent');
+    if (!holder || !isPublished(WEEK)) return;
+
+    stepIndex = clampIndex(stepIndex);
+    var nodes = sectionNodes(holder);
+    var total = nodes.length;
+
+    Array.prototype.forEach.call(nodes, function (node, i) {
+      if (isSteps()) {
+        node.hidden = i !== stepIndex;
+        /* 방금 펼친 섹션은 등장 애니메이션 없이 바로 보여 줍니다 */
+        if (i === stepIndex) node.classList.add('is-visible');
+      } else {
+        node.hidden = false;
+      }
+    });
+
+    /* 주 이동 블록은 마지막 섹션에서만 — 한 섹션씩 볼 때는 매번 안 보입니다 */
+    if (weekNavNode) weekNavNode.hidden = isSteps() && stepIndex < total - 1;
+
+    if (WEEK.sections[stepIndex]) activeSectionId = WEEK.sections[stepIndex].id;
+    markActiveToc(activeSectionId);
+    updateStepBar();
+    if (readBarUpdate) readBarUpdate();
+  }
+
+  function setViewMode(mode) {
+    viewMode = mode === 'all' ? 'all' : 'steps';
+    save(VIEW_KEY, viewMode);
+    applyViewMode();
+  }
+
+  function setHash(id) {
+    try {
+      if (window.history && window.history.replaceState) window.history.replaceState(null, '', '#' + id);
+    } catch (e) { /* file:// 등에서 막히면 주소만 그대로 둡니다 */ }
+  }
+
+  function scrollToContent() {
+    var holder = byId('issueContent');
+    if (!holder || !holder.getBoundingClientRect) return;
+    var top = holder.getBoundingClientRect().top + (window.scrollY || 0) - 140;
+    window.scrollTo({ top: top < 0 ? 0 : top, behavior: 'smooth' });
+  }
+
+  function goStep(i) {
+    var total = stepTotal();
+    if (!total) return;
+
+    stepIndex = clampIndex(i);
+    var section = WEEK.sections[stepIndex];
+    applyViewMode();
+
+    if (isSteps()) {
+      scrollToContent();
+    } else {
+      var node = byId(section.id);
+      if (node && node.scrollIntoView) node.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    setHash(section.id);
   }
 
   /* ── 섹션 그리기 ────────────────────────────────────────────────────── */
@@ -1573,27 +1744,37 @@
     if (!holder) return;
 
     holder.textContent = '';
+    stepBarRefs = null;
+    weekNavNode = null;
 
     /* 아직 구성이 끝나지 않은 주 — 본문 대신 플랜 안내를 띄웁니다 */
     if (!isPublished(WEEK)) {
       holder.appendChild(buildPlannedNotice());
-      holder.appendChild(buildWeekNav());
+      weekNavNode = buildWeekNav();
+      holder.appendChild(weekNavNode);
       renderToc();
+      updateResumeButton();
       applyReveal();
       return;
     }
+
+    /* 본문 맨 위에 섹션 이동 바 — 한 섹션씩 넘기거나 전체 보기로 바꿉니다 */
+    holder.appendChild(buildStepBar());
 
     WEEK.sections.forEach(function (section, i) {
       holder.appendChild(buildSection(section, i));
     });
 
     /* 본문을 다 읽으면 이전 주 / 다음 주로 이어집니다 */
-    holder.appendChild(buildWeekNav());
+    weekNavNode = buildWeekNav();
+    holder.appendChild(weekNavNode);
 
     syncSaveButtons();
     syncDoneButtons();
     renderToc();
+    updateResumeButton();
     applyReveal();
+    applyViewMode();
     setupScrollSpy();
   }
 
@@ -2148,6 +2329,20 @@
     loadWordbook();
     loadProgress();
 
+    viewMode = store(VIEW_KEY, 'steps') === 'all' ? 'all' : 'steps';
+
+    /* 처음 열 위치 — 주소의 #섹션 → 이어서 볼 섹션 → 첫 섹션 순서입니다 */
+    var hashId = '';
+    try {
+      hashId = window.location && window.location.hash ? String(window.location.hash).slice(1) : '';
+    } catch (e) { /* location 을 못 쓰는 환경 */ }
+    var startIdx = hashId ? sectionIndex(hashId) : -1;
+    if (startIdx < 0) {
+      var initTarget = firstUnfinished();
+      startIdx = initTarget ? sectionIndex(initTarget.id) : 0;
+    }
+    stepIndex = startIdx;
+
     renderCover();
     renderContent();
     renderWordbook();
@@ -2204,6 +2399,33 @@
         var file = restoreFile.files && restoreFile.files[0];
         restoreAll(file);
         restoreFile.value = '';
+      });
+    }
+
+    /* ← → 키로 섹션 이동. 입력 중에는 건드리지 않습니다 */
+    document.addEventListener('keydown', function (e) {
+      if (!e || e.altKey || e.ctrlKey || e.metaKey || !isPublished(WEEK)) return;
+      var tag = e.target && e.target.tagName ? String(e.target.tagName).toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      if (e.target && e.target.isContentEditable) return;
+      if (e.key === 'ArrowLeft') goStep(stepIndex - 1);
+      else if (e.key === 'ArrowRight') goStep(stepIndex + 1);
+    });
+
+    /* 표지의 "읽기 시작" — 한 섹션씩 보기에서는 그 섹션을 펼칩니다 */
+    var resume = byId('resumeBtn');
+    if (resume && resume.addEventListener) {
+      resume.addEventListener('click', function (e) {
+        if (!isSteps() || !isPublished(WEEK)) return;
+        if (e && e.preventDefault) e.preventDefault();
+        var href = String(resume.getAttribute ? (resume.getAttribute('href') || '') : '')
+          + ' ' + String(resume.href || '');
+        var idx = href.indexOf('#') > -1 ? sectionIndex(href.split('#').pop().trim()) : -1;
+        if (idx < 0) {
+          var resumeTarget = firstUnfinished();
+          idx = resumeTarget ? sectionIndex(resumeTarget.id) : 0;
+        }
+        goStep(idx);
       });
     }
 

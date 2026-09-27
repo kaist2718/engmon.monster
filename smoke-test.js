@@ -1067,6 +1067,45 @@ if (magazine) {
     return '섹션 ' + before + '개 유지, 미번역 키 0개 (en → ko 복귀)';
   });
 
+  check('섹션 단위 보기에서 한 번에 한 섹션만 보인다', () => {
+    const content = dom.byId.get('issueContent');
+    const sections = collect(content, 'm-section');
+    const bar = collect(content, 'step-bar')[0];
+    assert(bar, '섹션 이동 바가 없습니다');
+
+    let visible = sections.filter((s) => !s.hidden);
+    assert(visible.length === 1 && sections[0].hidden === false,
+      '처음에 보이는 섹션 ' + visible.length + '개 (첫 섹션 1개여야 합니다)');
+
+    const nav = collect(bar, 'step-nav');
+    assert(nav.length === 2, '이전/다음 버튼 = ' + nav.length + '개 (2개여야 합니다)');
+
+    nav[1].dispatch('click'); /* 다음 */
+    visible = sections.filter((s) => !s.hidden);
+    assert(visible.length === 1 && sections[1].hidden === false && sections[0].hidden === true,
+      '다음으로 넘어가지 않았습니다');
+
+    nav[0].dispatch('click'); /* 이전 */
+    assert(sections[0].hidden === false && sections[1].hidden === true, '이전으로 돌아오지 않았습니다');
+    return '한 섹션씩 표시 + 이전/다음 이동';
+  });
+
+  check('전체 보기로 바꾸면 모든 섹션이 펼쳐진다', () => {
+    const content = dom.byId.get('issueContent');
+    const sections = collect(content, 'm-section');
+    const view = collect(collect(content, 'step-bar')[0], 'step-view')[0];
+    assert(view, '전체 보기 버튼이 없습니다');
+
+    view.dispatch('click');
+    assert(sections.every((s) => !s.hidden), '전체 보기에서도 숨은 섹션이 있습니다');
+    assert(JSON.parse(sandbox.localStorage.getItem('monsterlab.view')) === 'all',
+      '보기 방식이 저장되지 않았습니다');
+
+    view.dispatch('click'); /* 기본(한 섹션씩)으로 되돌려 둡니다 */
+    assert(sections.filter((s) => !s.hidden).length === 1, '한 섹션씩으로 돌아오지 않았습니다');
+    return '전체 보기 ↔ 한 섹션씩 · 저장 확인';
+  });
+
   check('단어장 저장·복사·비우기 요소가 준비돼 있다', () => {
     ['wbList', 'wbEmpty', 'wbCopyBtn', 'wbClearBtn'].forEach((id) => {
       assert(dom.byId.get(id), '#' + id + '가 없습니다');
