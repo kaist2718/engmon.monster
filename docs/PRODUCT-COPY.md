@@ -36,8 +36,8 @@
 
 ### 2.2 한 줄 요약 (Gumroad의 Summary / 크몽의 부제)
 
-- **ko**: `매주 한 주제를 어휘 12 · 문제 12문항 · 받아쓰기 8문장으로 끝까지 푸는 영어 워크북`
-- **en**: `One topic a week — twelve words, twelve quiz items and eight dictation lines, worked through to the end`
+- **ko**: `매주 한 주제를 어휘 16 · 문제 16문항 · 받아쓰기 10문장으로 끝까지 푸는 영어 워크북`
+- **en**: `One topic a week — sixteen words, sixteen quiz items and ten dictation lines, worked through to the end`
 
 ### 2.3 소개문 — 한국어 (크몽·Gumroad 한국어 설명용)
 
@@ -48,10 +48,11 @@
 여행 영어 · 직장 영어 · 일상 회화 · 시사 뉴스 — 발행된 주를 모두 담았습니다.
 
 ■ 분량
-· 어휘·표현 351개 (뜻·예문·한국어 해설 포함)
-· 확인 문제 48문항 (문항마다 정답 해설)
-· 받아쓰기 32문장
-· 문법 표 4개, 독해 지문 4편, 회화 12장
+· 어휘·표현 412개 (뜻·예문·한국어 해설 포함)
+· 확인 문제 64문항 (문항마다 정답 해설)
+· 받아쓰기 40문장
+· 문법 표 4개, 독해 지문 4편, 회화 11장(대사 66줄)
+· 학습 지도 4개 (교재 목차와 겹치는 지점 · 주간 반복 루틴)
 
 ■ 이 워크북에만 있는 것
 · 확인 문제·받아쓰기를 먼저 풀고, 정답·해설편으로 바로 채점
@@ -84,9 +85,10 @@ The EngMon workbook for quarter one — the paper version of the weekly English 
 
 WHAT IS IN IT
 · Travel English, work English, everyday conversation and news English — every published week.
-· 351 words and expressions, each with meaning, an example and a Korean note.
-· 48 quiz items, every one with an explanation of the answer.
-· 32 dictation sentences, 4 grammar tables, 4 reading passages and 12 dialogues.
+· 412 words and expressions, each with meaning, an example and a Korean note.
+· 64 quiz items, every one with an explanation of the answer.
+· 40 dictation sentences, 4 grammar tables, 4 reading passages and 11 dialogues.
+· Four study-route pages that link each week to a coursebook order and a weekly repeat routine.
 
 WHAT THE WORKBOOK ADDS
 · Work through the quiz and dictation first, then mark them with the separate answer key.
@@ -149,14 +151,15 @@ Ask within seven days of downloading and you get your money back.
 | 항목 | 원본(여기서 확인) | 함께 고칠 곳 |
 | --- | --- | --- |
 | 발행 주 수 | `npm test` 의 「매거진 데이터 구조」 | 이 문서 §2.3·§2.4, `MONETIZATION.md` §2, `RESEARCH.md` 3.4 |
-| 항목 수(어휘·표현) | 〃 (현재 351) | 이 문서 §2.1·§2.3·§2.4 |
-| 확인 문제 수 | 〃 (현재 48) | 〃 |
-| 받아쓰기 수 | 〃 (현재 32) | 〃 |
-| 표·독해·회화 수 | 〃 (표 4 · 독해 4 · 회화 12) | 이 문서 §2.3·§2.4 |
-| 듣기 팩 분량·용량 | `npm run audio:plan` (현재 4주 708개 · 약 22분 · 13주 약 16MB) | 이 문서 §2.3·§2.4 · `PRICING.md` §3.3 |
+| 항목 수(어휘·표현) | 〃 (현재 412) | 이 문서 §2.1·§2.3·§2.4 |
+| 확인 문제 수 | 〃 (현재 64) | 〃 |
+| 받아쓰기 수 | 〃 (현재 40) | 〃 |
+| 표·독해·회화 수 | 〃 (표 4 · 독해 4 · 회화 11 · 학습 지도 4) | 이 문서 §2.3·§2.4 |
+| 듣기 팩 분량·용량 | `npm run audio:plan` (현재 4주 836개 · 약 25분 · 13주 약 19MB) | 이 문서 §2.3·§2.4 · `PRICING.md` §3.3 |
 | 가격 | `PRICING.md` §0·§2.1 (정본) | 이 문서 §1·§2, `index.html` 의 `mag.buyPrice` (ko·en), `script.js` 의 같은 키, `MONETIZATION.md` §4, `README.md` 「수익화」 절 |
 | 할인·환불 기간 | `PRICING.md` §4·§6 | 이 문서 §2.3·§2.4·§3, `terms.html` 제3조, `privacy.html` 4항 |
 
-- 분량 기준(주당 어휘 12 · 문제 12문항 · 받아쓰기 8문장)은 `RESEARCH.md` 5.2가 정본이고,
-  `smoke-test.js` 가 그 기준을 검사합니다. 기준을 넘겨 발행하면 이 문서의 숫자만 올리면 됩니다.
+- 분량 기준(주당 어휘 16 · 확인 문제 16문항 · 받아쓰기 10문장)은 `RESEARCH.md` 5.2가 정본이고,
+  `smoke-test.js` 는 하한(어휘 12 · 문제 12문항 · 받아쓰기 8문장)으로 검사합니다.
+  기준을 넘겨 발행하면 이 문서의 숫자만 올리면 됩니다.
 - 워크북 파일은 다시 만들어야 합니다: `npm run workbook`.
