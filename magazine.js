@@ -110,6 +110,7 @@
   var viewMode = 'steps';
   var stepIndex = 0;
   var stepBarRefs = null;
+  var stepTabRefs = null;
   var weekNavNode = null;
   var readBarUpdate = null;
 
@@ -1006,18 +1007,25 @@
   }
 
   function updateStepBar() {
-    var refs = stepBarRefs;
-    if (!refs) return;
-
     var total = stepTotal();
     var section = isPublished(WEEK) ? WEEK.sections[stepIndex] : null;
+    var atStart = !total || stepIndex <= 0;
+    var atEnd = !total || stepIndex >= total - 1;
 
-    refs.count.textContent = total ? (stepIndex + 1) + ' / ' + total : '';
-    refs.title.textContent = section ? pick(section.title) : '';
-    refs.prev.disabled = stepIndex <= 0;
-    refs.next.disabled = stepIndex >= total - 1;
-    refs.view.textContent = isSteps() ? t('mag.viewAll') : t('mag.viewSteps');
-    refs.view.setAttribute('aria-pressed', isSteps() ? 'false' : 'true');
+    if (stepBarRefs) {
+      stepBarRefs.count.textContent = total ? (stepIndex + 1) + ' / ' + total : '';
+      stepBarRefs.title.textContent = section ? pick(section.title) : '';
+      stepBarRefs.view.textContent = isSteps() ? t('mag.viewAll') : t('mag.viewSteps');
+      stepBarRefs.view.setAttribute('aria-pressed', isSteps() ? 'false' : 'true');
+    }
+
+    /* 이전/다음은 이동 바와 모바일 하단 탭바에 하나씩 있습니다 — 상태를 함께 맞춥니다 */
+    var pairs = [stepBarRefs, stepTabRefs];
+    for (var i = 0; i < pairs.length; i++) {
+      if (!pairs[i]) continue;
+      if (pairs[i].prev) pairs[i].prev.disabled = atStart;
+      if (pairs[i].next) pairs[i].next.disabled = atEnd;
+    }
   }
 
   function applyViewMode() {
@@ -2342,6 +2350,15 @@
       startIdx = initTarget ? sectionIndex(initTarget.id) : 0;
     }
     stepIndex = startIdx;
+
+    /* 모바일 하단 탭바의 이전/다음 버튼을 섹션 이동에 연결합니다 */
+    stepTabRefs = { prev: byId('tabStepPrev'), next: byId('tabStepNext') };
+    if (stepTabRefs.prev && stepTabRefs.prev.addEventListener) {
+      stepTabRefs.prev.addEventListener('click', function () { goStep(stepIndex - 1); });
+    }
+    if (stepTabRefs.next && stepTabRefs.next.addEventListener) {
+      stepTabRefs.next.addEventListener('click', function () { goStep(stepIndex + 1); });
+    }
 
     renderCover();
     renderContent();

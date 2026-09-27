@@ -442,6 +442,11 @@
      좁은 화면(≤760px)에서만 나타나는 고정 탭바입니다. 스크롤 위치에 따라
      지금 보고 있는 화면이 자동으로 강조되고, 누르면 그 화면으로 이동합니다. -->
 <nav class="tab-bar" id="tabBar" aria-label="하단 빠른 메뉴" data-i18n-aria-label="mag.tabNav">
+  <!-- 이전/다음 섹션 — 모바일에서는 이동 바의 버튼 대신 탭바 양 끝에서 넘깁니다 -->
+  <button class="tab-item tab-step" id="tabStepPrev" type="button">
+    <span class="tab-ico" aria-hidden="true">‹</span>
+    <span class="tab-label" data-i18n="mag.stepPrev">이전</span>
+  </button>
   <a class="tab-item" href="#top">
     <span class="tab-ico" aria-hidden="true">🏠</span>
     <span class="tab-label" data-i18n="mag.navHome">홈</span>
@@ -462,6 +467,10 @@
     <span class="tab-ico" aria-hidden="true">🗺️</span>
     <span class="tab-label" data-i18n="mag.navPlan">플랜</span>
   </a>
+  <button class="tab-item tab-step" id="tabStepNext" type="button">
+    <span class="tab-ico" aria-hidden="true">›</span>
+    <span class="tab-label" data-i18n="mag.stepNext">다음</span>
+  </button>
 </nav>
 
 <button class="to-top" id="toTop" type="button" aria-label="맨 위로" data-i18n-aria-label="top.back" hidden>

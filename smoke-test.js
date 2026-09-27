@@ -1106,6 +1106,23 @@ if (magazine) {
     return '전체 보기 ↔ 한 섹션씩 · 저장 확인';
   });
 
+  check('모바일 하단 탭바의 이전/다음으로 섹션이 넘어간다', () => {
+    const prev = dom.byId.get('tabStepPrev');
+    const next = dom.byId.get('tabStepNext');
+    assert(prev && next, '탭바 이전/다음 버튼이 없습니다');
+
+    const sections = collect(dom.byId.get('issueContent'), 'm-section');
+    const before = sections.findIndex((s) => !s.hidden);
+
+    next.dispatch('click');
+    const after = sections.findIndex((s) => !s.hidden);
+    assert(after === before + 1, '탭바 다음으로 넘어가지 않았습니다 (' + before + ' → ' + after + ')');
+
+    prev.dispatch('click');
+    assert(sections.findIndex((s) => !s.hidden) === before, '탭바 이전으로 돌아오지 않았습니다');
+    return '탭바 이전/다음 이동 확인';
+  });
+
   check('단어장 저장·복사·비우기 요소가 준비돼 있다', () => {
     ['wbList', 'wbEmpty', 'wbCopyBtn', 'wbClearBtn'].forEach((id) => {
       assert(dom.byId.get(id), '#' + id + '가 없습니다');

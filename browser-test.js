@@ -241,6 +241,10 @@ const overflowProbe = `(() => {
     if (n.closest('.visually-hidden, .toast, [hidden], script, style')) return;
     const r = n.getBoundingClientRect();
     if (r.width <= 2 && r.height >= 16) squeezed.push(n.tagName.toLowerCase() + '.' + String(n.className).trim().split(/\s+/)[0] + ' w=' + Math.round(r.width) + ' h=' + Math.round(r.height) + ' "' + txt.slice(0, 16) + '"');
+    /* 말줄임표로 잘려 사라진 라벨도 문제입니다(좁은 화면 탭바 라벨 등) */
+    if (r.width > 2 && n.classList.contains('tab-label') && n.scrollWidth > n.clientWidth + 1) {
+      squeezed.push('tab-label 잘림 "' + txt.slice(0, 16) + '"');
+    }
   });
 
   return {
@@ -282,18 +286,20 @@ const overflowProbe = `(() => {
        부르는 스크립트 버전(?v=) 이 라이브 HTML 에 나타날 때까지 기다립니다.
        (deploy.yml 의 잠깐 대기(sleep) 를 대체하는 확실한 확인입니다) */
     const localIndex = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-    const marker = (localIndex.match(/src="[^"]*script\.js\?v=\d+"/) || [])[0] || null;
-    if (marker) {
+    /* 스크립트 하나가 아니라 에셋 참조 전체(?v=)를 기준으로 합니다 —
+       어떤 파일만 고친 푸시에서도 새 배포본을 정확히 알아봅니다 */
+    const markers = [...localIndex.matchAll(/(?:src|href)="[^"]*\?v=[\w.-]+"/g)].map((m) => m[0]);
+    if (markers.length) {
       const deadline = Date.now() + 180000;
       let reflected = false;
       while (Date.now() < deadline) {
         const liveHtml = await fetch(url).then((r) => r.text()).catch(() => '');
-        if (liveHtml.indexOf(marker) > -1) { reflected = true; break; }
+        if (markers.every((mk) => liveHtml.indexOf(mk) > -1)) { reflected = true; break; }
         console.log('  · 라이브가 아직 이전 배포본입니다 — 배포 반영을 기다립니다…');
         await sleep(10000);
       }
       if (!reflected) {
-        throw new Error('라이브가 아직 이전 배포본을 보여 줍니다 — ' + marker + ' 를 찾지 못했습니다 (' + url + '). 배포가 반영된 뒤 다시 실행하세요.');
+        throw new Error('라이브가 아직 이전 배포본을 보여 줍니다 — ' + markers.join(', ') + ' 를 찾지 못했습니다 (' + url + '). 배포가 반영된 뒤 다시 실행하세요.');
       }
     }
   } else if (SITE_ROOT) {
@@ -488,6 +494,24 @@ const overflowProbe = `(() => {
   report(views.after === views.before - 1, '← → 키로 섹션이 넘어간다',
     views.before + ' → ' + views.after + ' (한 섹션씩)');
 
+  /* 모바일 하단 탭바 양 끝의 이전/다음 */
+  const tab = await evalv(`(() => {
+    const bar = document.getElementById('tabBar');
+    const prev = document.getElementById('tabStepPrev');
+    const next = document.getElementById('tabStepNext');
+    const secs = Array.from(document.querySelectorAll('.m-section'));
+    const before = secs.findIndex((s) => !s.hidden);
+    const shown = bar ? getComputedStyle(bar).display !== 'none' : false;
+    const labelFit = Array.from(document.querySelectorAll('.tab-label'))
+      .every((l) => l.scrollWidth <= l.clientWidth + 1);
+    if (next && !next.disabled) next.click();
+    const after = secs.findIndex((s) => !s.hidden);
+    return { shown: shown, has: !!prev && !!next, before: before, after: after, labelFit: labelFit };
+  })()`);
+  report(tab.shown && tab.has && tab.after === tab.before + 1 && tab.labelFit,
+    '모바일 탭바 이전/다음으로 섹션이 넘어간다',
+    '탭바=' + tab.shown + ' · ' + tab.before + ' → ' + tab.after + ' · 라벨 잘림=' + !tab.labelFit);
+
   /* ── 4. 기능 ─────────────────────────────────────────────────────────── */
   console.log('\n[4] 기능');
   await load(1400, 900, false);
@@ -636,18 +660,21 @@ const overflowProbe = `(() => {
     fs.mkdirSync(OUT, { recursive: true });
     for (const shot of [
       { w: 1400, h: 900, y: 0, m: false, name: 'b-cover' },
-      { w: 1400, h: 700, y: 2400, m: false, name: 'b-toc' },
-      { w: 1400, h: 900, y: 7200, m: false, name: 'b-reading' },
-      { w: 1400, h: 900, y: 10000, m: false, name: 'b-review' },
+      { w: 1400, h: 900, sel: '#issueContent', m: false, name: 'b-stepbar' },
+      { w: 1400, h: 700, sel: '#sections', m: false, name: 'b-toc' },
+      { w: 1400, h: 900, sel: '#review', m: false, name: 'b-review' },
       { w: 1400, h: 900, y: 'bottom', m: false, name: 'b-footer' },
       { w: 390, h: 780, y: 0, m: true, name: 'b-mobile-top' },
-      { w: 390, h: 780, y: 2600, m: true, name: 'b-mobile-toc' },
-      { w: 390, h: 780, y: 5200, m: true, name: 'b-mobile-reading' },
+      { w: 390, h: 780, sel: '#issueContent', m: true, name: 'b-mobile-step' },
+      { w: 390, h: 780, sel: '#wordbook', m: true, name: 'b-mobile-reading' },
     ]) {
       await load(shot.w, shot.h, shot.m);
-      /* 부드러운 스크롤을 끄지 않으면 긴 페이지에서 애니메이션 도중에 찍힙니다 */
-      await evalv('document.documentElement.style.scrollBehavior = "auto"; window.scrollTo(0,' +
-        (shot.y === 'bottom' ? 'document.documentElement.scrollHeight' : shot.y) + ')');
+      /* 부드러운 스크롤을 끄지 않으면 애니메이션 도중에 찍힙니다.
+         한 섹션씩 보기라 화면은 고정 좌표가 아니라 요소 기준으로 잡습니다. */
+      await evalv('document.documentElement.style.scrollBehavior = "auto"; ' +
+        (shot.sel
+          ? '(() => { const el = document.querySelector("' + shot.sel + '"); if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 150); })()'
+          : 'window.scrollTo(0,' + (shot.y === 'bottom' ? 'document.documentElement.scrollHeight' : shot.y) + ')'));
       await sleep(900);
       const png = await cdp.send('Page.captureScreenshot', { format: 'png' });
       fs.writeFileSync(path.join(OUT, shot.name + '.png'), Buffer.from(png.data, 'base64'));
